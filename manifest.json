@@ -1,0 +1,25 @@
+{
+  "name": "Lashawn Academy Management Portal",
+  "short_name": "Lashawn Academy",
+  "description": "Driving & Computer College Management System",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B1F3A",
+  "theme_color": "#0B1F3A",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/dgfmhyebp/image/upload/v1773819105/Untitled_design-Photoroom_g5hfty.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://res.cloudinary.com/dgfmhyebp/image/upload/v1773819105/Untitled_design-Photoroom_g5hfty.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
