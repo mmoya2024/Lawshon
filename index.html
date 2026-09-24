@@ -1,33 +1,876 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dgfmhyebp/image/upload/v1773819105/Untitled_design-Photoroom_g5hfty.png" />
-    <link rel="apple-touch-icon" href="https://res.cloudinary.com/dgfmhyebp/image/upload/v1773819105/Untitled_design-Photoroom_g5hfty.png" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Lashawn Driving & Computer College | Driving Lessons & Computer Training</title>
-    <meta name="description" content="Lashawn Driving & Computer College offers professional driving lessons and computer training courses to help you build practical, real-world skills." />
-    <meta name="theme-color" content="#0f172a" />
-    <meta name="robots" content="index, follow" />
+    <title>LASHAWN ACADEMY | Management System</title>
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Lashawn Driving & Computer College" />
-    <meta property="og:description" content="Professional driving lessons and computer training courses." />
-    <meta property="og:image" content="https://res.cloudinary.com/dgfmhyebp/image/upload/v1773819105/Untitled_design-Photoroom_g5hfty.png" />
+    <meta name="description"
+          content="LASHAWN ACADEMY Driving School, Computer Training and Printing Management System">
 
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Lashawn Driving & Computer College" />
-    <meta name="twitter:description" content="Professional driving lessons and computer training courses." />
-    <meta name="twitter:image" content="https://res.cloudinary.com/dgfmhyebp/image/upload/v1773819105/Untitled_design-Photoroom_g5hfty.png" />
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
 
-    <!-- Performance: warm up connection to the image CDN -->
-    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/index.tsx"></script>
-  </body>
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">LA</div>
+
+            <div>
+                <h1>LASHAWN</h1>
+                <span>ACADEMY</span>
+            </div>
+        </div>
+
+        <div class="brand-tagline">
+            Driving • Computer • Digital
+        </div>
+
+        <nav class="navigation">
+
+            <div class="nav-section">MAIN</div>
+
+            <button class="nav-item active" data-page="dashboard">
+                <span>▣</span>
+                Dashboard
+            </button>
+
+            <div class="nav-section">STUDENTS</div>
+
+            <button class="nav-item" data-page="students">
+                <span>👥</span>
+                Students
+            </button>
+
+            <button class="nav-item" data-page="registration">
+                <span>＋</span>
+                Register Student
+            </button>
+
+            <button class="nav-item" data-page="progress">
+                <span>◔</span>
+                Student Progress
+            </button>
+
+            <div class="nav-section">DRIVING SCHOOL</div>
+
+            <button class="nav-item" data-page="driving-classes">
+                <span>🚘</span>
+                Licence Classes
+            </button>
+
+            <button class="nav-item" data-page="enrolments">
+                <span>📋</span>
+                Enrolments
+            </button>
+
+            <button class="nav-item" data-page="theory">
+                <span>📖</span>
+                Theory Training
+            </button>
+
+            <button class="nav-item" data-page="practical">
+                <span>🚗</span>
+                Practical Lessons
+            </button>
+
+            <button class="nav-item" data-page="attendance">
+                <span>✓</span>
+                Attendance
+            </button>
+
+            <button class="nav-item" data-page="test-readiness">
+                <span>🎯</span>
+                Test Readiness
+            </button>
+
+            <button class="nav-item" data-page="tests">
+                <span>📝</span>
+                Tests
+            </button>
+
+            <button class="nav-item" data-page="endorsements">
+                <span>🏷</span>
+                Endorsements
+            </button>
+
+            <div class="nav-section">COMPUTER TRAINING</div>
+
+            <button class="nav-item" data-page="computer-courses">
+                <span>💻</span>
+                Courses
+            </button>
+
+            <button class="nav-item" data-page="computer-enrolments">
+                <span>📋</span>
+                Enrolments
+            </button>
+
+            <button class="nav-item" data-page="computer-classes">
+                <span>🖥</span>
+                Classes
+            </button>
+
+            <button class="nav-item" data-page="certificates">
+                <span>🎓</span>
+                Certificates
+            </button>
+
+            <div class="nav-section">PRINTING & DIGITAL</div>
+
+            <button class="nav-item" data-page="customers">
+                <span>👤</span>
+                Customers
+            </button>
+
+            <button class="nav-item" data-page="printing-jobs">
+                <span>🖨</span>
+                Printing Jobs
+            </button>
+
+            <button class="nav-item" data-page="services">
+                <span>⚙</span>
+                Services & Pricing
+            </button>
+
+            <div class="nav-section">FINANCE</div>
+
+            <button class="nav-item" data-page="fees">
+                <span>💰</span>
+                Fees
+            </button>
+
+            <button class="nav-item" data-page="invoices">
+                <span>🧾</span>
+                Invoices
+            </button>
+
+            <button class="nav-item" data-page="payments">
+                <span>💳</span>
+                Payments
+            </button>
+
+            <button class="nav-item" data-page="receipts">
+                <span>🧾</span>
+                Receipts
+            </button>
+
+            <div class="nav-section">OPERATIONS</div>
+
+            <button class="nav-item" data-page="vehicles">
+                <span>🚙</span>
+                Vehicles
+            </button>
+
+            <button class="nav-item" data-page="maintenance">
+                <span>🔧</span>
+                Maintenance
+            </button>
+
+            <button class="nav-item" data-page="staff">
+                <span>👨‍🏫</span>
+                Staff & Instructors
+            </button>
+
+            <button class="nav-item" data-page="branches">
+                <span>🏢</span>
+                Branches
+            </button>
+
+            <div class="nav-section">SYSTEM</div>
+
+            <button class="nav-item" data-page="reports">
+                <span>📊</span>
+                Reports
+            </button>
+
+            <button class="nav-item" data-page="settings">
+                <span>⚙</span>
+                Settings
+            </button>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <header class="topbar">
+
+            <button class="menu-btn" id="menuBtn">
+                ☰
+            </button>
+
+            <div>
+                <div class="page-title" id="pageTitle">
+                    Dashboard
+                </div>
+
+                <div class="breadcrumb">
+                    LASHAWN ACADEMY
+                </div>
+            </div>
+
+            <div class="top-actions">
+
+                <button class="icon-btn">
+                    🔔
+                    <span class="notification-dot"></span>
+                </button>
+
+                <div class="user-profile">
+                    <div class="avatar">MM</div>
+
+                    <div class="user-info">
+                        <strong>Administrator</strong>
+                        <small>Super Admin</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+        <section class="content" id="content">
+
+            <!-- DASHBOARD -->
+            <div class="page dashboard-page">
+
+                <div class="welcome">
+                    <div>
+                        <h2>Good evening 👋</h2>
+                        <p>
+                            Welcome to LASHAWN ACADEMY management system.
+                            Here's what's happening today.
+                        </p>
+                    </div>
+
+                    <button class="primary-btn" onclick="openRegistration()">
+                        + Register Student
+                    </button>
+                </div>
+
+
+                <!-- STAT CARDS -->
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <div class="stat-icon students">👥</div>
+                        <div>
+                            <span>Total Students</span>
+                            <strong>1,248</strong>
+                            <small>+12 this month</small>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon driving">🚘</div>
+                        <div>
+                            <span>Active Driving</span>
+                            <strong>186</strong>
+                            <small>Students in training</small>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon computer">💻</div>
+                        <div>
+                            <span>Computer Students</span>
+                            <strong>74</strong>
+                            <small>Currently enrolled</small>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon money">💰</div>
+                        <div>
+                            <span>Today's Revenue</span>
+                            <strong>KES 87,500</strong>
+                            <small>32 transactions</small>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- ACTION CENTRE -->
+                <div class="section-heading">
+                    <div>
+                        <h3>Action Centre</h3>
+                        <p>Items requiring attention</p>
+                    </div>
+                </div>
+
+                <div class="action-grid">
+
+                    <div class="action-card warning">
+                        <div class="action-number">8</div>
+                        <div>
+                            <strong>Approaching 6 Weeks</strong>
+                            <p>Review training progress</p>
+                        </div>
+                        <button>View →</button>
+                    </div>
+
+                    <div class="action-card blue">
+                        <div class="action-number">12</div>
+                        <div>
+                            <strong>Due for Theory</strong>
+                            <p>Students ready for theory test</p>
+                        </div>
+                        <button>View →</button>
+                    </div>
+
+                    <div class="action-card green">
+                        <div class="action-number">9</div>
+                        <div>
+                            <strong>Due for Practical</strong>
+                            <p>Students ready for practical test</p>
+                        </div>
+                        <button>View →</button>
+                    </div>
+
+                    <div class="action-card purple">
+                        <div class="action-number">11</div>
+                        <div>
+                            <strong>Due for Endorsement</strong>
+                            <p>Students requiring endorsement</p>
+                        </div>
+                        <button>View →</button>
+                    </div>
+
+                    <div class="action-card red">
+                        <div class="action-number">18</div>
+                        <div>
+                            <strong>Outstanding Balances</strong>
+                            <p>Students with unpaid fees</p>
+                        </div>
+                        <button>View →</button>
+                    </div>
+
+                    <div class="action-card orange">
+                        <div class="action-number">7</div>
+                        <div>
+                            <strong>Missed Lessons</strong>
+                            <p>Attendance requires review</p>
+                        </div>
+                        <button>View →</button>
+                    </div>
+
+                </div>
+
+
+                <!-- TRAINING OVERVIEW -->
+                <div class="two-column">
+
+                    <div class="panel">
+
+                        <div class="panel-header">
+                            <div>
+                                <h3>Training Overview</h3>
+                                <p>Current student status</p>
+                            </div>
+
+                            <button class="text-btn">
+                                View Details
+                            </button>
+                        </div>
+
+                        <div class="progress-list">
+
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>On Track</span>
+                                    <strong>96</strong>
+                                </div>
+
+                                <div class="progress-bar">
+                                    <div style="width:82%"></div>
+                                </div>
+                            </div>
+
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>Needs Attention</span>
+                                    <strong>14</strong>
+                                </div>
+
+                                <div class="progress-bar">
+                                    <div style="width:32%"></div>
+                                </div>
+                            </div>
+
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>Approaching 6 Weeks</span>
+                                    <strong>8</strong>
+                                </div>
+
+                                <div class="progress-bar">
+                                    <div style="width:18%"></div>
+                                </div>
+                            </div>
+
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>Theory Ready</span>
+                                    <strong>12</strong>
+                                </div>
+
+                                <div class="progress-bar">
+                                    <div style="width:26%"></div>
+                                </div>
+                            </div>
+
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>Practical Ready</span>
+                                    <strong>9</strong>
+                                </div>
+
+                                <div class="progress-bar">
+                                    <div style="width:21%"></div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="panel">
+
+                        <div class="panel-header">
+                            <div>
+                                <h3>Today's Operations</h3>
+                                <p>Activity summary</p>
+                            </div>
+                        </div>
+
+                        <div class="operation-list">
+
+                            <div class="operation">
+                                <span class="operation-icon">💳</span>
+                                <div>
+                                    <strong>Payments Received</strong>
+                                    <small>32 transactions</small>
+                                </div>
+                                <b>KES 87,500</b>
+                            </div>
+
+                            <div class="operation">
+                                <span class="operation-icon">🚗</span>
+                                <div>
+                                    <strong>Driving Lessons</strong>
+                                    <small>Today's sessions</small>
+                                </div>
+                                <b>48</b>
+                            </div>
+
+                            <div class="operation">
+                                <span class="operation-icon">💻</span>
+                                <div>
+                                    <strong>Computer Classes</strong>
+                                    <small>Active sessions</small>
+                                </div>
+                                <b>6</b>
+                            </div>
+
+                            <div class="operation">
+                                <span class="operation-icon">🖨</span>
+                                <div>
+                                    <strong>Printing Jobs</strong>
+                                    <small>Jobs processed</small>
+                                </div>
+                                <b>23</b>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RECENT STUDENTS -->
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h3>Recent Students</h3>
+                            <p>Latest registrations</p>
+                        </div>
+
+                        <button class="text-btn">
+                            View All Students
+                        </button>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Student No.</th>
+                                    <th>Programme</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+                                    <td>
+                                        <div class="table-person">
+                                            <div class="mini-avatar">JK</div>
+                                            <div>
+                                                <strong>John Kamau</strong>
+                                                <small>Registered today</small>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>LA-2026-00125</td>
+                                    <td>Class B</td>
+
+                                    <td>
+                                        <div class="table-progress">
+                                            <span>85%</span>
+                                            <div>
+                                                <i style="width:85%"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge success">Active</span>
+                                    </td>
+
+                                    <td>
+                                        <button class="more-btn">•••</button>
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>
+                                        <div class="table-person">
+                                            <div class="mini-avatar">MA</div>
+                                            <div>
+                                                <strong>Mary Akinyi</strong>
+                                                <small>Registered today</small>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>LA-2026-00124</td>
+                                    <td>Class C1</td>
+
+                                    <td>
+                                        <div class="table-progress">
+                                            <span>62%</span>
+                                            <div>
+                                                <i style="width:62%"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge success">Active</span>
+                                    </td>
+
+                                    <td>
+                                        <button class="more-btn">•••</button>
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>
+                                        <div class="table-person">
+                                            <div class="mini-avatar">PO</div>
+                                            <div>
+                                                <strong>Peter Otieno</strong>
+                                                <small>Registered yesterday</small>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>LA-2026-00123</td>
+                                    <td>Class D</td>
+
+                                    <td>
+                                        <div class="table-progress">
+                                            <span>100%</span>
+                                            <div>
+                                                <i style="width:100%"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge warning-badge">
+                                            Test Due
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <button class="more-btn">•••</button>
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>
+                                        <div class="table-person">
+                                            <div class="mini-avatar">JW</div>
+                                            <div>
+                                                <strong>Jane Wanjiku</strong>
+                                                <small>Registered yesterday</small>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>LA-2026-00122</td>
+                                    <td>Computer</td>
+
+                                    <td>
+                                        <div class="table-progress">
+                                            <span>70%</span>
+                                            <div>
+                                                <i style="width:70%"></i>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge success">Active</span>
+                                    </td>
+
+                                    <td>
+                                        <button class="more-btn">•••</button>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- REGISTER STUDENT MODAL -->
+<div class="modal-overlay" id="registrationModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+                <h2>Register Student</h2>
+                <p>Create a new LASHAWN ACADEMY student record.</p>
+            </div>
+
+            <button class="close-btn" onclick="closeRegistration()">
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="registrationForm">
+
+            <div class="form-section">
+
+                <h3>Personal Information</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>First Name *</label>
+                        <input type="text" name="first_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Last Name *</label>
+                        <input type="text" name="last_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" name="phone" placeholder="07XXXXXXXX" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ID / Passport Number *</label>
+                        <input type="text" name="id_number" required>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-section">
+
+                <h3>Programme</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label>Programme *</label>
+
+                        <select name="programme" id="programme" required>
+
+                            <option value="">
+                                Select programme
+                            </option>
+
+                            <option value="driving">
+                                Driving School
+                            </option>
+
+                            <option value="computer">
+                                Computer Training
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group" id="licenceClassGroup">
+
+                        <label>Licence Class</label>
+
+                        <select name="licence_class">
+
+                            <option value="">
+                                Select licence class
+                            </option>
+
+                            <option>Class A</option>
+                            <option>Class B</option>
+                            <option>Class C1</option>
+                            <option>Class C</option>
+                            <option>Class D1</option>
+                            <option>Class D</option>
+                            <option>Class E</option>
+                            <option>Class F</option>
+                            <option>Class G</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Training Start Date *</label>
+
+                        <input type="date"
+                               name="training_start"
+                               id="trainingStart"
+                               required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>Branch *</label>
+
+                        <select name="branch" required>
+
+                            <option value="">
+                                Select branch
+                            </option>
+
+                            <option>Head Office</option>
+                            <option>Nairobi</option>
+                            <option>Mombasa</option>
+                            <option>Kisumu</option>
+                            <option>Eldoret</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="six-week-notice">
+
+                <div class="notice-icon">⏱</div>
+
+                <div>
+                    <strong>6-Week Training Tracker</strong>
+
+                    <p>
+                        Driving school training will be monitored from
+                        the training start date. The system will alert
+                        management as the student approaches the
+                        maximum 6-week training period.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button type="button"
+                        class="secondary-btn"
+                        onclick="closeRegistration()">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        class="primary-btn">
+                    Register Student
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="assets/js/app.js"></script>
+
+</body>
 </html>
