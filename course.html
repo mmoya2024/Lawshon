@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Driving Courses — NTSA Curriculum | Lashawn Driving & Computer College</title>
+<meta name="description" content="NTSA-approved driving courses covering every license class and subclass — A, B, C, D, E, F, G — with age, prerequisite, hours and fee breakdown.">
+<style>
+  :root{
+    --navy:#0f2d52; --navy2:#163a68; --gold:#d4a017; --bg:#f6f7f9; --card:#ffffff;
+    --text:#1a1e24; --muted:#5b6472; --border:#e2e6eb;
+  }
+  *{box-sizing:border-box;}
+  html{font-size:19px;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:10;background:var(--navy);color:#fff;padding:.9rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;}
+  .brand{font-weight:700;font-size:1.05rem;display:flex;gap:.5rem;align-items:center;text-decoration:none;color:#fff;}
+  .brand .dot{color:var(--gold);}
+  nav{display:flex;gap:.4rem;flex-wrap:wrap;}
+  nav a{background:transparent;border:1px solid rgba(255,255,255,.25);color:#fff;padding:.5rem .9rem;border-radius:6px;text-decoration:none;font-size:.85rem;}
+  nav a.cta{background:var(--gold);border-color:var(--gold);color:#241900;font-weight:600;}
+
+  .page-head{max-width:1100px;margin:0 auto;padding:3rem 1.5rem 1rem;text-align:center;}
+  .page-head h1{font-size:2.2rem;color:var(--navy);margin:0 0 .6rem;}
+  .page-head p{color:var(--muted);font-size:1.05rem;max-width:700px;margin:0 auto;}
+  .badge-row{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:1.2rem;}
+  .badge{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:.35rem .9rem;font-size:.8rem;color:var(--muted);}
+
+  section{max-width:1100px;margin:0 auto;padding:2.4rem 1.5rem;}
+  section.alt{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  h2{font-size:1.6rem;color:var(--navy);text-align:center;margin:0 0 .4rem;}
+  .subtitle{text-align:center;color:var(--muted);font-size:.98rem;max-width:620px;margin:0 auto 1.8rem;}
+
+  .cat-block{margin-bottom:2.2rem;}
+  .cat-block-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;}
+  .cat-block-head .tag{background:var(--navy);color:#fff;font-weight:800;font-size:1.05rem;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .cat-block-head h3{margin:0;font-size:1.15rem;color:var(--navy);}
+  .cat-block-head .vehicles{color:var(--muted);font-size:.88rem;}
+
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--card);}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:.9rem;}
+  thead th{background:#eef2f7;color:var(--navy);text-align:left;padding:.65rem .8rem;font-size:.8rem;text-transform:uppercase;letter-spacing:.02em;border-bottom:1px solid var(--border);}
+  tbody td{padding:.65rem .8rem;border-bottom:1px solid var(--border);vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sub{font-weight:700;color:var(--navy);white-space:nowrap;}
+  td.fee{color:var(--gold);font-weight:700;white-space:nowrap;}
+
+  .curric-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+  @media (max-width:700px){.curric-grid{grid-template-columns:1fr;}}
+  .curric-col h3{color:var(--navy);font-size:1.1rem;margin:0 0 .7rem;display:flex;align-items:center;gap:.5rem;}
+  .curric-col ul{margin:0;padding-left:1.2rem;color:var(--text);font-size:.95rem;}
+  .curric-col li{margin-bottom:.5rem;}
+
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1.1rem;counter-reset:step;}
+  .step{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;}
+  .step::before{counter-increment:step;content:counter(step);display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;font-size:.85rem;margin-bottom:.5rem;}
+  .step h4{margin:.2rem 0 .4rem;font-size:1rem;}
+  .step p{margin:0;color:var(--muted);font-size:.88rem;}
+
+  .note{background:#fdf6e3;border:1px solid #eddfa8;border-radius:10px;padding:1rem 1.2rem;font-size:.9rem;color:#5a4a10;max-width:1100px;margin:0 auto 2.2rem;}
+
+  .cta-band{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:16px;padding:2.4rem 1.5rem;text-align:center;}
+  .cta-band h2{color:#fff;}
+  .cta-band p{color:#cfd9e8;max-width:480px;margin:0 auto 1.4rem;}
+  .btn{display:inline-block;background:var(--gold);color:#241900;border:none;padding:.85rem 1.6rem;border-radius:8px;font-weight:700;text-decoration:none;font-size:1rem;cursor:pointer;}
+
+  footer{text-align:center;color:var(--muted);font-size:1rem;padding:2.4rem 1.5rem;}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="brand" href="index.html">🎓 <span>Lashawn Driving <span class="dot">&</span> Computer College</span></a>
+  <nav>
+    <a href="index.html#why">Why Us</a>
+    <a href="courses-ntsa.html">Courses</a>
+    <a href="enroll.html" class="cta">Enroll Now</a>
+  </nav>
+</header>
+
+<div class="page-head">
+  <h1>Driving Courses — Full NTSA Curriculum</h1>
+  <p>Every license class and subclass, following NTSA's standard driving school curriculum: theory instruction, manoeuvre-yard practice, supervised road training and internal assessment ahead of the official NTSA test.</p>
+  <div class="badge-row">
+    <span class="badge">NTSA-approved instructors</span>
+    <span class="badge">National ID + passport photo</span>
+    <span class="badge">Interim license on registration</span>
+  </div>
+</div>
+
+<section id="classes">
+  <h2>License Classes &amp; Subclasses</h2>
+  <p class="subtitle">You train and test in one subclass at a time. Professional and heavier subclasses require a minimum number of years' experience and a higher minimum age.</p>
+
+  <div class="cat-block">
+    <div class="cat-block-head"><span class="tag">A</span><h3>Category A — Motorcycles</h3><span class="vehicles">Mopeds &amp; motorcycles</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Subclass</th><th>Vehicle</th><th>Min. Age</th><th>Prerequisite</th><th>Training Hours</th><th>Duration</th><th>Fee</th></tr></thead>
+      <tbody>
+        <tr><td class="sub">A1</td><td>Moped, up to 50cc, no passengers</td><td>16 yrs</td><td>National ID</td><td>24 hrs</td><td>1–2 weeks</td><td class="fee">KSh 6,000</td></tr>
+        <tr><td class="sub">A2</td><td>Motorcycle, standard capacity</td><td>18 yrs</td><td>National ID</td><td>30–40 hrs</td><td>2–3 weeks</td><td class="fee">KSh 7,500</td></tr>
+        <tr><td class="sub">A3</td><td>Motorcycle, professional/commercial (boda boda)</td><td>18 yrs</td><td>Valid A2, National ID</td><td>40 hrs</td><td>2–3 weeks</td><td class="fee">KSh 9,000</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="cat-block">
+    <div class="cat-block-head"><span class="tag">B</span><h3>Category B — Light Vehicles</h3><span class="vehicles">Saloon cars, light SUVs, small vans</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Subclass</th><th>Vehicle</th><th>Min. Age</th><th>Prerequisite</th><th>Training Hours</th><th>Duration</th><th>Fee</th></tr></thead>
+      <tbody>
+        <tr><td class="sub">B1</td><td>Automatic saloon car</td><td>18 yrs</td><td>National ID</td><td>40 hrs</td><td>3–5 weeks</td><td class="fee">KSh 10,000</td></tr>
+        <tr><td class="sub">B2</td><td>Manual saloon car</td><td>18 yrs</td><td>National ID</td><td>40–50 hrs</td><td>3–5 weeks</td><td class="fee">KSh 12,000</td></tr>
+        <tr><td class="sub">B3</td><td>Light vehicle, professional (taxi/ride-hailing)</td><td>21 yrs</td><td>Valid B2, 2 yrs driving experience</td><td>50–60 hrs</td><td>3–5 weeks</td><td class="fee">KSh 14,000</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="cat-block">
+    <div class="cat-block-head"><span class="tag">C</span><h3>Category C — Trucks</h3><span class="vehicles">Light and medium goods vehicles</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Subclass</th><th>Vehicle</th><th>Min. Age</th><th>Prerequisite</th><th>Training Hours</th><th>Duration</th><th>Fee</th></tr></thead>
+      <tbody>
+        <tr><td class="sub">C1</td><td>Light truck, professional</td><td>22 yrs</td><td>Valid B2, 2 yrs driving experience</td><td>60–70 hrs</td><td>3–5 weeks</td><td class="fee">KSh 16,500</td></tr>
+        <tr><td class="sub">C</td><td>Medium/heavy truck, professional</td><td>24 yrs</td><td>Valid C1, 2 yrs driving experience</td><td>80 hrs</td><td>3–5 weeks</td><td class="fee">KSh 19,000</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="cat-block">
+    <div class="cat-block-head"><span class="tag">D</span><h3>Category D — Public Service Vehicles</h3><span class="vehicles">Vans, minibuses, buses (PSV)</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Subclass</th><th>Vehicle</th><th>Min. Age</th><th>Prerequisite</th><th>Training Hours</th><th>Duration</th><th>Fee</th></tr></thead>
+      <tbody>
+        <tr><td class="sub">D1</td><td>Van, professional (PSV)</td><td>22 yrs</td><td>Valid B2, 2 yrs driving experience, Certificate of Good Conduct</td><td>60–80 hrs</td><td>3–5 weeks</td><td class="fee">KSh 18,000</td></tr>
+        <tr><td class="sub">D2</td><td>Minibus, professional (PSV)</td><td>25 yrs</td><td>Valid D1, 3 yrs driving experience, Certificate of Good Conduct</td><td>90–100 hrs</td><td>4–6 weeks</td><td class="fee">KSh 21,000</td></tr>
+        <tr><td class="sub">D3</td><td>Bus, professional (PSV)</td><td>26 yrs</td><td>Valid D2, 3 yrs driving experience, Certificate of Good Conduct</td><td>100 hrs</td><td>4–6 weeks</td><td class="fee">KSh 24,000</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="cat-block">
+    <div class="cat-block-head"><span class="tag">E</span><h3>Category E — Heavy Commercial</h3><span class="vehicles">Heavy trucks, trailers, haulage combinations</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Subclass</th><th>Vehicle</th><th>Min. Age</th><th>Prerequisite</th><th>Training Hours</th><th>Duration</th><th>Fee</th></tr></thead>
+      <tbody>
+        <tr><td class="sub">E</td><td>Heavy commercial vehicle / articulated trailer</td><td>26 yrs</td><td>Valid C, 3 yrs driving experience</td><td>120–160 hrs</td><td>5–8 weeks</td><td class="fee">KSh 28,000</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="cat-block">
+    <div class="cat-block-head"><span class="tag">F</span><h3>Category F — Persons With Disability</h3><span class="vehicles">Adapted vehicles</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Subclass</th><th>Vehicle</th><th>Min. Age</th><th>Prerequisite</th><th>Training Hours</th><th>Duration</th><th>Fee</th></tr></thead>
+      <tbody>
+        <tr><td class="sub">F</td><td>Vehicle adapted to the trainee's ability, matching equivalent able-driver class</td><td>18 yrs</td><td>National ID, medical/fitness-to-drive assessment</td><td>As per equivalent class</td><td>3–6 weeks</td><td>On request</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="cat-block">
+    <div class="cat-block-head"><span class="tag">G</span><h3>Category G — Industrial, Construction &amp; Agricultural Plant</h3><span class="vehicles">Forklifts, graders, excavators, rollers, tractors</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Subclass</th><th>Vehicle</th><th>Min. Age</th><th>Prerequisite</th><th>Training Hours</th><th>Duration</th><th>Fee</th></tr></thead>
+      <tbody>
+        <tr><td class="sub">G</td><td>Plant &amp; equipment endorsement</td><td>18 yrs</td><td>National ID, existing driving license</td><td>40–60 hrs</td><td>3–4 weeks</td><td class="fee">KSh 16,500</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+</section>
+
+<section class="alt" id="curriculum">
+  <h2>What the Curriculum Covers</h2>
+  <p class="subtitle">Every class blends theory, yard practice and road training, following the NTSA driving school curriculum units.</p>
+  <div class="curric-grid">
+    <div class="curric-col">
+      <h3>📘 Theory Instruction</h3>
+      <ul>
+        <li>Vehicle construction, controls and basic mechanics</li>
+        <li>Self-inspection of vehicles before driving</li>
+        <li>Highway Code — road signs, signals and markings</li>
+        <li>Traffic laws, regulations and driver responsibilities</li>
+        <li>Defensive driving and hazard perception</li>
+        <li>Emergency procedures and accident response</li>
+        <li>Class-specific rules (PSV conduct, goods documentation, plant safety, etc.)</li>
+        <li>Internal theory assessment before practicals begin</li>
+      </ul>
+    </div>
+    <div class="curric-col">
+      <h3>🚗 Practical Training</h3>
+      <ul>
+        <li>Vehicle control or manoeuvre yard: reversing, parking, hill starts, three-point turns</li>
+        <li>Clutch, gear, braking and steering control</li>
+        <li>Supervised road driving in varied traffic conditions</li>
+        <li>Night and highway driving practice (class-dependent)</li>
+        <li>Coupling/uncoupling and load handling (C, D, E classes)</li>
+        <li>Passenger safety and PSV conduct on-road (D classes)</li>
+        <li>Equipment operation drills (G class)</li>
+        <li>Mock test, readiness assessment and NTSA test booking</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="process">
+  <h2>Enrollment to License, Step by Step</h2>
+  <div class="steps">
+    <div class="step"><h4>Register</h4><p>National ID, passport photo and any class-specific documents (e.g. Certificate of Good Conduct for PSV).</p></div>
+    <div class="step"><h4>Interim License</h4><p>We help you apply for your interim/learner's license via NTSA before lessons begin.</p></div>
+    <div class="step"><h4>Theory &amp; Yard</h4><p>Classroom sessions and manoeuvre-yard practice for your specific class.</p></div>
+    <div class="step"><h4>Road Training</h4><p>Supervised on-road lessons until you meet our internal readiness standard.</p></div>
+    <div class="step"><h4>NTSA Test</h4><p>We book your official NTSA test and accompany you on test day.</p></div>
+  </div>
+</section>
+
+<div class="note">
+  <strong>Note:</strong> NTSA test booking, interim license and Smart Driving License fees are paid directly to NTSA via eCitizen and are separate from our tuition fees. Professional and heavier subclasses (B3, C, D, E) require proof of a minimum number of years' driving experience on the prerequisite class, per NTSA rules — bring your current license when registering.
+</div>
+
+<section id="enroll">
+  <div class="cta-band">
+    <h2>Pick Your Class, Start Today</h2>
+    <p>Talk to us about which class and subclass fits your goals — personal driving, commercial goods, PSV, or plant operation.</p>
+    <a class="btn" href="enroll.html">Start Enrollment</a>
+  </div>
+</section>
+
+<footer>Lashawn Driving & Computer College · <a href="mailto:info@lashawnacademy.com">info@lashawnacademy.com</a></footer>
+
+</body>
+</html>
