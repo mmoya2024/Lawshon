@@ -140,7 +140,6 @@
         <select id="licenseClass" name="licenseClass">
           <option value="">Select a class</option>
           <optgroup label="Category A — Motorcycles">
-            <option value="A1">A1 — Moped (50cc)</option>
             <option value="A2">A2 — Motorcycle</option>
             <option value="A3">A3 — Motorcycle, Professional</option>
           </optgroup>
@@ -158,11 +157,8 @@
             <option value="D2">D2 — Minibus, Professional (PSV)</option>
             <option value="D3">D3 — Bus, Professional (PSV)</option>
           </optgroup>
-          <optgroup label="Category E — Heavy Commercial">
-            <option value="E">E — Heavy Commercial / Trailer</option>
-          </optgroup>
-          <optgroup label="Category F — Persons With Disability">
-            <option value="F">F — Adapted Vehicle</option>
+          <optgroup label="Category CE — Heavy Commercial">
+            <option value="CE">CE — Heavy Commercial / Trailer</option>
           </optgroup>
           <optgroup label="Category G — Plant & Equipment">
             <option value="G">G — Industrial/Construction/Agricultural Plant</option>
@@ -220,7 +216,6 @@
   var classHint = document.getElementById('classHint');
 
   var hints = {
-    A1: "Min. age 16 · National ID · 24 hrs training",
     A2: "Min. age 18 · National ID · 30–40 hrs training",
     A3: "Min. age 18 · Requires valid A2 · 40 hrs training",
     B1: "Min. age 18 · National ID · 40 hrs training",
@@ -231,8 +226,7 @@
     D1: "Min. age 22 · Requires valid B2 + 2 yrs experience · Certificate of Good Conduct",
     D2: "Min. age 25 · Requires valid D1 + 3 yrs experience · Certificate of Good Conduct",
     D3: "Min. age 26 · Requires valid D2 + 3 yrs experience · Certificate of Good Conduct",
-    E:  "Min. age 26 · Requires valid C + 3 yrs experience · 120–160 hrs training",
-    F:  "Min. age 18 · National ID · Medical/fitness-to-drive assessment",
+    CE: "Min. age 26 · Requires valid C + 3 yrs experience · 120–160 hrs training",
     G:  "Min. age 18 · Requires existing driving license · 40–60 hrs training"
   };
 
