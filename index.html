@@ -1,30 +1,197 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dgfmhyebp/image/upload/v1773819105/Untitled_design-Photoroom_g5hfty.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#0B1F3A" />
-    <meta name="description" content="Lashawn Academy - Driving & Computer College Management System" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Lashawn Academy" />
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="https://res.cloudinary.com/dgfmhyebp/image/upload/v1773819105/Untitled_design-Photoroom_g5hfty.png" />
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <title>Lashawn Academy | Management Portal</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script src="assets/js/data.js"></script>
-    <script src="assets/js/pages.js"></script>
-    <script src="assets/js/app.js"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js').catch(err => console.log('SW:', err));
-        });
-      }
-    </script>
-  </body>
-</html>
+renderNav("admin.html");
+
+let adminTab = "overview";
+const app = document.getElementById("app");
+
+function money(n) { return `$${Number(n).toFixed(2)}`; }
+
+async function boot() {
+  if (!Api.isAuthed()) {
+    renderLogin();
+  } else {
+    await renderDashboard();
+  }
+}
+
+function renderLogin() {
+  app.innerHTML = `
+    <h2>Admin Login</h2>
+    <div id="loginMsg"></div>
+    <form id="loginForm" style="max-width:320px;">
+      <label>Email</label><input required type="email" name="email" value="admin@lashawnacademy.com">
+      <label>Password</label><input required type="password" name="password">
+      <button class="btn" type="submit" style="margin-top:1rem;">Log In</button>
+    </form>`;
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const msgEl = document.getElementById("loginMsg");
+    try {
+      const res = await Api.login(f.get("email"), f.get("password"));
+      Api.setToken(res.access_token);
+      adminTab = "overview";
+      await renderDashboard();
+    } catch (err) {
+      msgEl.innerHTML = `<div class="msg err">${err.detail || "Login failed"}</div>`;
+    }
+  });
+}
+
+async function renderDashboard() {
+  const tabs = ["overview", "students", "courses", "payments"];
+  const labels = { overview: "Overview", students: "Students", courses: "Courses", payments: "Payments" };
+  const tabBtns = tabs
+    .map((t) => `<button data-atab="${t}" class="${adminTab === t ? "active" : ""}">${labels[t]}</button>`)
+    .join("");
+
+  app.innerHTML = `
+    <div class="row" style="justify-content:space-between;">
+      <h2>Admin Dashboard</h2>
+      <button class="btn secondary" id="logoutBtn">Log Out</button>
+    </div>
+    <div class="tabs">${tabBtns}</div>
+    <div id="tabBody"><p class="spinner">Loading…</p></div>`;
+
+  document.getElementById("logoutBtn").onclick = () => { Api.clearToken(); boot(); };
+  document.querySelectorAll("[data-atab]").forEach((b) => {
+    b.onclick = () => { adminTab = b.dataset.atab; renderDashboard(); };
+  });
+
+  const body = document.getElementById("tabBody");
+  try {
+    if (adminTab === "overview") body.innerHTML = await tplOverview();
+    else if (adminTab === "students") body.innerHTML = await tplStudents();
+    else if (adminTab === "courses") body.innerHTML = await tplCourses();
+    else if (adminTab === "payments") body.innerHTML = await tplPayments();
+    bindTabEvents();
+  } catch (err) {
+    if (err.status === 401) { Api.clearToken(); boot(); return; }
+    body.innerHTML = `<div class="msg err">${err.detail || "Failed to load data"}</div>`;
+  }
+}
+
+async function tplOverview() {
+  const stats = await Api.overview();
+  return `<div class="grid">
+    <div class="stat"><b>${stats.total_students}</b>Students</div>
+    <div class="stat"><b>${stats.total_courses}</b>Courses</div>
+    <div class="stat"><b>${money(stats.total_revenue)}</b>Revenue collected</div>
+    <div class="stat"><b>${money(stats.total_outstanding)}</b>Outstanding balance</div>
+  </div>`;
+}
+
+async function tplStudents() {
+  const [students, courses] = await Promise.all([Api.listStudents(), Api.listCourses()]);
+  const rows = students.map((s) => `
+    <tr>
+      <td>${s.name}</td><td>${s.email}</td><td>${s.course_name || "—"}</td>
+      <td><span class="badge ${s.balance_due <= 0 ? "paid" : "pending"}">${s.balance_due <= 0 ? "Paid" : money(s.balance_due) + " due"}</span></td>
+      <td><button class="iconbtn" data-delstudent="${s.id}">Remove</button></td>
+    </tr>`).join("") || `<tr><td colspan="5" class="muted">No students yet.</td></tr>`;
+  const opts = courses.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+  return `
+    <div class="scrollx"><table><thead><tr><th>Name</th><th>Email</th><th>Course</th><th>Status</th><th></th></tr></thead>
+    <tbody>${rows}</tbody></table></div>
+    <h3 style="margin-top:1.5rem;">Add Student Manually</h3>
+    <div id="studentFormMsg"></div>
+    <form id="addStudentForm">
+      <label>Name</label><input required name="name">
+      <label>Email</label><input required type="email" name="email">
+      <label>Phone</label><input required name="phone">
+      <label>Course</label><select required name="courseId">${opts}</select>
+      <button class="btn" style="margin-top:1rem;" type="submit">Add Student</button>
+    </form>`;
+}
+
+async function tplCourses() {
+  const courses = await Api.listCourses();
+  const rows = courses.map((c) => `
+    <tr><td>${c.name}</td><td>${c.category}</td><td>${c.duration}</td><td>${money(c.price)}</td>
+    <td><button class="iconbtn" data-delcourse="${c.id}">Remove</button></td></tr>`).join("");
+  return `
+    <div class="scrollx"><table><thead><tr><th>Name</th><th>Category</th><th>Duration</th><th>Price</th><th></th></tr></thead>
+    <tbody>${rows}</tbody></table></div>
+    <h3 style="margin-top:1.5rem;">Add Course</h3>
+    <div id="courseFormMsg"></div>
+    <form id="addCourseForm">
+      <label>Name</label><input required name="name">
+      <label>Category</label><select name="category"><option>Driving</option><option>Computer</option></select>
+      <label>Duration</label><input required name="duration" placeholder="e.g. 6 weeks">
+      <label>Price ($)</label><input required type="number" min="0" step="0.01" name="price">
+      <button class="btn" style="margin-top:1rem;" type="submit">Add Course</button>
+    </form>`;
+}
+
+async function tplPayments() {
+  const [payments, students] = await Promise.all([Api.listPayments(), Api.listStudents()]);
+  const byId = Object.fromEntries(students.map((s) => [s.id, s]));
+  const rows = payments.map((p) => `
+    <tr><td>${byId[p.student_id]?.name || "—"}</td><td>${money(p.amount)}</td><td>${p.method}</td><td>${p.paid_on}</td></tr>`
+  ).join("") || `<tr><td colspan="4" class="muted">No payments recorded.</td></tr>`;
+  const stOpts = students.map((s) => `<option value="${s.id}">${s.name} (owes ${money(s.balance_due)})</option>`).join("");
+  return `
+    <div class="scrollx"><table><thead><tr><th>Student</th><th>Amount</th><th>Method</th><th>Date</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>
+    <h3 style="margin-top:1.5rem;">Record Payment</h3>
+    <div id="paymentFormMsg"></div>
+    <form id="addPaymentForm">
+      <label>Student</label><select required name="studentId">${stOpts}</select>
+      <label>Amount ($)</label><input required type="number" min="0.01" step="0.01" name="amount">
+      <label>Method</label><select name="method"><option>Cash</option><option>Card</option><option>Bank Transfer</option></select>
+      <button class="btn" style="margin-top:1rem;" type="submit">Record Payment</button>
+    </form>`;
+}
+
+function bindTabEvents() {
+  const asf = document.getElementById("addStudentForm");
+  if (asf) asf.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = new FormData(asf);
+    try {
+      await Api.enroll({ name: f.get("name"), email: f.get("email"), phone: f.get("phone"), course_id: f.get("courseId") });
+      renderDashboard();
+    } catch (err) {
+      document.getElementById("studentFormMsg").innerHTML = `<div class="msg err">${err.detail}</div>`;
+    }
+  });
+  document.querySelectorAll("[data-delstudent]").forEach((b) => {
+    b.onclick = async () => {
+      if (!confirm("Remove this student?")) return;
+      await Api.deleteStudent(b.dataset.delstudent);
+      renderDashboard();
+    };
+  });
+
+  const acf = document.getElementById("addCourseForm");
+  if (acf) acf.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = new FormData(acf);
+    try {
+      await Api.createCourse({ name: f.get("name"), category: f.get("category"), duration: f.get("duration"), price: Number(f.get("price")) });
+      renderDashboard();
+    } catch (err) {
+      document.getElementById("courseFormMsg").innerHTML = `<div class="msg err">${err.detail}</div>`;
+    }
+  });
+  document.querySelectorAll("[data-delcourse]").forEach((b) => {
+    b.onclick = async () => {
+      if (!confirm("Remove this course?")) return;
+      await Api.deleteCourse(b.dataset.delcourse);
+      renderDashboard();
+    };
+  });
+
+  const apf = document.getElementById("addPaymentForm");
+  if (apf) apf.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = new FormData(apf);
+    try {
+      await Api.recordPayment({ student_id: f.get("studentId"), amount: Number(f.get("amount")), method: f.get("method") });
+      renderDashboard();
+    } catch (err) {
+      document.getElementById("paymentFormMsg").innerHTML = `<div class="msg err">${err.detail}</div>`;
+    }
+  });
+}
+
+boot();
