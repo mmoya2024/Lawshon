@@ -43,10 +43,15 @@
   .card h3{margin:0 0 .4rem;font-size:1.15rem;}
   .card p{color:var(--muted);font-size:1rem;margin:0;}
   .card .price{color:var(--gold);font-weight:700;margin-top:.5rem;font-size:1.1rem;}
+  .card-link{display:block;text-decoration:none;}
+  .card-link .card{transition:border-color .15s ease,transform .15s ease;cursor:pointer;}
+  .card-link:hover .card{border-color:var(--gold);transform:translateY(-2px);}
 
   .quote{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;}
   .quote p{font-style:italic;color:var(--text);margin:0 0 .8rem;font-size:1.05rem;}
   .quote .who{color:var(--muted);font-size:.95rem;font-weight:600;}
+
+  .view-all{text-align:center;margin-top:1.6rem;}
 
   .cta-band{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:16px;padding:2.5rem 1.5rem;text-align:center;}
   .cta-band h2{color:#fff;}
@@ -73,7 +78,7 @@
 <header>
   <a class="brand" href="#top">🎓 <span>Lashawn Driving <span class="dot">&</span> Computer College</span></a>
   <nav>
-    <a href="#courses">Courses</a>
+    <a href="courses-ntsa.html">Courses</a>
     <a href="#why">Why Us</a>
     <a href="#enroll" class="cta">Enroll Now</a>
   </nav>
@@ -84,7 +89,7 @@
     <h1>Drive Forward. <span>Skill Up.</span></h1>
     <p>Professional driving instruction and computer training programs, built to get you certified, confident, and ready for what's next.</p>
     <a class="btn" href="#enroll">Enroll Now</a>
-    <a class="btn secondary" href="#courses">View Courses</a>
+    <a class="btn secondary" href="courses-ntsa.html">View Courses</a>
   </div>
   <div class="hero-visual">
     <div class="big">500+ Graduates</div>
@@ -105,14 +110,15 @@
 
 <section id="courses" class="alt">
   <h2>Popular Courses</h2>
-  <p class="subtitle">A sample of what we offer — full catalog and pricing on enrollment.</p>
+  <p class="subtitle">A sample of what we offer — click any course, or view the full NTSA course catalog and pricing.</p>
   <div class="grid">
-    <div class="card"><h3>Beginner Driving Course</h3><p>4 weeks · classroom + behind-the-wheel</p><div class="price">From KSh 25,000</div></div>
-    <div class="card"><h3>Defensive Driving</h3><p>8 hours · single-day intensive</p><div class="price">From KSh 8,000</div></div>
+    <a class="card-link" href="courses-ntsa.html"><div class="card"><h3>Beginner Driving Course</h3><p>4 weeks · classroom + behind-the-wheel</p><div class="price">From KSh 25,000</div></div></a>
+    <a class="card-link" href="courses-ntsa.html"><div class="card"><h3>Defensive Driving</h3><p>8 hours · single-day intensive</p><div class="price">From KSh 8,000</div></div></a>
     <div class="card"><h3>Computer Basics</h3><p>6 weeks · beginner friendly</p><div class="price">From KSh 15,000</div></div>
     <div class="card"><h3>Web Design Fundamentals</h3><p>10 weeks · build real projects</p><div class="price">From KSh 30,000</div></div>
     <div class="card"><h3>Printing & Copying</h3><p>Walk-in · per page, black & white or color</p><div class="price">From KSh 10</div></div>
   </div>
+  <div class="view-all"><a class="btn" href="courses-ntsa.html">View All Driving Courses</a></div>
 </section>
 
 <section>
