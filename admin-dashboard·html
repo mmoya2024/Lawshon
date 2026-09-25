@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Super Admin — Lashawn Driving & Computer College</title>
+<style>
+  :root{
+    --navy:#0f2d52; --navy2:#163a68; --gold:#d4a017; --bg:#f6f7f9; --card:#ffffff;
+    --text:#1a1e24; --muted:#5b6472; --border:#e2e6eb; --danger:#b3261e; --ok:#1a7a4c;
+  }
+  *{box-sizing:border-box;}
+  html{font-size:17px;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;}
+  a{color:inherit;text-decoration:none;}
+
+  .shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+  @media (max-width:820px){.shell{grid-template-columns:1fr;}}
+
+  aside{background:var(--navy);color:#fff;padding:1.4rem 1rem;display:flex;flex-direction:column;gap:.3rem;}
+  .brand{font-weight:700;font-size:1rem;padding:0 .5rem 1.2rem;display:flex;gap:.5rem;align-items:center;}
+  .brand .dot{color:var(--gold);}
+  .role-tag{font-size:.72rem;color:#cfd9e8;padding:0 .5rem 1rem;text-transform:uppercase;letter-spacing:.04em;}
+  nav.tabs{display:flex;flex-direction:column;gap:.2rem;}
+  nav.tabs button{
+    all:unset;cursor:pointer;padding:.65rem .8rem;border-radius:8px;font-size:.9rem;color:#dbe3ee;
+  }
+  nav.tabs button:hover{background:rgba(255,255,255,.08);}
+  nav.tabs button.active{background:var(--gold);color:#241900;font-weight:700;}
+  .side-foot{margin-top:auto;font-size:.78rem;color:#9fb0c8;padding:.5rem;}
+  .side-foot a{color:#fff;text-decoration:underline;}
+
+  main{padding:1.8rem 2rem;max-width:1180px;}
+  @media (max-width:600px){main{padding:1.2rem 1rem;}}
+  h1{font-size:1.5rem;color:var(--navy);margin:0 0 .2rem;}
+  .lede{color:var(--muted);font-size:.92rem;margin:0 0 1.6rem;}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin-bottom:1.8rem;}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.2rem;}
+  .stat .num{font-size:1.6rem;font-weight:800;color:var(--navy);}
+  .stat .label{color:var(--muted);font-size:.82rem;margin-top:.2rem;}
+  .stat .delta{font-size:.78rem;margin-top:.4rem;color:var(--ok);}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1.5rem;}
+  .card h2{font-size:1.05rem;color:var(--navy);margin:0 0 1rem;}
+
+  .bars{display:flex;align-items:flex-end;gap:1rem;height:140px;padding:0 .3rem;}
+  .bar-col{display:flex;flex-direction:column;align-items:center;gap:.5rem;flex:1;}
+  .bar{width:100%;max-width:38px;background:linear-gradient(180deg,var(--gold),#b8850f);border-radius:5px 5px 0 0;}
+  .bar-col .bl{font-size:.72rem;color:var(--muted);text-align:center;}
+  .bar-col .bv{font-size:.72rem;color:var(--navy);font-weight:700;}
+
+  table{border-collapse:collapse;width:100%;font-size:.88rem;}
+  thead th{background:#eef2f7;color:var(--navy);text-align:left;padding:.6rem .7rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.02em;border-bottom:1px solid var(--border);}
+  tbody td{padding:.6rem .7rem;border-bottom:1px solid var(--border);}
+  tbody tr:last-child td{border-bottom:none;}
+  .tbl-wrap{overflow-x:auto;}
+  .tag-pill{display:inline-block;padding:.15rem .55rem;border-radius:999px;font-size:.74rem;font-weight:600;}
+  .tag-pill.paid{background:#e4f5ec;color:var(--ok);}
+  .tag-pill.pending{background:#fdf1d8;color:#8a5a00;}
+  .tag-pill.super{background:#e8ecf5;color:var(--navy);}
+  .tag-pill.office{background:#f1f1f4;color:var(--muted);}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;}
+  .search{padding:.5rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;min-width:200px;}
+
+  .price-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.9rem;}
+  .price-row{border:1px solid var(--border);border-radius:10px;padding:.9rem;background:#fbfcfd;}
+  .price-row .name{font-weight:700;font-size:.9rem;color:var(--navy);margin-bottom:.5rem;}
+  .price-row .edit{display:flex;gap:.4rem;align-items:center;}
+  .price-row input{width:100%;padding:.45rem .55rem;border:1px solid var(--border);border-radius:6px;font-size:.88rem;}
+  .price-row button{white-space:nowrap;}
+
+  .btn{display:inline-block;background:var(--gold);color:#241900;border:none;padding:.55rem 1rem;border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer;}
+  .btn.outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+  .btn.danger{background:#fbe7e5;color:var(--danger);}
+  .btn:disabled{opacity:.55;cursor:not-allowed;}
+
+  .form-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.6rem;align-items:end;margin-bottom:1.2rem;}
+  @media (max-width:700px){.form-row{grid-template-columns:1fr;}}
+  .form-row .field label{display:block;font-size:.78rem;font-weight:600;margin-bottom:.3rem;color:var(--muted);}
+  .form-row input, .form-row select{width:100%;padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;}
+
+  .toast{position:fixed;bottom:1.2rem;right:1.2rem;background:var(--navy);color:#fff;padding:.8rem 1.1rem;border-radius:8px;font-size:.85rem;box-shadow:0 6px 20px rgba(0,0,0,.18);display:none;}
+  .toast.show{display:block;}
+  .note{background:#fdf6e3;border:1px solid #eddfa8;border-radius:10px;padding:.85rem 1rem;font-size:.85rem;color:#5a4a10;margin-bottom:1.5rem;}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside>
+    <div class="brand">🎓 <span>Lashawn <span class="dot">Admin</span></span></div>
+    <div class="role-tag">Super Admin</div>
+    <nav class="tabs">
+      <button data-panel="overview" class="active">Overview</button>
+      <button data-panel="enrollments">Enrollments &amp; Sales</button>
+      <button data-panel="services">Services &amp; Pricing</button>
+      <button data-panel="admins">Admin Accounts</button>
+    </nav>
+    <div class="side-foot">Signed in as <strong>Brahim</strong><br><a href="index.html">← Back to site</a></div>
+  </aside>
+
+  <main>
+
+    <!-- OVERVIEW -->
+    <section class="panel active" id="panel-overview">
+      <h1>Overview</h1>
+      <p class="lede">Snapshot of today's activity across driving classes and other services.</p>
+
+      <div class="stat-grid">
+        <div class="stat"><div class="num" id="stat-revenue">KSh 0</div><div class="label">Revenue today</div><div class="delta" id="stat-revenue-count">0 transactions</div></div>
+        <div class="stat"><div class="num" id="stat-students">0</div><div class="label">Students enrolled (all time, demo)</div></div>
+        <div class="stat"><div class="num" id="stat-pending">0</div><div class="label">Pending payments</div></div>
+        <div class="stat"><div class="num" id="stat-admins">0</div><div class="label">Active office admins</div></div>
+      </div>
+
+      <div class="card">
+        <h2>Revenue by service, this week (demo data)</h2>
+        <div class="bars" id="revenue-bars"></div>
+      </div>
+
+      <div class="card">
+        <h2>Latest activity</h2>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Student</th><th>Service</th><th>Amount</th><th>Recorded by</th><th>Time</th></tr></thead>
+          <tbody id="latest-activity"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ENROLLMENTS & SALES -->
+    <section class="panel" id="panel-enrollments">
+      <h1>Enrollments &amp; Sales</h1>
+      <p class="lede">Every driving-class enrollment and other-service sale recorded by office admins.</p>
+
+      <div class="toolbar">
+        <input type="text" class="search" id="enrollSearch" placeholder="Search by name or service...">
+      </div>
+
+      <div class="card">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Student</th><th>Phone</th><th>Service</th><th>Class</th><th>Amount</th><th>Payment</th><th>Status</th><th>Admin</th><th>Date</th></tr></thead>
+          <tbody id="enroll-table"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- SERVICES & PRICING -->
+    <section class="panel" id="panel-services">
+      <h1>Services &amp; Pricing</h1>
+      <p class="lede">Prices used by office admins when enrolling students or selling other services.</p>
+      <div class="note">Changes here apply to new transactions recorded in this browser session. Connect this page to your FastAPI/Supabase backend to persist pricing across devices.</div>
+
+      <div class="card">
+        <h2>Driving classes</h2>
+        <div class="price-grid" id="price-driving"></div>
+      </div>
+
+      <div class="card">
+        <h2>Other services</h2>
+        <div class="price-grid" id="price-other"></div>
+      </div>
+    </section>
+
+    <!-- ADMIN ACCOUNTS -->
+    <section class="panel" id="panel-admins">
+      <h1>Admin Accounts</h1>
+      <p class="lede">Manage who can access the office enrollment console and this super admin dashboard.</p>
+
+      <div class="card">
+        <h2>Add admin</h2>
+        <div class="form-row">
+          <div class="field"><label for="adminName">Full name</label><input type="text" id="adminName" placeholder="Jane Wanjiru"></div>
+          <div class="field"><label for="adminEmail">Email</label><input type="email" id="adminEmail" placeholder="jane@lashawnacademy.com"></div>
+          <div class="field"><label for="adminRole">Role</label>
+            <select id="adminRole">
+              <option value="office">Office Admin</option>
+              <option value="super">Super Admin</option>
+            </select>
+          </div>
+          <button class="btn" id="addAdminBtn">Add Admin</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Added</th><th></th></tr></thead>
+          <tbody id="admin-table"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+
+  // ---------- Demo/mock data (in-memory only; wire to your API for real persistence) ----------
+  var drivingPrices = {
+    A2:{label:'A2 — Motorcycle',price:7500}, A3:{label:'A3 — Motorcycle, Professional',price:9000},
+    B1:{label:'B1 — Automatic Saloon Car',price:10000}, B2:{label:'B2 — Manual Saloon Car',price:12000},
+    B3:{label:'B3 — Light Vehicle, Professional',price:14000}, C1:{label:'C1 — Light Truck, Professional',price:16500},
+    C:{label:'C — Medium/Heavy Truck',price:19000}, D1:{label:'D1 — Van (PSV)',price:18000},
+    D2:{label:'D2 — Minibus (PSV)',price:21000}, D3:{label:'D3 — Bus (PSV)',price:24000},
+    CE:{label:'CE — Heavy Commercial/Trailer',price:28000}, G:{label:'G — Plant & Equipment',price:16500}
+  };
+  var otherPrices = {
+    computerBasics:{label:'Computer Basics',price:15000},
+    webDesign:{label:'Web Design Fundamentals',price:30000},
+    defensiveDriving:{label:'Defensive Driving (1-day)',price:8000},
+    refresher:{label:'Refresher Course (5 lessons)',price:2500},
+    instructor:{label:'Driving School Instructor Course',price:30000},
+    printingBw:{label:'Printing/Copying — B&W (per page)',price:10},
+    printingColor:{label:'Printing/Copying — Color (per page)',price:30}
+  };
+
+  var demoEnrollments = [
+    {name:'Peter Njoroge', phone:'0722 111 222', service:'Driving Class', cls:'B2', amount:12000, payment:'M-Pesa', status:'paid', admin:'Jane Wanjiru', date:'Today, 09:14'},
+    {name:'Faith Achieng', phone:'0733 222 333', service:'Other Service', cls:'Computer Basics', amount:15000, payment:'Cash', status:'paid', admin:'Jane Wanjiru', date:'Today, 10:02'},
+    {name:'Kevin Otieno', phone:'0711 333 444', service:'Driving Class', cls:'C1', amount:16500, payment:'M-Pesa', status:'pending', admin:'Samuel Kiptoo', date:'Today, 11:40'},
+    {name:'Mary Wambui', phone:'0700 444 555', service:'Driving Class', cls:'B1', amount:10000, payment:'Cash', status:'paid', admin:'Samuel Kiptoo', date:'Yesterday, 15:20'},
+    {name:'Brian Mutiso', phone:'0788 555 666', service:'Other Service', cls:'Printing/Copying', amount:450, payment:'Cash', status:'paid', admin:'Jane Wanjiru', date:'Yesterday, 16:05'}
+  ];
+
+  var demoAdmins = [
+    {name:'Jane Wanjiru', email:'jane@lashawnacademy.com', role:'office', status:'active', added:'2026-08-14'},
+    {name:'Samuel Kiptoo', email:'samuel@lashawnacademy.com', role:'office', status:'active', added:'2026-09-01'},
+    {name:'Brahim', email:'brahim@lashawnacademy.com', role:'super', status:'active', added:'2026-06-01'}
+  ];
+
+  var revenueByService = [
+    {label:'Driving', value:96500}, {label:'Computer', value:15000}, {label:'Web Design', value:0},
+    {label:'Defensive', value:8000}, {label:'Printing', value:450}, {label:'Refresher', value:2500}
+  ];
+
+  // ---------- Tab switching ----------
+  var buttons = document.querySelectorAll('nav.tabs button');
+  buttons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      buttons.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+      document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    });
+  });
+
+  function money(n){ return 'KSh ' + Number(n).toLocaleString(); }
+
+  // ---------- Overview ----------
+  function renderOverview(){
+    var todays = demoEnrollments.filter(function(e){ return e.date.indexOf('Today') === 0; });
+    var revenue = todays.reduce(function(sum, e){ return sum + e.amount; }, 0);
+    document.getElementById('stat-revenue').textContent = money(revenue);
+    document.getElementById('stat-revenue-count').textContent = todays.length + ' transactions';
+    document.getElementById('stat-students').textContent = demoEnrollments.length;
+    document.getElementById('stat-pending').textContent = demoEnrollments.filter(function(e){ return e.status === 'pending'; }).length;
+    document.getElementById('stat-admins').textContent = demoAdmins.filter(function(a){ return a.role === 'office' && a.status === 'active'; }).length;
+
+    var max = Math.max.apply(null, revenueByService.map(function(r){ return r.value; })) || 1;
+    var barsHtml = revenueByService.map(function(r){
+      var h = Math.max(6, Math.round((r.value / max) * 120));
+      return '<div class="bar-col"><div class="bv">' + money(r.value) + '</div><div class="bar" style="height:' + h + 'px"></div><div class="bl">' + r.label + '</div></div>';
+    }).join('');
+    document.getElementById('revenue-bars').innerHTML = barsHtml;
+
+    var latest = demoEnrollments.slice(0, 5).map(function(e){
+      return '<tr><td>' + e.name + '</td><td>' + e.service + ' — ' + e.cls + '</td><td>' + money(e.amount) + '</td><td>' + e.admin + '</td><td>' + e.date + '</td></tr>';
+    }).join('');
+    document.getElementById('latest-activity').innerHTML = latest;
+  }
+
+  // ---------- Enrollments table ----------
+  function renderEnrollments(filter){
+    filter = (filter || '').toLowerCase();
+    var rows = demoEnrollments.filter(function(e){
+      return !filter || e.name.toLowerCase().indexOf(filter) > -1 || e.cls.toLowerCase().indexOf(filter) > -1 || e.service.toLowerCase().indexOf(filter) > -1;
+    }).map(function(e){
+      var statusPill = e.status === 'paid' ? '<span class="tag-pill paid">Paid</span>' : '<span class="tag-pill pending">Pending</span>';
+      return '<tr><td>' + e.name + '</td><td>' + e.phone + '</td><td>' + e.service + '</td><td>' + e.cls + '</td><td>' + money(e.amount) + '</td><td>' + e.payment + '</td><td>' + statusPill + '</td><td>' + e.admin + '</td><td>' + e.date + '</td></tr>';
+    }).join('');
+    document.getElementById('enroll-table').innerHTML = rows || '<tr><td colspan="9">No matching records.</td></tr>';
+  }
+  document.getElementById('enrollSearch').addEventListener('input', function(e){ renderEnrollments(e.target.value); });
+
+  // ---------- Services & Pricing ----------
+  function priceRow(key, item, group){
+    return '<div class="price-row" data-key="' + key + '" data-group="' + group + '">' +
+      '<div class="name">' + item.label + '</div>' +
+      '<div class="edit"><input type="number" min="0" value="' + item.price + '"><button class="btn outline save-price">Save</button></div>' +
+    '</div>';
+  }
+  function renderPrices(){
+    document.getElementById('price-driving').innerHTML = Object.keys(drivingPrices).map(function(k){ return priceRow(k, drivingPrices[k], 'driving'); }).join('');
+    document.getElementById('price-other').innerHTML = Object.keys(otherPrices).map(function(k){ return priceRow(k, otherPrices[k], 'other'); }).join('');
+  }
+  document.addEventListener('click', function(e){
+    if(!e.target.classList.contains('save-price')) return;
+    var row = e.target.closest('.price-row');
+    var key = row.dataset.key, group = row.dataset.group;
+    var input = row.querySelector('input');
+    var val = Number(input.value);
+    if(isNaN(val) || val < 0){ showToast('Enter a valid price.'); return; }
+    (group === 'driving' ? drivingPrices : otherPrices)[key].price = val;
+    showToast('Price updated for ' + (group === 'driving' ? drivingPrices : otherPrices)[key].label + '.');
+    renderOverview();
+  });
+
+  // ---------- Admin accounts ----------
+  function renderAdmins(){
+    var rows = demoAdmins.map(function(a, i){
+      var roleTag = a.role === 'super' ? '<span class="tag-pill super">Super Admin</span>' : '<span class="tag-pill office">Office Admin</span>';
+      var statusLabel = a.status === 'active' ? 'Active' : 'Suspended';
+      var toggleLabel = a.status === 'active' ? 'Suspend' : 'Reactivate';
+      return '<tr><td>' + a.name + '</td><td>' + a.email + '</td><td>' + roleTag + '</td><td>' + statusLabel + '</td><td>' + a.added + '</td>' +
+        '<td><button class="btn outline" data-toggle="' + i + '">' + toggleLabel + '</button></td></tr>';
+    }).join('');
+    document.getElementById('admin-table').innerHTML = rows;
+  }
+  document.addEventListener('click', function(e){
+    if(e.target.dataset.toggle === undefined) return;
+    var idx = Number(e.target.dataset.toggle);
+    demoAdmins[idx].status = demoAdmins[idx].status === 'active' ? 'suspended' : 'active';
+    renderAdmins();
+    renderOverview();
+  });
+
+  document.getElementById('addAdminBtn').addEventListener('click', function(){
+    var name = document.getElementById('adminName').value.trim();
+    var email = document.getElementById('adminEmail').value.trim();
+    var role = document.getElementById('adminRole').value;
+    if(!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      showToast('Enter a name and valid email.');
+      return;
+    }
+    demoAdmins.push({name:name, email:email, role:role, status:'active', added:new Date().toISOString().slice(0,10)});
+    document.getElementById('adminName').value = '';
+    document.getElementById('adminEmail').value = '';
+    renderAdmins();
+    renderOverview();
+    showToast('Admin account added.');
+  });
+
+  // ---------- Toast ----------
+  var toastTimer;
+  function showToast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  }
+
+  renderOverview();
+  renderEnrollments('');
+  renderPrices();
+  renderAdmins();
+})();
+</script>
+
+</body>
+</html>
