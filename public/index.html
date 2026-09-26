@@ -4,8 +4,43 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lashawn Driving & Computer College</title>
-<meta name="description" content="Professional driving instruction and computer training programs in a supportive, hands-on environment.">
+<meta name="description" content="Professional driving instruction, computer training, printing, and branding services in a supportive, hands-on environment.">
 <link rel="stylesheet" href="css/style.css">
+<style>
+  /* Nav dropdown (small addition, safe for all pages) */
+  .nav-item { position: relative; }
+  .nav-item > a::after { content: " ▾"; font-size: 0.7em; opacity: 0.7; }
+  .nav-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    padding: 0.4rem;
+    min-width: 220px;
+    z-index: 200;
+    margin-top: 0.3rem;
+  }
+  .nav-item:hover .nav-dropdown { display: block; }
+  .nav-dropdown a {
+    display: block;
+    color: var(--text);
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    text-align: left;
+  }
+  .nav-dropdown a:hover { background: var(--bg); color: var(--navy); }
+  @media (max-width: 820px) {
+    .nav-dropdown { position: static; display: block; box-shadow: none; border: none; padding: 0; margin: 0; }
+    .nav-item > a::after { content: ""; }
+  }
+</style>
 </head>
 <body>
 
@@ -15,7 +50,36 @@
   </a>
   <nav>
     <a href="index.html">Home</a>
-    <a href="courses-ntsa.html">Courses</a>
+
+    <div class="nav-item">
+      <a href="courses-ntsa.html">Driving</a>
+      <div class="nav-dropdown">
+        <a href="courses-ntsa.html">All NTSA Classes</a>
+        <a href="enroll.html">Enroll in Driving</a>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <a href="computer.html">Computer</a>
+      <div class="nav-dropdown">
+        <a href="computer.html">Computer Courses</a>
+        <a href="enroll.html">Enroll in Computer</a>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <a href="printing.html">Printing</a>
+      <div class="nav-dropdown">
+        <a href="printing.html">All Printing Services</a>
+        <a href="printing.html#catalog">Service Catalog & Prices</a>
+        <a href="printing.html#catalog">Large Format Printing</a>
+        <a href="printing.html#catalog">T-Shirt &amp; Merch Branding</a>
+        <a href="printing.html#catalog">Signage &amp; Vehicle Wraps</a>
+        <a href="printing.html#catalog">Graphic Design</a>
+        <a href="printing.html#quote">Request a Quote</a>
+      </div>
+    </div>
+
     <a href="#why">Why Us</a>
     <a href="enroll.html" class="cta">Enroll Now</a>
   </nav>
@@ -26,8 +90,8 @@
      ============================================================ -->
 <div id="top" class="hero">
   <div>
-    <h1>Drive Forward. <span>Skill Up.</span></h1>
-    <p>Professional driving instruction and computer training programs, built to get you certified, confident, and ready for what's next.</p>
+    <h1>Drive Forward. <span>Skill Up.</span> Brand Better.</h1>
+    <p>Professional driving instruction, computer training, and complete printing &amp; branding services — all under one roof.</p>
     <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
       <a class="btn" href="enroll.html">Enroll Now</a>
       <a class="btn secondary" href="courses-ntsa.html">View Courses</a>
@@ -44,6 +108,10 @@
       <div>
         <div style="font-size:1.6rem;font-weight:800;color:var(--navy);">6</div>
         <div style="font-size:0.85rem;color:var(--muted);">Week Programmes</div>
+      </div>
+      <div>
+        <div style="font-size:1.6rem;font-weight:800;color:var(--navy);">30+</div>
+        <div style="font-size:0.85rem;color:var(--muted);">Print Services</div>
       </div>
     </div>
   </div>
@@ -79,8 +147,8 @@
     </div>
     <div class="card">
       <span class="icon">🖨️</span>
-      <h3>Printing Services</h3>
-      <p>Document printing, copying, and scanning available on-site for students and the public.</p>
+      <h3>Printing &amp; Branding</h3>
+      <p>Document printing, large format, T-shirt branding, signage, and design — all in-house.</p>
     </div>
     <div class="card">
       <span class="icon">📄</span>
@@ -91,32 +159,133 @@
 </section>
 
 <!-- ============================================================
-     NTSA CLASSES (loaded from Supabase)
+     SERVICE CATEGORIES
      ============================================================ -->
-<section id="courses" class="alt">
+<section class="alt">
   <div>
-    <h2>NTSA Driving Classes</h2>
-    <p class="subtitle">All licence classes we train — click any class to start enrollment.</p>
+    <h2>Our Three Service Pillars</h2>
+    <p class="subtitle">Everything we do, grouped into three simple categories.</p>
 
-    <div class="grid" id="drivingClassesGrid">
-      <!-- Populated by app.js -->
-      <div class="card" style="grid-column:1/-1;">
-        <p class="text-muted text-center">Loading classes...</p>
-      </div>
-    </div>
+    <div class="grid grid-3">
+      <a class="card-link" href="courses-ntsa.html">
+        <div class="card" style="border-top:4px solid var(--navy);">
+          <span class="icon">🚗</span>
+          <h3>Driving School</h3>
+          <p>NTSA-licensed classes A through G. Theory, practical, and test readiness.</p>
+          <div class="price">From KSh 25,000</div>
+        </div>
+      </a>
 
-    <div class="view-all text-center mt-3">
-      <a class="btn secondary" href="courses-ntsa.html">View Full Catalog</a>
+      <a class="card-link" href="computer.html">
+        <div class="card" style="border-top:4px solid var(--gold);">
+          <span class="icon">💻</span>
+          <h3>Computer College</h3>
+          <p>Beginner to advanced IT training — office, design, web, and more.</p>
+          <div class="price">From KSh 15,000</div>
+        </div>
+      </a>
+
+      <a class="card-link" href="printing.html">
+        <div class="card" style="border-top:4px solid var(--success);">
+          <span class="icon">🖨️</span>
+          <h3>Printing &amp; Branding</h3>
+          <p>Print, design, large format, T-shirts, signage, and corporate identity.</p>
+          <div class="price">From KSh 5 / page</div>
+        </div>
+      </a>
     </div>
   </div>
 </section>
 
 <!-- ============================================================
-     POPULAR COURSES (static, mixes driving + computer + printing)
+     NTSA CLASSES (loaded from Supabase)
+     ============================================================ -->
+<section id="courses">
+  <h2>NTSA Driving Classes</h2>
+  <p class="subtitle">All licence classes we train — click any class to start enrollment.</p>
+
+  <div class="grid" id="drivingClassesGrid">
+    <div class="card" style="grid-column:1/-1;">
+      <p class="text-muted text-center">Loading classes...</p>
+    </div>
+  </div>
+
+  <div class="view-all text-center mt-3">
+    <a class="btn secondary" href="courses-ntsa.html">View Full Catalog</a>
+  </div>
+</section>
+
+<!-- ============================================================
+     PRINTING HIGHLIGHTS
+     ============================================================ -->
+<section class="alt">
+  <div>
+    <h2>Printing &amp; Branding Highlights</h2>
+    <p class="subtitle">From single pages to full corporate brand rollouts.</p>
+
+    <div class="grid grid-3">
+      <a class="card-link" href="printing.html#catalog">
+        <div class="card">
+          <span class="icon">📄</span>
+          <h3>Document Printing</h3>
+          <p>B&amp;W and colour printing, photocopying, scanning, and lamination.</p>
+          <div class="price">From KSh 5 / page</div>
+        </div>
+      </a>
+      <a class="card-link" href="printing.html#catalog">
+        <div class="card">
+          <span class="icon">🖼️</span>
+          <h3>Large Format Printing</h3>
+          <p>Banners, posters (A2–A0), backdrops, pull-ups, and outdoor signage.</p>
+          <div class="price">From KSh 1,000 / sqm</div>
+        </div>
+      </a>
+      <a class="card-link" href="printing.html#catalog">
+        <div class="card">
+          <span class="icon">👕</span>
+          <h3>T-Shirt &amp; Merch Branding</h3>
+          <p>Heat transfer, screen print, embroidery on shirts, caps, mugs, and more.</p>
+          <div class="price">From KSh 350 / item</div>
+        </div>
+      </a>
+      <a class="card-link" href="printing.html#catalog">
+        <div class="card">
+          <span class="icon">🎨</span>
+          <h3>Graphic Design</h3>
+          <p>Logos, flyers, posters, and full brand identity kits.</p>
+          <div class="price">From KSh 500 / job</div>
+        </div>
+      </a>
+      <a class="card-link" href="printing.html#catalog">
+        <div class="card">
+          <span class="icon">🪧</span>
+          <h3>Signage &amp; Vehicle Wraps</h3>
+          <p>3D signs, wall graphics, window branding, and full vehicle wraps.</p>
+          <div class="price">Quote on request</div>
+        </div>
+      </a>
+      <a class="card-link" href="printing.html#catalog">
+        <div class="card">
+          <span class="icon">📇</span>
+          <h3>Business Stationery</h3>
+          <p>Business cards, letterheads, envelopes, invoice books, and rubber stamps.</p>
+          <div class="price">From KSh 1,200 / pack</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="view-all text-center mt-3">
+      <a class="btn" href="printing.html">Explore All Printing Services</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     POPULAR COURSES
      ============================================================ -->
 <section>
   <h2>Popular Courses</h2>
-  <p class="subtitle">A sample of what we offer across driving, computing, and printing.</p>
+  <p class="subtitle">A sample across driving, computing, and printing.</p>
   <div class="grid">
     <a class="card-link" href="courses-ntsa.html">
       <div class="card">
@@ -142,11 +311,13 @@
       <p>10 weeks · build real projects</p>
       <div class="price">From KSh 30,000</div>
     </div>
-    <div class="card">
-      <h3>Printing & Copying</h3>
-      <p>Walk-in · per page, black & white or color</p>
-      <div class="price">From KSh 10</div>
-    </div>
+    <a class="card-link" href="printing.html#catalog">
+      <div class="card">
+        <h3>Printing &amp; Copying</h3>
+        <p>Walk-in · per page, black &amp; white or color</p>
+        <div class="price">From KSh 10</div>
+      </div>
+    </a>
   </div>
 </section>
 
@@ -155,20 +326,20 @@
      ============================================================ -->
 <section class="alt">
   <div>
-    <h2>What Students Say</h2>
-    <p class="subtitle">Real feedback from graduates of our programmes.</p>
+    <h2>What Clients Say</h2>
+    <p class="subtitle">Real feedback from graduates and printing customers.</p>
     <div class="grid">
       <div class="card">
         <p style="font-style:italic;font-size:1rem;">"I went from never driving to passing my test on the first try. The instructors were so patient."</p>
-        <div class="text-muted" style="font-weight:600;font-size:0.9rem;margin-top:0.6rem;">— Former Student</div>
+        <div class="text-muted" style="font-weight:600;font-size:0.9rem;margin-top:0.6rem;">— Former Driving Student</div>
       </div>
       <div class="card">
         <p style="font-style:italic;font-size:1rem;">"The computer basics course finally made me comfortable using a laptop for work."</p>
-        <div class="text-muted" style="font-weight:600;font-size:0.9rem;margin-top:0.6rem;">— Former Student</div>
+        <div class="text-muted" style="font-weight:600;font-size:0.9rem;margin-top:0.6rem;">— Computer Student</div>
       </div>
       <div class="card">
-        <p style="font-style:italic;font-size:1rem;">"Flexible scheduling meant I could keep my job while I trained."</p>
-        <div class="text-muted" style="font-weight:600;font-size:0.9rem;margin-top:0.6rem;">— Former Student</div>
+        <p style="font-style:italic;font-size:1rem;">"They handled our branding — logo, cards, T-shirts, and a pull-up banner — all under one roof."</p>
+        <div class="text-muted" style="font-weight:600;font-size:0.9rem;margin-top:0.6rem;">— Business Client</div>
       </div>
     </div>
   </div>
@@ -180,10 +351,13 @@
 <section id="enroll">
   <div style="background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:16px;padding:2.5rem 1.5rem;text-align:center;">
     <h2 style="color:#fff;">Ready to Start?</h2>
-    <p style="color:#cfd9e8;max-width:480px;margin:0 auto 1.5rem;">
-      Enrollment takes less than five minutes. Pick a course, tell us a bit about you, and our team will follow up.
+    <p style="color:#cfd9e8;max-width:520px;margin:0 auto 1.5rem;">
+      Enroll in a course, or request a printing &amp; branding quote — both take less than five minutes.
     </p>
-    <a class="btn" href="enroll.html">Start Enrollment</a>
+    <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <a class="btn" href="enroll.html">Start Enrollment</a>
+      <a class="btn secondary" href="printing.html#quote" style="background:transparent;color:#fff;border-color:rgba(255,255,255,0.3);">Request Printing Quote</a>
+    </div>
   </div>
 </section>
 
@@ -191,32 +365,47 @@
      FOOTER
      ============================================================ -->
 <footer style="background:var(--navy);color:#cfd9e8;padding:2.5rem 1.5rem 1.5rem;margin-top:2rem;">
-  <div style="max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2rem;">
+  <div style="max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;">
+
     <div>
       <div style="color:#fff;font-weight:700;margin-bottom:0.6rem;">🎓 Lashawn Academy</div>
       <p style="font-size:0.9rem;margin:0;">
-        Driving & Computer College. Hands-on training, real credentials.
+        Driving, Computer &amp; Printing Services. Hands-on training, real credentials.
       </p>
     </div>
+
     <div>
-      <div style="color:#fff;font-weight:700;margin-bottom:0.6rem;">Quick Links</div>
+      <div style="color:#fff;font-weight:700;margin-bottom:0.6rem;">Programmes</div>
       <div style="display:flex;flex-direction:column;gap:0.3rem;font-size:0.9rem;">
-        <a href="index.html" style="color:#cfd9e8;text-decoration:none;">Home</a>
-        <a href="courses-ntsa.html" style="color:#cfd9e8;text-decoration:none;">Courses</a>
-        <a href="enroll.html" style="color:#cfd9e8;text-decoration:none;">Enroll</a>
-        <a href="login.html" style="color:#cfd9e8;text-decoration:none;">Staff Login</a>
+        <a href="courses-ntsa.html" style="color:#cfd9e8;text-decoration:none;">Driving Classes</a>
+        <a href="computer.html" style="color:#cfd9e8;text-decoration:none;">Computer Courses</a>
+        <a href="enroll.html" style="color:#cfd9e8;text-decoration:none;">Enroll Now</a>
       </div>
     </div>
+
+    <div>
+      <div style="color:#fff;font-weight:700;margin-bottom:0.6rem;">Printing Services</div>
+      <div style="display:flex;flex-direction:column;gap:0.3rem;font-size:0.9rem;">
+        <a href="printing.html#catalog" style="color:#cfd9e8;text-decoration:none;">Document Printing</a>
+        <a href="printing.html#catalog" style="color:#cfd9e8;text-decoration:none;">Large Format</a>
+        <a href="printing.html#catalog" style="color:#cfd9e8;text-decoration:none;">T-Shirt Branding</a>
+        <a href="printing.html#catalog" style="color:#cfd9e8;text-decoration:none;">Signage &amp; Wraps</a>
+        <a href="printing.html#quote" style="color:#cfd9e8;text-decoration:none;">Request a Quote</a>
+      </div>
+    </div>
+
     <div>
       <div style="color:#fff;font-weight:700;margin-bottom:0.6rem;">Contact</div>
       <div style="font-size:0.9rem;display:flex;flex-direction:column;gap:0.3rem;">
         <a href="mailto:info@lashawnacademy.com" style="color:#cfd9e8;text-decoration:none;">info@lashawnacademy.com</a>
         <span>Mon–Sat · 8:00–18:00</span>
+        <a href="login.html" style="color:#cfd9e8;text-decoration:none;">Staff Login</a>
       </div>
     </div>
+
   </div>
   <div style="max-width:1080px;margin:1.5rem auto 0;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.15);text-align:center;font-size:0.85rem;">
-    © <span id="year"></span> Lashawn Driving & Computer College. All rights reserved.
+    © <span id="year"></span> Lashawn Driving &amp; Computer College. All rights reserved.
   </div>
 </footer>
 
@@ -227,7 +416,6 @@
 <script src="js/supabase.js"></script>
 <script src="js/app.js"></script>
 <script>
-  // Simple year in footer
   document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 </body>
