@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Profile — Lashawn Academy</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="brand">🎓 Lashawn Academy</div>
+    <nav>
+      <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="students.html" class="active"><span class="icon">👥</span> Students</a>
+      <a href="driving.html"><span class="icon">🚗</span> Driving</a>
+      <a href="computer.html"><span class="icon">💻</span> Computer</a>
+      <a href="printing.html"><span class="icon">🖨️</span> Printing</a>
+      <a href="finance.html"><span class="icon">💰</span> Finance</a>
+      <a href="vehicles.html"><span class="icon">🚙</span> Vehicles</a>
+      <a href="staff.html"><span class="icon">👔</span> Staff</a>
+      <a href="reports.html"><span class="icon">📈</span> Reports</a>
+      <a href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      <a href="#" onclick="window.signOut();return false;"><span class="icon">🚪</span> Logout</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="flex-between mb-3">
+      <div>
+        <h2 style="text-align:left;margin:0;">Student Profile</h2>
+        <p class="text-muted" style="margin:0;"><a href="students.html">← Back to Students</a></p>
+      </div>
+    </div>
+
+    <div id="profileContent">
+      <p class="text-muted">Loading...</p>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const session = await window.getSession();
+  if (!session) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const studentId = params.get("id");
+
+  if (!studentId) {
+    document.getElementById("profileContent").innerHTML =
+      '<div class="alert alert-danger">No student ID provided.</div>';
+    return;
+  }
+
+  await loadProfile(studentId);
+});
+
+async function loadProfile(id) {
+  const el = document.getElementById("profileContent");
+  try {
+    const { data: student, error } = await LashawnDB
+      .from("students")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!student) {
+      el.innerHTML = '<div class="alert alert-danger">Student not found.</div>';
+      return;
+    }
+
+    // Enrolments
+    const { data: enrolments } = await LashawnDB
+      .from("enrolments")
+      .select("*")
+      .eq("student_id", id)
+      .order("created_at", { ascending: false });
+
+    el.innerHTML = `
+      <div class="grid grid-2 mb-3">
+        <div class="card">
+          <h3 style="margin:0 0 1rem;">Personal Details</h3>
+          <p><strong>Name:</strong> ${student.first_name} ${student.middle_name || ""} ${student.last_name}</p>
+          <p><strong>Student No:</strong> ${student.student_number}</p>
+          <p><strong>Phone:</strong> ${student.phone || "—"}</p>
+          <p><strong>Email:</strong> ${student.email || "—"}</p>
+          <p><strong>ID/Passport:</strong> ${student.national_id || student.passport_number || "—"}</p>
+          <p><strong>Status:</strong> <span class="badge badge-${student.status === "ACTIVE" ? "success" : "neutral"}">${student.status}</span></p>
+          <p><strong>Registered:</strong> ${student.registration_date || "—"}</p>
+        </div>
+
+        <div class="card">
+          <h3 style="margin:0 0 1rem;">Enrolments</h3>
+          ${
+            enrolments && enrolments.length
+              ? enrolments
+                  .map(
+                    (e) => `
+              <div style="border-bottom:1px solid var(--border);padding:0.6rem 0;">
+                <p style="margin:0;"><strong>${e.enrolment_number}</strong></p>
+                <p style="margin:0;font-size:0.9rem;color:var(--muted);">
+                  ${e.programme} · ${e.status} · Start: ${e.start_date}
+                </p>
+              </div>`
+                  )
+                  .join("")
+              : '<p class="text-muted">No enrolments.</p>'
+          }
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    console.error(err);
+    el.innerHTML =
+      '<div class="alert alert-danger">Could not load student profile.</div>';
+  }
+}
+</script>
+</body>
+</html>
