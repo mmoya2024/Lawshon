@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Staff Login — Lashawn Driving & Computer College</title>
+<meta name="description" content="Staff login for Lashawn Academy management system.">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .login-shell{
+    min-height:100vh;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    background:var(--bg);
+  }
+  @media (max-width:900px){
+    .login-shell{grid-template-columns:1fr;}
+    .login-brandside{display:none;}
+  }
+
+  /* ---------- LEFT: Brand panel ---------- */
+  .login-brandside{
+    background:linear-gradient(135deg,var(--navy),var(--navy2));
+    color:#fff;
+    padding:3rem 3.5rem;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+    overflow:hidden;
+  }
+  .login-brandside::before{
+    content:"";
+    position:absolute;
+    width:420px;height:420px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(212,160,23,0.18), transparent 70%);
+    top:-120px; right:-120px;
+  }
+  .login-brandside::after{
+    content:"";
+    position:absolute;
+    width:340px;height:340px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%);
+    bottom:-100px; left:-100px;
+  }
+  .login-brandside .bs-brand{
+    font-size:1.15rem;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+    position:relative;
+    z-index:1;
+  }
+  .login-brandside .bs-brand .dot{color:var(--gold);}
+  .login-brandside .bs-mid{
+    position:relative;
+    z-index:1;
+    max-width:420px;
+  }
+  .login-brandside .bs-mid h2{
+    font-size:2.1rem;
+    color:#fff;
+    text-align:left;
+    margin:0 0 .8rem;
+    line-height:1.15;
+  }
+  .login-brandside .bs-mid h2 span{color:var(--gold);}
+  .login-brandside .bs-mid p{
+    color:#cfd9e8;
+    font-size:1rem;
+    margin:0 0 1.6rem;
+  }
+  .login-brandside .bs-features{
+    display:flex;
+    flex-direction:column;
+    gap:.55rem;
+    font-size:.92rem;
+    color:#cfd9e8;
+  }
+  .login-brandside .bs-features span{
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+  }
+  .login-brandside .bs-foot{
+    position:relative;
+    z-index:1;
+    font-size:.82rem;
+    color:#9fb0c8;
+  }
+  .login-brandside .bs-foot a{
+    color:#fff;
+    text-decoration:underline;
+  }
+
+  /* ---------- RIGHT: Form panel ---------- */
+  .login-formside{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:2rem 1.5rem;
+  }
+  .login-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:2.2rem;
+    max-width:420px;
+    width:100%;
+    box-shadow:0 8px 32px rgba(15,45,82,0.08);
+  }
+  .login-card .mobile-brand{
+    display:none;
+    text-align:center;
+    font-weight:700;
+    color:var(--navy);
+    margin-bottom:1rem;
+    font-size:1.05rem;
+  }
+  .login-card .mobile-brand .dot{color:var(--gold);}
+  @media (max-width:900px){
+    .login-card .mobile-brand{display:block;}
+  }
+  .login-card h1{
+    font-size:1.5rem;
+    color:var(--navy);
+    text-align:center;
+    margin:0 0 .35rem;
+  }
+  .login-card .subtitle{
+    text-align:center;
+    color:var(--muted);
+    font-size:.92rem;
+    margin:0 0 1.6rem;
+  }
+
+  .form-group{margin-bottom:1rem;}
+  .form-group label{
+    display:block;
+    font-size:.85rem;
+    font-weight:600;
+    margin-bottom:.35rem;
+    color:var(--text);
+  }
+  .form-group input{
+    width:100%;
+    padding:.7rem .85rem;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:1rem;
+    font-family:inherit;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .form-group input:focus{
+    outline:none;
+    border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(212,160,23,.15);
+  }
+
+  .pwd-wrap{position:relative;}
+  .pwd-wrap input{padding-right:3rem;}
+  .pwd-toggle{
+    position:absolute;
+    right:.5rem;
+    top:50%;
+    transform:translateY(-50%);
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    font-size:1rem;
+    padding:.35rem .5rem;
+    color:var(--muted);
+    border-radius:6px;
+  }
+  .pwd-toggle:hover{background:var(--bg);color:var(--navy);}
+
+  .login-btn{
+    width:100%;
+    background:var(--gold);
+    color:#241900;
+    border:none;
+    padding:.85rem 1rem;
+    border-radius:8px;
+    font-weight:700;
+    font-size:1rem;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .15s ease, transform .1s ease;
+    margin-top:.5rem;
+  }
+  .login-btn:hover:not(:disabled){background:var(--gold-light);transform:translateY(-1px);}
+  .login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+  .forgot{
+    display:block;
+    text-align:center;
+    font-size:.85rem;
+    color:var(--muted);
+    margin-top:1rem;
+    text-decoration:none;
+  }
+  .forgot:hover{color:var(--navy);text-decoration:underline;}
+
+  .login-foot{
+    text-align:center;
+    margin-top:1.6rem;
+    padding-top:1.2rem;
+    border-top:1px solid var(--border);
+    font-size:.85rem;
+    color:var(--muted);
+  }
+  .login-foot a{color:var(--navy);text-decoration:none;}
+  .login-foot a:hover{text-decoration:underline;}
+
+  .alert{
+    padding:.8rem 1rem;
+    border-radius:8px;
+    font-size:.88rem;
+    margin-bottom:1rem;
+    border:1px solid;
+    line-height:1.4;
+  }
+  .alert-danger{background:#ffebe9;border-color:#cf222e;color:#cf222e;}
+  .alert-info{background:#ddf4ff;border-color:#0969da;color:#0969da;}
+  .alert-success{background:#dafbe1;border-color:#1a7f37;color:#1a7f37;}
+
+  .spinner{
+    display:inline-block;
+    width:16px;height:16px;
+    border:2px solid rgba(36,25,0,0.25);
+    border-radius:50%;
+    border-top-color:#241900;
+    animation:spin .8s linear infinite;
+    vertical-align:middle;
+    margin-right:.4rem;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .login-note{
+    background:#fdf6e3;
+    border:1px solid #eddfa8;
+    border-radius:8px;
+    padding:.7rem .9rem;
+    font-size:.8rem;
+    color:#5a4a10;
+    margin-top:1.2rem;
+    line-height:1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-shell">
+
+  <!-- ============================ LEFT: BRAND PANEL ============================ -->
+  <div class="login-brandside">
+    <a href="index.html" class="bs-brand" style="color:#fff;text-decoration:none;">
+      🎓 <span>Lashawn Driving <span class="dot">&</span> Computer College</span>
+    </a>
+
+    <div class="bs-mid">
+      <h2>Welcome back.<br><span>Sign in to your dashboard.</span></h2>
+      <p>Access student records, enrolments, fee top-ups, and training progress — all in one place.</p>
+
+      <div class="bs-features">
+        <span>✅ Role-based dashboards</span>
+        <span>✅ Live 6-week training tracker</span>
+        <span>✅ Fee top-up & balance tracking</span>
+        <span>✅ Secure Supabase authentication</span>
+      </div>
+    </div>
+
+    <div class="bs-foot">
+      © <span id="yearLeft"></span> Lashawn Academy · <a href="index.html">Back to public site</a>
+    </div>
+  </div>
+
+  <!-- ============================ RIGHT: FORM PANEL ============================ -->
+  <div class="login-formside">
+    <div class="login-card">
+
+      <div class="mobile-brand">
+        🎓 Lashawn Driving <span class="dot">&</span> Computer College
+      </div>
+
+      <h1>Staff Sign In</h1>
+      <p class="subtitle">Use your academy email and password</p>
+
+      <div id="loginAlert"></div>
+
+      <form id="loginForm" autocomplete="on">
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            autocomplete="email"
+            placeholder="you@lashawnacademy.com"
+            inputmode="email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="pwd-wrap">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              autocomplete="current-password"
+              placeholder="Enter your password"
+            >
+            <button type="button" class="pwd-toggle" id="pwdToggle" aria-label="Show password">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" class="login-btn" id="loginBtn">
+          Sign In
+        </button>
+
+        <a href="mailto:info@lashawnacademy.com?subject=Password%20Reset%20Request" class="forgot">
+          Forgot password? Contact admin
+        </a>
+      </form>
+
+      <div class="login-note">
+        <strong>Not a staff member?</strong><br>
+        Only registered Lashawn Academy staff can access this portal.
+        Contact management to be added.
+      </div>
+
+      <div class="login-foot">
+        <a href="index.html">← Back to public website</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================ SCRIPTS ============================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+/* ============================================================
+   LASHAWN ACADEMY - LOGIN
+   ============================================================ */
+
+document.addEventListener("DOMContentLoaded", async () => {
+  document.getElementById("yearLeft").textContent = new Date().getFullYear();
+
+  // If already signed in, route to correct dashboard
+  try {
+    const session = await window.getSession();
+    if (session) {
+      await routeToDashboard();
+      return;
+    }
+  } catch (err) { /* continue to login form */ }
+
+  // Show/hide password
+  document.getElementById("pwdToggle").addEventListener("click", () => {
+    const p = document.getElementById("password");
+    const btn = document.getElementById("pwdToggle");
+    if (p.type === "password") { p.type = "text"; btn.textContent = "🙈"; }
+    else { p.type = "password"; btn.textContent = "👁"; }
+  });
+
+  // Login submit
+  document.getElementById("loginForm").addEventListener("submit", handleLogin);
+});
+
+/* ------------------------------------------------------------
+   LOGIN HANDLER
+   ------------------------------------------------------------ */
+async function handleLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById("loginBtn");
+  const alertBox = document.getElementById("loginAlert");
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Signing in...';
+  alertBox.innerHTML = "";
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    alertBox.innerHTML = '<div class="alert alert-danger">Email and password are required.</div>';
+    btn.disabled = false;
+    btn.textContent = "Sign In";
+    return;
+  }
+
+  try {
+    // 1. Authenticate
+    const { data, error } = await LashawnDB.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+
+    // 2. Verify user is registered staff
+    const { data: staff, error: staffErr } = await LashawnDB
+      .from("staff")
+      .select("id, role, is_active, first_name, last_name")
+      .eq("auth_user_id", data.user.id)
+      .maybeSingle();
+
+    if (staffErr) throw staffErr;
+
+    if (!staff) {
+      await LashawnDB.auth.signOut();
+      throw new Error("Your account is not registered as staff. Contact an administrator.");
+    }
+
+    if (!staff.is_active) {
+      await LashawnDB.auth.signOut();
+      throw new Error("Your account has been deactivated. Contact an administrator.");
+    }
+
+    // 3. Show success + route by role
+    alertBox.innerHTML = `
+      <div class="alert alert-success">
+        Welcome back, ${escapeHtml(staff.first_name)}!<br>
+        Redirecting to your dashboard...
+      </div>`;
+
+    await routeToDashboard(staff.role);
+  } catch (err) {
+    console.error("Login error:", err);
+    alertBox.innerHTML = `
+      <div class="alert alert-danger">
+        ${escapeHtml(translateError(err.message))}
+      </div>`;
+    btn.disabled = false;
+    btn.textContent = "Sign In";
+  }
+}
+
+/* ------------------------------------------------------------
+   ROUTE BASED ON ROLE
+   ------------------------------------------------------------ */
+async function routeToDashboard(role) {
+  // If no role passed, fetch it
+  if (!role) {
+    try {
+      const { data } = await LashawnDB.rpc("get_my_role");
+      role = data || "NONE";
+    } catch (err) {
+      role = "NONE";
+    }
+  }
+
+  const routes = {
+    SUPER_ADMIN:     "superadmin.html",
+    ADMIN:           "superadmin.html",
+    BRANCH_MANAGER:  "admin.html",
+    RECEPTIONIST:    "admin.html",
+    FINANCE:         "admin.html",
+    INSTRUCTOR:      "dashboard.html",
+    COMPUTER_TRAINER:"dashboard.html",
+    PRINTING_OPERATOR:"printing.html",
+    AUDITOR:         "reports.html",
+  };
+
+  const target = routes[role];
+
+  if (!target) {
+    // Unknown role — sign out
+    await LashawnDB.auth.signOut();
+    document.getElementById("loginAlert").innerHTML = `
+      <div class="alert alert-danger">
+        Your account role (${escapeHtml(role)}) has no dashboard assigned. Contact an administrator.
+      </div>`;
+    return;
+  }
+
+  // Small delay so user sees the success message
+  setTimeout(() => {
+    window.location.href = target;
+  }, 700);
+}
+
+/* ------------------------------------------------------------
+   ERROR TRANSLATION
+   ------------------------------------------------------------ */
+function translateError(msg) {
+  if (!msg) return "Login failed. Please try again.";
+  const m = msg.toLowerCase();
+
+  if (m.includes("invalid login") || m.includes("invalid credentials")) {
+    return "Incorrect email or password. Please check and try again.";
+  }
+  if (m.includes("email not confirmed")) {
+    return "Your email has not been confirmed yet. Contact an administrator.";
+  }
+  if (m.includes("too many requests") || m.includes("rate limit")) {
+    return "Too many login attempts. Wait a minute and try again.";
+  }
+  if (m.includes("network") || m.includes("failed to fetch")) {
+    return "Cannot reach the server. Check your internet connection.";
+  }
+  return msg;
+}
+
+function escapeHtml(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+</script>
+</body>
+</html>
