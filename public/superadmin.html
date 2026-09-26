@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Super Admin — Lashawn Driving & Computer College</title>
+<link rel="stylesheet" href="css/style.css">
+<!-- reuse the same <style> block from your existing full admin.html -->
+</head>
+<body>
+<!-- paste the exact body from your full admin.html -->
+
+<!-- ... sidebar, all 6 panels, payment modal ... -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/role-guard.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  // ⛔ Guard: only SUPER_ADMIN or ADMIN can access
+  const role = await window.requireSuperAdmin();
+  if (role !== "SUPER_ADMIN" && role !== "ADMIN") {
+    // requireSuperAdmin() already redirects non-super users to admin.html
+    return;
+  }
+
+  // ✅ Continue with the full dashboard initialization
+  // (paste the rest of your existing init code here)
+});
+</script>
+</body>
+</html>
