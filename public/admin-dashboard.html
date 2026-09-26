@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Super Admin — Lashawn Driving & Computer College</title>
+<link rel="stylesheet" href="css/style.css">
 <style>
   :root{
     --navy:#0f2d52; --navy2:#163a68; --gold:#d4a017; --bg:#f6f7f9; --card:#ffffff;
     --text:#1a1e24; --muted:#5b6472; --border:#e2e6eb; --danger:#b3261e; --ok:#1a7a4c;
   }
   *{box-sizing:border-box;}
-  html{font-size:17px;}
   body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;}
   a{color:inherit;text-decoration:none;}
 
@@ -22,15 +22,13 @@
   .brand .dot{color:var(--gold);}
   .role-tag{font-size:.72rem;color:#cfd9e8;padding:0 .5rem 1rem;text-transform:uppercase;letter-spacing:.04em;}
   nav.tabs{display:flex;flex-direction:column;gap:.2rem;}
-  nav.tabs button{
-    all:unset;cursor:pointer;padding:.65rem .8rem;border-radius:8px;font-size:.9rem;color:#dbe3ee;
-  }
+  nav.tabs button{all:unset;cursor:pointer;padding:.65rem .8rem;border-radius:8px;font-size:.9rem;color:#dbe3ee;}
   nav.tabs button:hover{background:rgba(255,255,255,.08);}
   nav.tabs button.active{background:var(--gold);color:#241900;font-weight:700;}
   .side-foot{margin-top:auto;font-size:.78rem;color:#9fb0c8;padding:.5rem;}
   .side-foot a{color:#fff;text-decoration:underline;}
 
-  main{padding:1.8rem 2rem;max-width:1180px;}
+  main{padding:1.8rem 2rem;max-width:1280px;}
   @media (max-width:600px){main{padding:1.2rem 1rem;}}
   h1{font-size:1.5rem;color:var(--navy);margin:0 0 .2rem;}
   .lede{color:var(--muted);font-size:.92rem;margin:0 0 1.6rem;}
@@ -38,11 +36,14 @@
   .panel{display:none;}
   .panel.active{display:block;}
 
-  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin-bottom:1.8rem;}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.8rem;}
   .stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.2rem;}
-  .stat .num{font-size:1.6rem;font-weight:800;color:var(--navy);}
+  .stat .num{font-size:1.55rem;font-weight:800;color:var(--navy);}
   .stat .label{color:var(--muted);font-size:.82rem;margin-top:.2rem;}
   .stat .delta{font-size:.78rem;margin-top:.4rem;color:var(--ok);}
+  .stat.warn .num{color:#8a5a00;}
+  .stat.danger .num{color:var(--danger);}
+  .stat.ok .num{color:var(--ok);}
 
   .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1.5rem;}
   .card h2{font-size:1.05rem;color:var(--navy);margin:0 0 1rem;}
@@ -53,30 +54,41 @@
   .bar-col .bl{font-size:.72rem;color:var(--muted);text-align:center;}
   .bar-col .bv{font-size:.72rem;color:var(--navy);font-weight:700;}
 
-  table{border-collapse:collapse;width:100%;font-size:.88rem;}
-  thead th{background:#eef2f7;color:var(--navy);text-align:left;padding:.6rem .7rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.02em;border-bottom:1px solid var(--border);}
-  tbody td{padding:.6rem .7rem;border-bottom:1px solid var(--border);}
+  table{border-collapse:collapse;width:100%;font-size:.85rem;}
+  thead th{background:#eef2f7;color:var(--navy);text-align:left;padding:.6rem .7rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.02em;border-bottom:1px solid var(--border);white-space:nowrap;}
+  tbody td{padding:.6rem .7rem;border-bottom:1px solid var(--border);vertical-align:middle;}
   tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover td{background:#fafbfc;}
   .tbl-wrap{overflow-x:auto;}
-  .tag-pill{display:inline-block;padding:.15rem .55rem;border-radius:999px;font-size:.74rem;font-weight:600;}
+  .tag-pill{display:inline-block;padding:.15rem .55rem;border-radius:999px;font-size:.72rem;font-weight:600;white-space:nowrap;}
   .tag-pill.paid{background:#e4f5ec;color:var(--ok);}
-  .tag-pill.pending{background:#fdf1d8;color:#8a5a00;}
+  .tag-pill.partial{background:#fdf1d8;color:#8a5a00;}
+  .tag-pill.pending{background:#fbe7e5;color:var(--danger);}
   .tag-pill.super{background:#e8ecf5;color:var(--navy);}
   .tag-pill.office{background:#f1f1f4;color:var(--muted);}
+  .tag-pill.on-track{background:#e4f5ec;color:var(--ok);}
+  .tag-pill.approaching{background:#fdf1d8;color:#8a5a00;}
+  .tag-pill.overdue{background:#fbe7e5;color:var(--danger);}
+
+  .progress{background:#eef2f7;border-radius:999px;height:8px;overflow:hidden;min-width:80px;}
+  .progress > div{height:100%;background:var(--gold);transition:width .3s ease;}
+  .progress.ok > div{background:var(--ok);}
+  .progress.warn > div{background:#d49a17;}
 
   .toolbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;}
-  .search{padding:.5rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;min-width:200px;}
+  .search{padding:.5rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;min-width:220px;}
+  .filter-select{padding:.5rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;}
 
-  .price-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.9rem;}
+  .price-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.9rem;}
   .price-row{border:1px solid var(--border);border-radius:10px;padding:.9rem;background:#fbfcfd;}
   .price-row .name{font-weight:700;font-size:.9rem;color:var(--navy);margin-bottom:.5rem;}
   .price-row .edit{display:flex;gap:.4rem;align-items:center;}
   .price-row input{width:100%;padding:.45rem .55rem;border:1px solid var(--border);border-radius:6px;font-size:.88rem;}
-  .price-row button{white-space:nowrap;}
 
   .btn{display:inline-block;background:var(--gold);color:#241900;border:none;padding:.55rem 1rem;border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer;}
   .btn.outline{background:transparent;border:1px solid var(--border);color:var(--text);}
   .btn.danger{background:#fbe7e5;color:var(--danger);}
+  .btn.small{padding:.35rem .7rem;font-size:.78rem;}
   .btn:disabled{opacity:.55;cursor:not-allowed;}
 
   .form-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.6rem;align-items:end;margin-bottom:1.2rem;}
@@ -84,9 +96,19 @@
   .form-row .field label{display:block;font-size:.78rem;font-weight:600;margin-bottom:.3rem;color:var(--muted);}
   .form-row input, .form-row select{width:100%;padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;}
 
-  .toast{position:fixed;bottom:1.2rem;right:1.2rem;background:var(--navy);color:#fff;padding:.8rem 1.1rem;border-radius:8px;font-size:.85rem;box-shadow:0 6px 20px rgba(0,0,0,.18);display:none;}
+  .toast{position:fixed;bottom:1.2rem;right:1.2rem;background:var(--navy);color:#fff;padding:.8rem 1.1rem;border-radius:8px;font-size:.85rem;box-shadow:0 6px 20px rgba(0,0,0,.18);display:none;z-index:2000;}
   .toast.show{display:block;}
   .note{background:#fdf6e3;border:1px solid #eddfa8;border-radius:10px;padding:.85rem 1rem;font-size:.85rem;color:#5a4a10;margin-bottom:1.5rem;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:1rem;}
+  .modal-overlay.active{display:flex;}
+  .modal{background:#fff;border-radius:12px;padding:1.5rem;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;}
+  .modal h3{margin:0 0 1rem;color:var(--navy);}
+
+  .fee-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.8rem;margin-top:.8rem;font-size:.82rem;}
+  .fee-summary .item{padding:.6rem;background:#f8f9fb;border-radius:8px;}
+  .fee-summary .item .k{color:var(--muted);}
+  .fee-summary .item .v{font-weight:700;color:var(--navy);font-size:1rem;margin-top:.15rem;}
 </style>
 </head>
 <body>
@@ -97,98 +119,155 @@
     <div class="role-tag">Super Admin</div>
     <nav class="tabs">
       <button data-panel="overview" class="active">Overview</button>
-      <button data-panel="enrollments">Enrollments &amp; Sales</button>
-      <button data-panel="services">Services &amp; Pricing</button>
+      <button data-panel="tracker">6-Week Tracker</button>
+      <button data-panel="fees">Fees & Balances</button>
+      <button data-panel="enrollments">Enrollments & Sales</button>
+      <button data-panel="services">Services & Pricing</button>
       <button data-panel="admins">Admin Accounts</button>
     </nav>
-    <div class="side-foot">Signed in as <strong>Brahim</strong><br><a href="index.html">← Back to site</a></div>
+    <div class="side-foot">Signed in as <strong id="sideName">Admin</strong><br><a href="index.html">← Back to site</a> · <a href="#" onclick="window.signOut();return false;">Logout</a></div>
   </aside>
 
   <main>
 
-    <!-- OVERVIEW -->
+    <!-- ============================ OVERVIEW ============================ -->
     <section class="panel active" id="panel-overview">
       <h1>Overview</h1>
-      <p class="lede">Snapshot of today's activity across driving classes and other services.</p>
+      <p class="lede">Snapshot of students, revenue, fees, and training progress.</p>
 
       <div class="stat-grid">
-        <div class="stat"><div class="num" id="stat-revenue">KSh 0</div><div class="label">Revenue today</div><div class="delta" id="stat-revenue-count">0 transactions</div></div>
-        <div class="stat"><div class="num" id="stat-students">0</div><div class="label">Students enrolled (all time, demo)</div></div>
-        <div class="stat"><div class="num" id="stat-pending">0</div><div class="label">Pending payments</div></div>
-        <div class="stat"><div class="num" id="stat-admins">0</div><div class="label">Active office admins</div></div>
+        <div class="stat"><div class="num" id="stat-students">—</div><div class="label">Total students</div></div>
+        <div class="stat ok"><div class="num" id="stat-revenue">—</div><div class="label">Revenue (confirmed)</div></div>
+        <div class="stat warn"><div class="num" id="stat-balance">—</div><div class="label">Outstanding balance</div></div>
+        <div class="stat"><div class="num" id="stat-active">—</div><div class="label">Active enrolments</div></div>
+        <div class="stat warn"><div class="num" id="stat-approaching">—</div><div class="label">Approaching 6 weeks</div></div>
+        <div class="stat danger"><div class="num" id="stat-overdue">—</div><div class="label">Over 6 weeks</div></div>
+        <div class="stat ok"><div class="num" id="stat-ready">—</div><div class="label">Test ready</div></div>
+        <div class="stat"><div class="num" id="stat-admins">—</div><div class="label">Active staff</div></div>
       </div>
 
       <div class="card">
-        <h2>Revenue by service, this week (demo data)</h2>
-        <div class="bars" id="revenue-bars"></div>
-      </div>
-
-      <div class="card">
-        <h2>Latest activity</h2>
+        <h2>Training status (driving students)</h2>
         <div class="tbl-wrap"><table>
-          <thead><tr><th>Student</th><th>Service</th><th>Amount</th><th>Recorded by</th><th>Time</th></tr></thead>
-          <tbody id="latest-activity"></tbody>
+          <thead><tr>
+            <th>Student</th><th>Class</th><th>Start</th><th>Expected Test Date</th>
+            <th>Days Left</th><th>Progress</th><th>Fee Balance</th><th>Status</th>
+          </tr></thead>
+          <tbody id="overview-tracker"></tbody>
         </table></div>
       </div>
     </section>
 
-    <!-- ENROLLMENTS & SALES -->
-    <section class="panel" id="panel-enrollments">
-      <h1>Enrollments &amp; Sales</h1>
-      <p class="lede">Every driving-class enrollment and other-service sale recorded by office admins.</p>
+    <!-- ============================ 6-WEEK TRACKER ============================ -->
+    <section class="panel" id="panel-tracker">
+      <h1>6-Week Training Tracker</h1>
+      <p class="lede">Automatic tracking of every active driving enrolment. Expected test date = start date + 42 days.</p>
 
       <div class="toolbar">
-        <input type="text" class="search" id="enrollSearch" placeholder="Search by name or service...">
+        <input type="text" class="search" id="trackerSearch" placeholder="Search student or class...">
+        <select class="filter-select" id="trackerFilter">
+          <option value="">All statuses</option>
+          <option value="ON_TRACK">On Track</option>
+          <option value="APPROACHING_6_WEEKS">Approaching 6 Weeks</option>
+          <option value="OVER_6_WEEKS">Over 6 Weeks</option>
+        </select>
       </div>
 
       <div class="card">
         <div class="tbl-wrap"><table>
-          <thead><tr><th>Student</th><th>Phone</th><th>Service</th><th>Class</th><th>Amount</th><th>Payment</th><th>Status</th><th>Admin</th><th>Date</th></tr></thead>
+          <thead><tr>
+            <th>Student</th><th>Class</th><th>Start</th><th>Expected Test Date</th>
+            <th>Days Left</th><th>Progress</th><th>Fee Balance</th><th>Status</th><th></th>
+          </tr></thead>
+          <tbody id="tracker-table"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ============================ FEES & BALANCES ============================ -->
+    <section class="panel" id="panel-fees">
+      <h1>Fees & Balances</h1>
+      <p class="lede">Course fee, amount paid, balance, due date, and payment status for every student.</p>
+
+      <div class="toolbar">
+        <input type="text" class="search" id="feeSearch" placeholder="Search student or class...">
+        <select class="filter-select" id="feeFilter">
+          <option value="">All fee statuses</option>
+          <option value="PAID">Paid in full</option>
+          <option value="PARTIAL">Partial payment</option>
+          <option value="UNPAID">Unpaid</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="tbl-wrap"><table>
+          <thead><tr>
+            <th>Student</th><th>Class / Course</th><th>Course Fee</th><th>Paid</th>
+            <th>Balance</th><th>Due Date</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="fee-table"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ============================ ENROLLMENTS ============================ -->
+    <section class="panel" id="panel-enrollments">
+      <h1>Enrollments & Sales</h1>
+      <p class="lede">Every enrollment recorded in the system.</p>
+
+      <div class="toolbar">
+        <input type="text" class="search" id="enrollSearch" placeholder="Search by name or programme...">
+      </div>
+
+      <div class="card">
+        <div class="tbl-wrap"><table>
+          <thead><tr>
+            <th>Student No.</th><th>Name</th><th>Phone</th><th>Programme</th>
+            <th>Enrolment No.</th><th>Start Date</th><th>Status</th><th>Actions</th>
+          </tr></thead>
           <tbody id="enroll-table"></tbody>
         </table></div>
       </div>
     </section>
 
-    <!-- SERVICES & PRICING -->
+    <!-- ============================ SERVICES & PRICING ============================ -->
     <section class="panel" id="panel-services">
-      <h1>Services &amp; Pricing</h1>
-      <p class="lede">Prices used by office admins when enrolling students or selling other services.</p>
-      <div class="note">Changes here apply to new transactions recorded in this browser session. Connect this page to your FastAPI/Supabase backend to persist pricing across devices.</div>
+      <h1>Services & Pricing</h1>
+      <p class="lede">Prices used when enrolling students. Loaded from Supabase.</p>
 
       <div class="card">
         <h2>Driving classes</h2>
-        <div class="price-grid" id="price-driving"></div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Code</th><th>Class</th><th>Min Age</th><th>Weeks</th><th>Description</th></tr></thead>
+          <tbody id="price-driving"></tbody>
+        </table></div>
       </div>
 
       <div class="card">
-        <h2>Other services</h2>
-        <div class="price-grid" id="price-other"></div>
+        <h2>Computer courses</h2>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Code</th><th>Course</th><th>Duration</th><th>Fee</th></tr></thead>
+          <tbody id="price-computer"></tbody>
+        </table></div>
+      </div>
+
+      <div class="card">
+        <h2>Printing services</h2>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Code</th><th>Service</th><th>Category</th><th>Unit</th><th>Price</th></tr></thead>
+          <tbody id="price-printing"></tbody>
+        </table></div>
       </div>
     </section>
 
-    <!-- ADMIN ACCOUNTS -->
+    <!-- ============================ ADMIN ACCOUNTS ============================ -->
     <section class="panel" id="panel-admins">
-      <h1>Admin Accounts</h1>
-      <p class="lede">Manage who can access the office enrollment console and this super admin dashboard.</p>
-
-      <div class="card">
-        <h2>Add admin</h2>
-        <div class="form-row">
-          <div class="field"><label for="adminName">Full name</label><input type="text" id="adminName" placeholder="Jane Wanjiru"></div>
-          <div class="field"><label for="adminEmail">Email</label><input type="email" id="adminEmail" placeholder="jane@lashawnacademy.com"></div>
-          <div class="field"><label for="adminRole">Role</label>
-            <select id="adminRole">
-              <option value="office">Office Admin</option>
-              <option value="super">Super Admin</option>
-            </select>
-          </div>
-          <button class="btn" id="addAdminBtn">Add Admin</button>
-        </div>
-      </div>
+      <h1>Admin & Staff Accounts</h1>
+      <p class="lede">Manage who can access this dashboard.</p>
 
       <div class="card">
         <div class="tbl-wrap"><table>
-          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Added</th><th></th></tr></thead>
+          <thead><tr><th>Staff No.</th><th>Name</th><th>Email</th><th>Role</th><th>Active</th></tr></thead>
           <tbody id="admin-table"></tbody>
         </table></div>
       </div>
@@ -197,172 +276,612 @@
   </main>
 </div>
 
+<!-- ============================ PAYMENT MODAL ============================ -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <h3>Record Payment</h3>
+    <div id="paymentAlert"></div>
+
+    <div id="paymentStudentInfo" class="fee-summary mb-2"></div>
+
+    <form id="paymentForm">
+      <input type="hidden" id="payEnrolmentId">
+      <input type="hidden" id="payStudentId">
+
+      <div class="form-row" style="grid-template-columns:1fr 1fr;">
+        <div class="form-group">
+          <label for="payAmount">Amount *</label>
+          <input type="number" id="payAmount" min="1" required placeholder="0">
+        </div>
+        <div class="form-group">
+          <label for="payMethod">Method *</label>
+          <select id="payMethod" required>
+            <option value="CASH">Cash</option>
+            <option value="MPESA">M-Pesa</option>
+            <option value="BANK">Bank Transfer</option>
+            <option value="CARD">Card</option>
+            <option value="CHEQUE">Cheque</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="payReference">Reference (M-Pesa code, cheque no., etc.)</label>
+        <input type="text" id="payReference" placeholder="Optional">
+      </div>
+
+      <div class="form-group">
+        <label for="payNotes">Notes</label>
+        <textarea id="payNotes" rows="2"></textarea>
+      </div>
+
+      <div class="modal-actions" style="display:flex;gap:0.6rem;justify-content:flex-end;margin-top:1.2rem;">
+        <button type="button" class="btn outline" onclick="closePaymentModal()">Cancel</button>
+        <button type="submit" class="btn" id="paySubmitBtn">Record Payment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
 <script>
-(function(){
+/* ============================================================
+   LASHAWN ACADEMY - SUPER ADMIN DASHBOARD
+   ============================================================ */
 
-  // ---------- Demo/mock data (in-memory only; wire to your API for real persistence) ----------
-  var drivingPrices = {
-    A2:{label:'A2 — Motorcycle',price:7500}, A3:{label:'A3 — Motorcycle, Professional',price:9000},
-    B1:{label:'B1 — Automatic Saloon Car',price:10000}, B2:{label:'B2 — Manual Saloon Car',price:12000},
-    B3:{label:'B3 — Light Vehicle, Professional',price:14000}, C1:{label:'C1 — Light Truck, Professional',price:16500},
-    C:{label:'C — Medium/Heavy Truck',price:19000}, D1:{label:'D1 — Van (PSV)',price:18000},
-    D2:{label:'D2 — Minibus (PSV)',price:21000}, D3:{label:'D3 — Bus (PSV)',price:24000},
-    CE:{label:'CE — Heavy Commercial/Trailer',price:28000}, G:{label:'G — Plant & Equipment',price:16500}
-  };
-  var otherPrices = {
-    computerBasics:{label:'Computer Basics',price:15000},
-    webDesign:{label:'Web Design Fundamentals',price:30000},
-    defensiveDriving:{label:'Defensive Driving (1-day)',price:8000},
-    refresher:{label:'Refresher Course (5 lessons)',price:2500},
-    instructor:{label:'Driving School Instructor Course',price:30000},
-    printingBw:{label:'Printing/Copying — B&W (per page)',price:10},
-    printingColor:{label:'Printing/Copying — Color (per page)',price:30}
-  };
+var ALL_ENROLMENTS = [];
+var ALL_TRACKER = [];
+var ALL_FEES = [];
+var ALL_STAFF = [];
 
-  var demoEnrollments = [
-    {name:'Peter Njoroge', phone:'0722 111 222', service:'Driving Class', cls:'B2', amount:12000, payment:'M-Pesa', status:'paid', admin:'Jane Wanjiru', date:'Today, 09:14'},
-    {name:'Faith Achieng', phone:'0733 222 333', service:'Other Service', cls:'Computer Basics', amount:15000, payment:'Cash', status:'paid', admin:'Jane Wanjiru', date:'Today, 10:02'},
-    {name:'Kevin Otieno', phone:'0711 333 444', service:'Driving Class', cls:'C1', amount:16500, payment:'M-Pesa', status:'pending', admin:'Samuel Kiptoo', date:'Today, 11:40'},
-    {name:'Mary Wambui', phone:'0700 444 555', service:'Driving Class', cls:'B1', amount:10000, payment:'Cash', status:'paid', admin:'Samuel Kiptoo', date:'Yesterday, 15:20'},
-    {name:'Brian Mutiso', phone:'0788 555 666', service:'Other Service', cls:'Printing/Copying', amount:450, payment:'Cash', status:'paid', admin:'Jane Wanjiru', date:'Yesterday, 16:05'}
-  ];
+document.addEventListener("DOMContentLoaded", async () => {
+  // Auth guard
+  const session = await window.getSession();
+  if (!session) {
+    window.location.href = "login.html";
+    return;
+  }
 
-  var demoAdmins = [
-    {name:'Jane Wanjiru', email:'jane@lashawnacademy.com', role:'office', status:'active', added:'2026-08-14'},
-    {name:'Samuel Kiptoo', email:'samuel@lashawnacademy.com', role:'office', status:'active', added:'2026-09-01'},
-    {name:'Brahim', email:'brahim@lashawnacademy.com', role:'super', status:'active', added:'2026-06-01'}
-  ];
-
-  var revenueByService = [
-    {label:'Driving', value:96500}, {label:'Computer', value:15000}, {label:'Web Design', value:0},
-    {label:'Defensive', value:8000}, {label:'Printing', value:450}, {label:'Refresher', value:2500}
-  ];
-
-  // ---------- Tab switching ----------
-  var buttons = document.querySelectorAll('nav.tabs button');
-  buttons.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      buttons.forEach(function(b){ b.classList.remove('active'); });
-      btn.classList.add('active');
-      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
-      document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+  // Tabs
+  document.querySelectorAll("nav.tabs button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("nav.tabs button").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+      document.getElementById("panel-" + btn.dataset.panel).classList.add("active");
     });
   });
 
-  function money(n){ return 'KSh ' + Number(n).toLocaleString(); }
+  // Search & filter wiring
+  document.getElementById("trackerSearch").addEventListener("input", renderTracker);
+  document.getElementById("trackerFilter").addEventListener("change", renderTracker);
+  document.getElementById("feeSearch").addEventListener("input", renderFees);
+  document.getElementById("feeFilter").addEventListener("change", renderFees);
+  document.getElementById("enrollSearch").addEventListener("input", renderEnrolments);
 
-  // ---------- Overview ----------
-  function renderOverview(){
-    var todays = demoEnrollments.filter(function(e){ return e.date.indexOf('Today') === 0; });
-    var revenue = todays.reduce(function(sum, e){ return sum + e.amount; }, 0);
-    document.getElementById('stat-revenue').textContent = money(revenue);
-    document.getElementById('stat-revenue-count').textContent = todays.length + ' transactions';
-    document.getElementById('stat-students').textContent = demoEnrollments.length;
-    document.getElementById('stat-pending').textContent = demoEnrollments.filter(function(e){ return e.status === 'pending'; }).length;
-    document.getElementById('stat-admins').textContent = demoAdmins.filter(function(a){ return a.role === 'office' && a.status === 'active'; }).length;
+  // Payment form
+  document.getElementById("paymentForm").addEventListener("submit", handlePaymentSubmit);
 
-    var max = Math.max.apply(null, revenueByService.map(function(r){ return r.value; })) || 1;
-    var barsHtml = revenueByService.map(function(r){
-      var h = Math.max(6, Math.round((r.value / max) * 120));
-      return '<div class="bar-col"><div class="bv">' + money(r.value) + '</div><div class="bar" style="height:' + h + 'px"></div><div class="bl">' + r.label + '</div></div>';
-    }).join('');
-    document.getElementById('revenue-bars').innerHTML = barsHtml;
+  // Load everything
+  await Promise.all([
+    loadProfile(),
+    loadTracker(),
+    loadEnrolments(),
+    loadFees(),
+    loadServices(),
+    loadStaff(),
+  ]);
+});
 
-    var latest = demoEnrollments.slice(0, 5).map(function(e){
-      return '<tr><td>' + e.name + '</td><td>' + e.service + ' — ' + e.cls + '</td><td>' + money(e.amount) + '</td><td>' + e.admin + '</td><td>' + e.date + '</td></tr>';
-    }).join('');
-    document.getElementById('latest-activity').innerHTML = latest;
-  }
+/* ---------- HELPERS ---------- */
+function money(n) {
+  return "KSh " + Number(n || 0).toLocaleString();
+}
+function fmtDate(d) {
+  if (!d) return "—";
+  try { return new Date(d).toLocaleDateString(); } catch { return d; }
+}
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window.__toastT);
+  window.__toastT = setTimeout(() => t.classList.remove("show"), 2400);
+}
 
-  // ---------- Enrollments table ----------
-  function renderEnrollments(filter){
-    filter = (filter || '').toLowerCase();
-    var rows = demoEnrollments.filter(function(e){
-      return !filter || e.name.toLowerCase().indexOf(filter) > -1 || e.cls.toLowerCase().indexOf(filter) > -1 || e.service.toLowerCase().indexOf(filter) > -1;
-    }).map(function(e){
-      var statusPill = e.status === 'paid' ? '<span class="tag-pill paid">Paid</span>' : '<span class="tag-pill pending">Pending</span>';
-      return '<tr><td>' + e.name + '</td><td>' + e.phone + '</td><td>' + e.service + '</td><td>' + e.cls + '</td><td>' + money(e.amount) + '</td><td>' + e.payment + '</td><td>' + statusPill + '</td><td>' + e.admin + '</td><td>' + e.date + '</td></tr>';
-    }).join('');
-    document.getElementById('enroll-table').innerHTML = rows || '<tr><td colspan="9">No matching records.</td></tr>';
-  }
-  document.getElementById('enrollSearch').addEventListener('input', function(e){ renderEnrollments(e.target.value); });
-
-  // ---------- Services & Pricing ----------
-  function priceRow(key, item, group){
-    return '<div class="price-row" data-key="' + key + '" data-group="' + group + '">' +
-      '<div class="name">' + item.label + '</div>' +
-      '<div class="edit"><input type="number" min="0" value="' + item.price + '"><button class="btn outline save-price">Save</button></div>' +
-    '</div>';
-  }
-  function renderPrices(){
-    document.getElementById('price-driving').innerHTML = Object.keys(drivingPrices).map(function(k){ return priceRow(k, drivingPrices[k], 'driving'); }).join('');
-    document.getElementById('price-other').innerHTML = Object.keys(otherPrices).map(function(k){ return priceRow(k, otherPrices[k], 'other'); }).join('');
-  }
-  document.addEventListener('click', function(e){
-    if(!e.target.classList.contains('save-price')) return;
-    var row = e.target.closest('.price-row');
-    var key = row.dataset.key, group = row.dataset.group;
-    var input = row.querySelector('input');
-    var val = Number(input.value);
-    if(isNaN(val) || val < 0){ showToast('Enter a valid price.'); return; }
-    (group === 'driving' ? drivingPrices : otherPrices)[key].price = val;
-    showToast('Price updated for ' + (group === 'driving' ? drivingPrices : otherPrices)[key].label + '.');
-    renderOverview();
-  });
-
-  // ---------- Admin accounts ----------
-  function renderAdmins(){
-    var rows = demoAdmins.map(function(a, i){
-      var roleTag = a.role === 'super' ? '<span class="tag-pill super">Super Admin</span>' : '<span class="tag-pill office">Office Admin</span>';
-      var statusLabel = a.status === 'active' ? 'Active' : 'Suspended';
-      var toggleLabel = a.status === 'active' ? 'Suspend' : 'Reactivate';
-      return '<tr><td>' + a.name + '</td><td>' + a.email + '</td><td>' + roleTag + '</td><td>' + statusLabel + '</td><td>' + a.added + '</td>' +
-        '<td><button class="btn outline" data-toggle="' + i + '">' + toggleLabel + '</button></td></tr>';
-    }).join('');
-    document.getElementById('admin-table').innerHTML = rows;
-  }
-  document.addEventListener('click', function(e){
-    if(e.target.dataset.toggle === undefined) return;
-    var idx = Number(e.target.dataset.toggle);
-    demoAdmins[idx].status = demoAdmins[idx].status === 'active' ? 'suspended' : 'active';
-    renderAdmins();
-    renderOverview();
-  });
-
-  document.getElementById('addAdminBtn').addEventListener('click', function(){
-    var name = document.getElementById('adminName').value.trim();
-    var email = document.getElementById('adminEmail').value.trim();
-    var role = document.getElementById('adminRole').value;
-    if(!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-      showToast('Enter a name and valid email.');
-      return;
+/* ---------- PROFILE ---------- */
+async function loadProfile() {
+  try {
+    const { data } = await LashawnDB.rpc("get_my_profile");
+    if (data && data.first_name) {
+      document.getElementById("sideName").textContent = data.first_name;
     }
-    demoAdmins.push({name:name, email:email, role:role, status:'active', added:new Date().toISOString().slice(0,10)});
-    document.getElementById('adminName').value = '';
-    document.getElementById('adminEmail').value = '';
-    renderAdmins();
+  } catch (err) { /* silent */ }
+}
+
+/* ---------- TRACKER (6-week) ---------- */
+async function loadTracker() {
+  try {
+    const { data, error } = await LashawnDB
+      .from("academy_student_training_status")
+      .select("*")
+      .order("days_remaining", { ascending: true });
+
+    if (error) throw error;
+    ALL_TRACKER = data || [];
+
+    // Attach fee data
+    await attachFeeData(ALL_TRACKER);
+
     renderOverview();
-    showToast('Admin account added.');
+    renderTracker();
+  } catch (err) {
+    console.error("Tracker load error:", err);
+    document.getElementById("tracker-table").innerHTML =
+      '<tr><td colspan="9" class="text-muted">Could not load tracker.</td></tr>';
+  }
+}
+
+async function attachFeeData(rows) {
+  // Fetch balances view and merge
+  try {
+    const { data: balances } = await LashawnDB.from("student_balances").select("*");
+    const map = {};
+    (balances || []).forEach((b) => { map[b.student_id] = b; });
+    rows.forEach((r) => {
+      const b = map[r.student_id] || {};
+      r.fee_invoiced = b.invoiced || 0;
+      r.fee_paid = b.paid || 0;
+      r.fee_balance = b.balance || 0;
+    });
+  } catch (err) {
+    rows.forEach((r) => { r.fee_balance = 0; r.fee_paid = 0; r.fee_invoiced = 0; });
+  }
+}
+
+function renderOverview() {
+  const active = ALL_TRACKER.length;
+  const approaching = ALL_TRACKER.filter((t) => t.training_alert === "APPROACHING_6_WEEKS").length;
+  const overdue = ALL_TRACKER.filter((t) => t.training_alert === "OVER_6_WEEKS").length;
+
+  document.getElementById("stat-active").textContent = active;
+  document.getElementById("stat-approaching").textContent = approaching;
+  document.getElementById("stat-overdue").textContent = overdue;
+
+  // Overview tracker table
+  const tbody = document.getElementById("overview-tracker");
+  if (ALL_TRACKER.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="text-muted">No active enrolments.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = ALL_TRACKER.slice(0, 10).map((t) => {
+    const expected = t.expected_end_date || addDays(t.start_date, 42);
+    const progress = computeProgress(t);
+    const feeBadge = feeBadgeFor(t.fee_balance, t.fee_paid, t.fee_invoiced);
+    return `
+      <tr>
+        <td>${esc(t.student_number)}<br><small class="text-muted">${esc(t.student_name)}</small></td>
+        <td>${esc(t.class_name || "—")}</td>
+        <td>${fmtDate(t.start_date)}</td>
+        <td>${fmtDate(expected)}</td>
+        <td>${t.days_remaining ?? "—"}</td>
+        <td>${progressBar(progress)}</td>
+        <td>${money(t.fee_balance || 0)}</td>
+        <td>${alertBadge(t.training_alert)}</td>
+      </tr>`;
+  }).join("");
+}
+
+function renderTracker() {
+  const q = document.getElementById("trackerSearch").value.toLowerCase();
+  const filter = document.getElementById("trackerFilter").value;
+
+  let rows = ALL_TRACKER;
+  if (q) rows = rows.filter((t) =>
+    (t.student_name || "").toLowerCase().includes(q) ||
+    (t.student_number || "").toLowerCase().includes(q) ||
+    (t.class_name || "").toLowerCase().includes(q)
+  );
+  if (filter) rows = rows.filter((t) => t.training_alert === filter);
+
+  const tbody = document.getElementById("tracker-table");
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" class="text-muted">No matching students.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map((t) => {
+    const expected = t.expected_end_date || addDays(t.start_date, 42);
+    const progress = computeProgress(t);
+    return `
+      <tr>
+        <td>${esc(t.student_number)}<br><small class="text-muted">${esc(t.student_name)}</small></td>
+        <td>${esc(t.class_name || "—")}</td>
+        <td>${fmtDate(t.start_date)}</td>
+        <td><strong>${fmtDate(expected)}</strong></td>
+        <td>${t.days_remaining ?? "—"}</td>
+        <td>${progressBar(progress)}</td>
+        <td>${money(t.fee_balance || 0)}</td>
+        <td>${alertBadge(t.training_alert)}</td>
+        <td><button class="btn small outline" onclick="openPayment('${t.enrolment_id}','${t.student_id}')">Pay</button></td>
+      </tr>`;
+  }).join("");
+}
+
+function computeProgress(t) {
+  // Simple heuristic: elapsed days vs 42
+  if (!t.start_date) return 0;
+  const start = new Date(t.start_date);
+  const days = Math.floor((Date.now() - start) / 86400000);
+  return Math.min(100, Math.max(0, Math.round((days / 42) * 100)));
+}
+
+function progressBar(pct) {
+  const cls = pct >= 80 ? "ok" : pct >= 50 ? "warn" : "";
+  return `<div style="display:flex;align-items:center;gap:0.5rem;">
+    <div class="progress ${cls}"><div style="width:${pct}%"></div></div>
+    <small>${pct}%</small>
+  </div>`;
+}
+
+function alertBadge(a) {
+  if (a === "OVER_6_WEEKS") return '<span class="tag-pill overdue">Over 6 Weeks</span>';
+  if (a === "APPROACHING_6_WEEKS") return '<span class="tag-pill approaching">Approaching</span>';
+  return '<span class="tag-pill on-track">On Track</span>';
+}
+
+function feeBadgeFor(balance, paid, invoiced) {
+  if (!invoiced) return '<span class="tag-pill pending">No invoice</span>';
+  if (balance <= 0) return '<span class="tag-pill paid">Paid</span>';
+  if (paid > 0) return '<span class="tag-pill partial">Partial</span>';
+  return '<span class="tag-pill pending">Unpaid</span>';
+}
+
+function addDays(dateStr, days) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+/* ---------- FEES ---------- */
+async function loadFees() {
+  try {
+    const { data: balances, error } = await LashawnDB.from("student_balances").select("*");
+    if (error) throw error;
+
+    const { data: students } = await LashawnDB
+      .from("students")
+      .select("id, student_number, first_name, last_name, phone");
+    const sMap = {};
+    (students || []).forEach((s) => { sMap[s.id] = s; });
+
+    const { data: enrolments } = await LashawnDB
+      .from("enrolments")
+      .select("id, student_id, programme, driving_class_id, start_date, expected_end_date");
+    const eMap = {};
+    (enrolments || []).forEach((e) => { eMap[e.student_id] = e; });
+
+    const { data: classes } = await LashawnDB
+      .from("driving_classes")
+      .select("id, class_code, class_name");
+    const cMap = {};
+    (classes || []).forEach((c) => { cMap[c.id] = c; });
+
+    ALL_FEES = (balances || []).map((b) => {
+      const s = sMap[b.student_id] || {};
+      const e = eMap[b.student_id] || {};
+      const c = e.driving_class_id ? cMap[e.driving_class_id] : null;
+      const due = e.expected_end_date || addDays(e.start_date, 42);
+      return {
+        student_id: b.student_id,
+        student_number: b.student_number,
+        name: b.student_name,
+        phone: s.phone,
+        class_label: c ? `${c.class_code} — ${c.class_name}` : (e.programme || "—"),
+        invoiced: b.invoiced || 0,
+        paid: b.paid || 0,
+        balance: b.balance || 0,
+        due_date: due,
+      };
+    });
+
+    renderFees();
+  } catch (err) {
+    console.error("Fees load error:", err);
+    document.getElementById("fee-table").innerHTML =
+      '<tr><td colspan="8" class="text-muted">Could not load fees.</td></tr>';
+  }
+}
+
+function renderFees() {
+  const q = document.getElementById("feeSearch").value.toLowerCase();
+  const filter = document.getElementById("feeFilter").value;
+
+  let rows = ALL_FEES;
+  if (q) rows = rows.filter((f) =>
+    (f.name || "").toLowerCase().includes(q) ||
+    (f.class_label || "").toLowerCase().includes(q)
+  );
+  if (filter === "PAID") rows = rows.filter((f) => f.balance <= 0 && f.invoiced > 0);
+  if (filter === "PARTIAL") rows = rows.filter((f) => f.balance > 0 && f.paid > 0);
+  if (filter === "UNPAID") rows = rows.filter((f) => f.paid === 0 && f.invoiced > 0);
+
+  const tbody = document.getElementById("fee-table");
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="text-muted">No matching fee records.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map((f) => {
+    const badge = f.balance <= 0 ? '<span class="tag-pill paid">Paid</span>'
+                : f.paid > 0     ? '<span class="tag-pill partial">Partial</span>'
+                : '<span class="tag-pill pending">Unpaid</span>';
+    return `
+      <tr>
+        <td>${esc(f.student_number)}<br><small class="text-muted">${esc(f.name)}</small></td>
+        <td>${esc(f.class_label)}</td>
+        <td>${money(f.invoiced)}</td>
+        <td>${money(f.paid)}</td>
+        <td><strong style="color:${f.balance > 0 ? '#b3261e' : '#1a7a4c'};">${money(f.balance)}</strong></td>
+        <td>${fmtDate(f.due_date)}</td>
+        <td>${badge}</td>
+        <td><button class="btn small" onclick="openPaymentByStudent('${f.student_id}')">Record Payment</button></td>
+      </tr>`;
+  }).join("");
+}
+
+/* ---------- ENROLMENTS ---------- */
+async function loadEnrolments() {
+  try {
+    const { data, error } = await LashawnDB
+      .from("enrolments")
+      .select(`
+        id, enrolment_number, student_id, programme, start_date, expected_end_date, status,
+        students:student_id (student_number, first_name, last_name, phone),
+        driving_classes:driving_class_id (class_code, class_name)
+      `)
+      .order("created_at", { ascending: false })
+      .limit(200);
+
+    if (error) throw error;
+    ALL_ENROLMENTS = data || [];
+    renderEnrolments();
+  } catch (err) {
+    console.error("Enrolments error:", err);
+    // Fallback: try without joins
+    try {
+      const { data } = await LashawnDB.from("enrolments").select("*").order("created_at", { ascending: false }).limit(200);
+      ALL_ENROLMENTS = (data || []).map((e) => ({ ...e, students: null, driving_classes: null }));
+      renderEnrolments();
+    } catch (e2) {
+      document.getElementById("enroll-table").innerHTML =
+        '<tr><td colspan="8" class="text-muted">Could not load enrolments.</td></tr>';
+    }
+  }
+}
+
+function renderEnrolments() {
+  const q = document.getElementById("enrollSearch").value.toLowerCase();
+  let rows = ALL_ENROLMENTS;
+  if (q) rows = rows.filter((e) => {
+    const name = e.students ? `${e.students.first_name} ${e.students.last_name}` : "";
+    return name.toLowerCase().includes(q) || (e.programme || "").toLowerCase().includes(q);
   });
 
-  // ---------- Toast ----------
-  var toastTimer;
-  function showToast(msg){
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  const tbody = document.getElementById("enroll-table");
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="text-muted">No enrolments yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map((e) => {
+    const name = e.students ? `${e.students.first_name} ${e.students.last_name}` : "—";
+    const phone = e.students ? e.students.phone : "—";
+    const studentNo = e.students ? e.students.student_number : "—";
+    const prog = e.driving_classes
+      ? `${e.programme} · ${e.driving_classes.class_code}`
+      : e.programme;
+    return `
+      <tr>
+        <td>${esc(studentNo)}</td>
+        <td>${esc(name)}</td>
+        <td>${esc(phone)}</td>
+        <td>${esc(prog)}</td>
+        <td>${esc(e.enrolment_number || "—")}</td>
+        <td>${fmtDate(e.start_date)}</td>
+        <td><span class="tag-pill ${e.status === "ACTIVE" ? "paid" : "office"}">${esc(e.status)}</span></td>
+        <td><a href="student-profile.html?id=${e.student_id}" class="btn small outline">View</a></td>
+      </tr>`;
+  }).join("");
+}
+
+/* ---------- SERVICES ---------- */
+async function loadServices() {
+  try {
+    const [dc, cc, ps] = await Promise.all([
+      LashawnDB.from("driving_classes").select("*").eq("is_active", true).order("class_code"),
+      LashawnDB.from("computer_courses").select("*").eq("is_active", true).order("course_code"),
+      LashawnDB.from("printing_services").select("*").eq("is_active", true).order("service_code"),
+    ]);
+
+    document.getElementById("price-driving").innerHTML = (dc.data || []).map((c) => `
+      <tr><td><strong>${esc(c.class_code)}</strong></td><td>${esc(c.class_name)}</td>
+      <td>${c.minimum_age || "—"}</td><td>${c.training_weeks || 6}</td>
+      <td>${esc(c.description || "—")}</td></tr>`).join("")
+      || '<tr><td colspan="5" class="text-muted">No classes.</td></tr>';
+
+    document.getElementById("price-computer").innerHTML = (cc.data || []).map((c) => `
+      <tr><td><strong>${esc(c.course_code)}</strong></td><td>${esc(c.course_name)}</td>
+      <td>${c.duration_weeks ? c.duration_weeks + " weeks" : "—"}</td>
+      <td>${money(c.fee)}</td></tr>`).join("")
+      || '<tr><td colspan="4" class="text-muted">No courses.</td></tr>';
+
+    document.getElementById("price-printing").innerHTML = (ps.data || []).map((p) => `
+      <tr><td><strong>${esc(p.service_code)}</strong></td><td>${esc(p.service_name)}</td>
+      <td>${esc(p.category || "—")}</td><td>${esc(p.unit || "—")}</td>
+      <td>${money(p.unit_price)}</td></tr>`).join("")
+      || '<tr><td colspan="5" class="text-muted">No printing services.</td></tr>';
+  } catch (err) {
+    console.error("Services load error:", err);
+  }
+}
+
+/* ---------- STAFF ---------- */
+async function loadStaff() {
+  try {
+    const { data, error } = await LashawnDB.from("staff").select("*").order("created_at");
+    if (error) throw error;
+    ALL_STAFF = data || [];
+
+    document.getElementById("stat-admins").textContent =
+      ALL_STAFF.filter((s) => s.is_active).length;
+
+    document.getElementById("admin-table").innerHTML = ALL_STAFF.map((s) => {
+      const roleCls = s.role === "SUPER_ADMIN" ? "super" : "office";
+      return `
+        <tr>
+          <td>${esc(s.staff_number)}</td>
+          <td>${esc(s.first_name + " " + s.last_name)}</td>
+          <td>${esc(s.email || "—")}</td>
+          <td><span class="tag-pill ${roleCls}">${esc(s.role)}</span></td>
+          <td>${s.is_active ? "✅ Active" : "❌ Inactive"}</td>
+        </tr>`;
+    }).join("") || '<tr><td colspan="5" class="text-muted">No staff records.</td></tr>';
+  } catch (err) {
+    console.error("Staff load error:", err);
+  }
+}
+
+/* ---------- PAYMENT MODAL ---------- */
+window.openPayment = function (enrolmentId, studentId) {
+  const t = ALL_TRACKER.find((x) => x.enrolment_id === enrolmentId);
+  if (!t) { toast("Enrolment not found."); return; }
+  showPaymentModal({
+    enrolment_id: enrolmentId,
+    student_id: studentId,
+    student_name: t.student_name,
+    class_label: t.class_name || "—",
+    balance: t.fee_balance || 0,
+    paid: t.fee_paid || 0,
+    invoiced: t.fee_invoiced || 0,
+  });
+};
+
+window.openPaymentByStudent = function (studentId) {
+  const f = ALL_FEES.find((x) => x.student_id === studentId);
+  const e = ALL_ENROLMENTS.find((x) => x.student_id === studentId);
+  if (!f || !e) { toast("Record not found."); return; }
+  showPaymentModal({
+    enrolment_id: e.id,
+    student_id: studentId,
+    student_name: f.name,
+    class_label: f.class_label,
+    balance: f.balance,
+    paid: f.paid,
+    invoiced: f.invoiced,
+  });
+};
+
+function showPaymentModal(data) {
+  document.getElementById("payEnrolmentId").value = data.enrolment_id || "";
+  document.getElementById("payStudentId").value = data.student_id || "";
+  document.getElementById("payAmount").value = data.balance > 0 ? data.balance : "";
+
+  document.getElementById("paymentStudentInfo").innerHTML = `
+    <div class="item"><div class="k">Student</div><div class="v">${esc(data.student_name)}</div></div>
+    <div class="item"><div class="k">Class</div><div class="v">${esc(data.class_label)}</div></div>
+    <div class="item"><div class="k">Invoiced</div><div class="v">${money(data.invoiced)}</div></div>
+    <div class="item"><div class="k">Paid</div><div class="v">${money(data.paid)}</div></div>
+    <div class="item"><div class="k">Balance</div><div class="v" style="color:${data.balance > 0 ? '#b3261e' : '#1a7a4c'};">${money(data.balance)}</div></div>
+  `;
+
+  document.getElementById("paymentAlert").innerHTML = "";
+  document.getElementById("paymentModal").classList.add("active");
+}
+
+window.closePaymentModal = function () {
+  document.getElementById("paymentModal").classList.remove("active");
+};
+
+async function handlePaymentSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById("paySubmitBtn");
+  const alertBox = document.getElementById("paymentAlert");
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Recording...';
+  alertBox.innerHTML = "";
+
+  const enrolmentId = document.getElementById("payEnrolmentId").value;
+  const studentId = document.getElementById("payStudentId").value;
+  const amount = Number(document.getElementById("payAmount").value);
+  const method = document.getElementById("payMethod").value;
+  const reference = document.getElementById("payReference").value.trim() || null;
+  const notes = document.getElementById("payNotes").value.trim() || null;
+
+  if (!amount || amount <= 0) {
+    alertBox.innerHTML = '<div class="alert alert-danger">Enter a valid amount.</div>';
+    btn.disabled = false;
+    btn.textContent = "Record Payment";
+    return;
   }
 
-  renderOverview();
-  renderEnrollments('');
-  renderPrices();
-  renderAdmins();
-})();
-</script>
+  try {
+    // Insert payment
+    const { error: payErr } = await LashawnDB.from("payments").insert({
+      student_id: studentId,
+      enrolment_id: enrolmentId,
+      amount: amount,
+      payment_method: method,
+      transaction_reference: reference,
+      status: "CONFIRMED",
+      notes: notes,
+    });
+    if (payErr) throw payErr;
 
+    // Update invoice paid/balance if one exists
+    const { data: invoices } = await LashawnDB
+      .from("invoices")
+      .select("*")
+      .eq("enrolment_id", enrolmentId)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (invoices && invoices.length > 0) {
+      const inv = invoices[0];
+      const newPaid = Number(inv.amount_paid || 0) + amount;
+      const newBalance = Math.max(0, Number(inv.total_amount || 0) - newPaid);
+      const newStatus = newBalance <= 0 ? "PAID" : newPaid > 0 ? "PARTIAL" : inv.status;
+
+      await LashawnDB.from("invoices").update({
+        amount_paid: newPaid,
+        balance: newBalance,
+        status: newStatus,
+      }).eq("id", inv.id);
+    }
+
+    alertBox.innerHTML = '<div class="alert alert-success">Payment recorded successfully.</div>';
+    toast("Payment recorded: " + money(amount));
+
+    setTimeout(async () => {
+      closePaymentModal();
+      await Promise.all([loadTracker(), loadEnrolments(), loadFees()]);
+    }, 1200);
+  } catch (err) {
+    console.error(err);
+    alertBox.innerHTML = '<div class="alert alert-danger">' + esc(err.message || "Could not record payment.") + '</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Record Payment";
+  }
+}
+</script>
 </body>
 </html>
