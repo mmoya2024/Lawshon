@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Staff Login — Lashawn Academy</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-card">
+    <h1>🎓 Lashawn Academy</h1>
+    <p class="subtitle text-center">Staff & Management Portal</p>
+
+    <div id="loginAlert"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" required placeholder="you@lashawnacademy.com" autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="btn full" id="loginBtn">Sign In</button>
+    </form>
+
+    <p class="text-center mt-3 text-muted" style="font-size:0.85rem;">
+      <a href="index.html">← Back to public website</a>
+    </p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  // If already logged in, redirect to dashboard
+  const session = await window.getSession();
+  if (session) {
+    window.location.href = "dashboard.html";
+    return;
+  }
+
+  const form = document.getElementById("loginForm");
+  const btn = document.getElementById("loginBtn");
+  const alertBox = document.getElementById("loginAlert");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    alertBox.innerHTML = "";
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Signing in...';
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    try {
+      const { data, error } = await LashawnDB.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      // Verify this user is registered as active staff
+      const { data: staff, error: staffError } = await LashawnDB
+        .from("staff")
+        .select("id, role, is_active")
+        .eq("auth_user_id", data.user.id)
+        .maybeSingle();
+
+      if (staffError) throw staffError;
+
+      if (!staff || !staff.is_active) {
+        await LashawnDB.auth.signOut();
+        throw new Error(
+          "Your account is not registered as active staff. Contact an administrator."
+        );
+      }
+
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      console.error(err);
+      alertBox.innerHTML =
+        '<div class="alert alert-danger">' +
+        (err.message || "Login failed. Check your credentials.") +
+        "</div>";
+      btn.disabled = false;
+      btn.textContent = "Sign In";
+    }
+  });
+});
+</script>
+</body>
+</html>
