@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Printing & Branding — Lashawn Academy</title>
+<meta name="description" content="Professional printing, large format, and branding services. Business cards, banners, T-shirts, signage, and more.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <a class="brand" href="index.html">
+    🎓 <span>Lashawn Driving <span class="dot">&</span> Computer College</span>
+  </a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="courses-ntsa.html">Courses</a>
+    <a href="printing.html" class="cta">Printing & Branding</a>
+  </nav>
+</header>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<div style="background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:3rem 1.5rem;">
+  <div style="max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr;gap:2rem;align-items:center;">
+    <div>
+      <h1 style="font-size:2.4rem;margin:0 0 0.8rem;color:#fff;line-height:1.15;">
+        Print. Brand. <span style="color:var(--gold);">Stand Out.</span>
+      </h1>
+      <p style="color:#cfd9e8;font-size:1.05rem;margin:0 0 1.4rem;max-width:520px;">
+        From everyday photocopying to large-format banners, branded T-shirts, business cards, and full corporate identity kits — we handle it all, in-house.
+      </p>
+      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+        <a class="btn" href="#quote">Request a Quote</a>
+        <a class="btn secondary" href="#catalog" style="background:transparent;color:#fff;border-color:rgba(255,255,255,0.3);">View Services</a>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:1.6rem;">
+      <div style="font-size:1.4rem;font-weight:800;margin-bottom:0.8rem;">What we do</div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.95rem;color:#cfd9e8;">
+        <span>✅ Digital & offset printing</span>
+        <span>✅ Large format & banners</span>
+        <span>✅ T-shirt & merch branding</span>
+        <span>✅ Business cards & flyers</span>
+        <span>✅ Signage & vehicle wraps</span>
+        <span>✅ Logo & graphic design</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     QUICK SERVICE CATEGORIES
+     ============================================================ -->
+<section>
+  <h2>Service Categories</h2>
+  <p class="subtitle">Everything you need for print, branding, and design — under one roof.</p>
+
+  <div class="grid grid-3">
+    <a class="card-link" href="#catalog">
+      <div class="card">
+        <span class="icon">📄</span>
+        <h3>Document Printing</h3>
+        <p>Black & white, colour printing, and photocopying. Walk-in or bulk.</p>
+        <div class="price">From KSh 5 / page</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="#catalog">
+      <div class="card">
+        <span class="icon">🎨</span>
+        <h3>Graphic Design</h3>
+        <p>Logos, posters, flyers, business cards, and full brand identity kits.</p>
+        <div class="price">From KSh 500 / job</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="#catalog">
+      <div class="card">
+        <span class="icon">🖼️</span>
+        <h3>Large Format Printing</h3>
+        <p>Banners, posters, backdrops, and signage up to full building scale.</p>
+        <div class="price">From KSh 1,000 / sqm</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="#catalog">
+      <div class="card">
+        <span class="icon">👕</span>
+        <h3>T-Shirt & Merch Branding</h3>
+        <p>Heat transfer, screen printing, and embroidery on shirts, caps, mugs, and more.</p>
+        <div class="price">From KSh 350 / item</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="#catalog">
+      <div class="card">
+        <span class="icon">🪧</span>
+        <h3>Signage & Vehicle Wraps</h3>
+        <p>3D signage, wall graphics, vehicle branding, and shop-front lettering.</p>
+        <div class="price">Quote on request</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="#catalog">
+      <div class="card">
+        <span class="icon">📇</span>
+        <h3>Business Stationery</h3>
+        <p>Business cards, letterheads, envelopes, invoice books, and rubber stamps.</p>
+        <div class="price">From KSh 1,500 / pack</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ============================================================
+     FULL CATALOG (from Supabase printing_services)
+     ============================================================ -->
+<section id="catalog" class="alt">
+  <div>
+    <h2>Full Service Catalog</h2>
+    <p class="subtitle">Live pricing pulled from our system. Walk in, or request a bulk quote below.</p>
+
+    <div id="catalogAlert"></div>
+
+    <div id="servicesCatalog">
+      <div class="card">
+        <p class="text-muted text-center">Loading services...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     BRANDING PACKAGES
+     ============================================================ -->
+<section>
+  <h2>Branding Packages</h2>
+  <p class="subtitle">Bundle services and save. Ideal for startups, schools, churches, and events.</p>
+
+  <div class="grid grid-3">
+    <div class="card" style="border-top:4px solid var(--navy);">
+      <h3 style="font-size:1.15rem;">Starter Brand</h3>
+      <div style="font-size:1.8rem;font-weight:800;color:var(--navy);margin:0.6rem 0;">KSh 8,500</div>
+      <p class="text-muted" style="font-size:0.85rem;margin-bottom:1rem;">For new businesses getting their first branded materials.</p>
+      <ul style="list-style:none;padding:0;margin:0;font-size:0.9rem;">
+        <li style="padding:0.35rem 0;">✅ Logo design (3 concepts)</li>
+        <li style="padding:0.35rem 0;">✅ 100 business cards</li>
+        <li style="padding:0.35rem 0;">✅ 50 A5 flyers</li>
+        <li style="padding:0.35rem 0;">✅ 1 rubber stamp</li>
+      </ul>
+      <a class="btn full mt-3" href="#quote" onclick="preselectPackage('Starter Brand')">Get Started</a>
+    </div>
+
+    <div class="card" style="border-top:4px solid var(--gold);position:relative;">
+      <span class="badge badge-warning" style="position:absolute;top:-10px;right:14px;">Most Popular</span>
+      <h3 style="font-size:1.15rem;">Business Brand</h3>
+      <div style="font-size:1.8rem;font-weight:800;color:var(--navy);margin:0.6rem 0;">KSh 22,000</div>
+      <p class="text-muted" style="font-size:0.85rem;margin-bottom:1rem;">For active businesses that need a complete identity.</p>
+      <ul style="list-style:none;padding:0;margin:0;font-size:0.9rem;">
+        <li style="padding:0.35rem 0;">✅ Full logo & brand guide</li>
+        <li style="padding:0.35rem 0;">✅ 500 business cards</li>
+        <li style="padding:0.35rem 0;">✅ 250 A5 flyers</li>
+        <li style="padding:0.35rem 0;">✅ 2 branded T-shirts</li>
+        <li style="padding:0.35rem 0;">✅ 1 pull-up banner</li>
+        <li style="padding:0.35rem 0;">✅ 1 rubber stamp</li>
+      </ul>
+      <a class="btn full mt-3" href="#quote" onclick="preselectPackage('Business Brand')">Get Started</a>
+    </div>
+
+    <div class="card" style="border-top:4px solid var(--success);">
+      <h3 style="font-size:1.15rem;">Corporate Brand</h3>
+      <div style="font-size:1.8rem;font-weight:800;color:var(--navy);margin:0.6rem 0;">KSh 65,000</div>
+      <p class="text-muted" style="font-size:0.85rem;margin-bottom:1rem;">For established brands needing full rollout.</p>
+      <ul style="list-style:none;padding:0;margin:0;font-size:0.9rem;">
+        <li style="padding:0.35rem 0;">✅ Full brand identity</li>
+        <li style="padding:0.35rem 0;">✅ 1,000 business cards</li>
+        <li style="padding:0.35rem 0;">✅ 1,000 A5 flyers</li>
+        <li style="padding:0.35rem 0;">✅ 10 branded T-shirts</li>
+        <li style="padding:0.35rem 0;">✅ 2 pull-up banners</li>
+        <li style="padding:0.35rem 0;">✅ Vehicle branding (1 car)</li>
+        <li style="padding:0.35rem 0;">✅ 1 shop-front signage</li>
+      </ul>
+      <a class="btn full mt-3" href="#quote" onclick="preselectPackage('Corporate Brand')">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     QUOTE REQUEST FORM
+     ============================================================ -->
+<section id="quote" class="alt">
+  <div style="max-width:720px;margin:0 auto;">
+    <h2>Request a Quote</h2>
+    <p class="subtitle">Tell us what you need — we'll respond within 24 hours with pricing and timelines.</p>
+
+    <div id="quoteAlert"></div>
+
+    <div class="card" style="padding:1.8rem;">
+      <form id="quoteForm">
+
+        <h3 style="font-size:1rem;color:var(--navy);margin:0 0 0.8rem;">1. Your Details</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="qName">Full Name / Company *</label>
+            <input type="text" id="qName" required placeholder="e.g. Acme Ltd or Jane W.">
+          </div>
+          <div class="form-group">
+            <label for="qPhone">Phone *</label>
+            <input type="tel" id="qPhone" required placeholder="07XXXXXXXX">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="qEmail">Email</label>
+          <input type="email" id="qEmail" placeholder="you@example.com">
+        </div>
+
+        <h3 style="font-size:1rem;color:var(--navy);margin:1.5rem 0 0.8rem;">2. Job Details</h3>
+
+        <div class="form-group">
+          <label for="qService">Service Needed *</label>
+          <select id="qService" required>
+            <option value="">Select a service...</option>
+            <option value="Document Printing">📄 Document Printing / Photocopy</option>
+            <option value="Graphic Design">🎨 Graphic Design</option>
+            <option value="Large Format Printing">🖼️ Large Format Printing (banners, posters)</option>
+            <option value="T-Shirt Branding">👕 T-Shirt & Merch Branding</option>
+            <option value="Signage">🪧 Signage & Vehicle Wraps</option>
+            <option value="Business Stationery">📇 Business Stationery (cards, letterheads)</option>
+            <option value="Branding Package">📦 Branding Package</option>
+            <option value="Other">🔧 Other</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="qQuantity">Quantity / Size</label>
+            <input type="text" id="qQuantity" placeholder="e.g. 500 pages, 2m x 1m, 20 shirts">
+          </div>
+          <div class="form-group">
+            <label for="qDeadline">Deadline</label>
+            <input type="date" id="qDeadline">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="qDescription">Description / Notes</label>
+          <textarea id="qDescription" rows="4" placeholder="Colours, material, design files you have, delivery address, etc."></textarea>
+        </div>
+
+        <button type="submit" class="btn full mt-2" id="quoteBtn">
+          Send Quote Request
+        </button>
+
+        <p class="text-muted text-center mt-2" style="font-size:0.85rem;margin-bottom:0;">
+          We'll contact you to confirm final pricing before any work begins.
+        </p>
+
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     WHY US / TRUST
+     ============================================================ -->
+<section>
+  <h2>Why Choose Us</h2>
+  <div class="grid grid-4">
+    <div class="card text-center">
+      <span class="icon">⚡</span>
+      <h3 style="font-size:0.95rem;">Fast Turnaround</h3>
+      <p style="font-size:0.85rem;">Same-day for walk-ins, 24–72h for bulk jobs.</p>
+    </div>
+    <div class="card text-center">
+      <span class="icon">🎯</span>
+      <h3 style="font-size:0.95rem;">Quality Materials</h3>
+      <p style="font-size:0.85rem;">Durable inks, premium paper, weatherproof vinyl.</p>
+    </div>
+    <div class="card text-center">
+      <span class="icon">💬</span>
+      <h3 style="font-size:0.95rem;">Free Consultations</h3>
+      <p style="font-size:0.85rem;">Not sure what you need? We'll guide you.</p>
+    </div>
+    <div class="card text-center">
+      <span class="icon">📦</span>
+      <h3 style="font-size:0.95rem;">Bulk Discounts</h3>
+      <p style="font-size:0.85rem;">The more you print, the more you save.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer style="background:var(--navy);color:#cfd9e8;padding:2.5rem 1.5rem 1.5rem;margin-top:2rem;">
+  <div style="max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2rem;">
+    <div>
+      <div style="color:#fff;font-weight:700;margin-bottom:0.6rem;">🎓 Lashawn Academy</div>
+      <p style="font-size:0.9rem;margin:0;">Driving, Computer & Printing Services.</p>
+    </div>
+    <div>
+      <div style="color:#fff;font-weight:700;margin-bottom:0.6rem;">Services</div>
+      <div style="display:flex;flex-direction:column;gap:0.3rem;font-size:0.9rem;">
+        <a href="#catalog" style="color:#cfd9e8;text-decoration:none;">Printing</a>
+        <a href="#catalog" style="color:#cfd9e8;text-decoration:none;">Branding</a>
+        <a href="#catalog" style="color:#cfd9e8;text-decoration:none;">Graphic Design</a>
+        <a href="#quote" style="color:#cfd9e8;text-decoration:none;">Request Quote</a>
+      </div>
+    </div>
+    <div>
+      <div style="color:#fff;font-weight:700;margin-bottom:0.6rem;">Contact</div>
+      <div style="font-size:0.9rem;display:flex;flex-direction:column;gap:0.3rem;">
+        <a href="mailto:info@lashawnacademy.com" style="color:#cfd9e8;text-decoration:none;">info@lashawnacademy.com</a>
+        <span>Mon–Sat · 8:00–18:00</span>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:1080px;margin:1.5rem auto 0;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.15);text-align:center;font-size:0.85rem;">
+    © <span id="year"></span> Lashawn Driving & Computer College. All rights reserved.
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/printing.js"></script>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  function preselectPackage(name) {
+    // Called by package buttons — scrolls to form and preselects
+    setTimeout(() => {
+      const sel = document.getElementById("qService");
+      if (sel) {
+        sel.value = "Branding Package";
+        document.getElementById("qDescription").value =
+          "Interested in the " + name + " package. Please share details.";
+      }
+    }, 100);
+  }
+</script>
+</body>
+</html>
