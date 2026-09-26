@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Students — Lashawn Academy</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="brand">🎓 Lashawn Academy</div>
+    <nav>
+      <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="students.html" class="active"><span class="icon">👥</span> Students</a>
+      <a href="driving.html"><span class="icon">🚗</span> Driving</a>
+      <a href="computer.html"><span class="icon">💻</span> Computer</a>
+      <a href="printing.html"><span class="icon">🖨️</span> Printing</a>
+      <a href="finance.html"><span class="icon">💰</span> Finance</a>
+      <a href="vehicles.html"><span class="icon">🚙</span> Vehicles</a>
+      <a href="staff.html"><span class="icon">👔</span> Staff</a>
+      <a href="reports.html"><span class="icon">📈</span> Reports</a>
+      <a href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      <a href="#" onclick="window.signOut();return false;"><span class="icon">🚪</span> Logout</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="flex-between mb-3">
+      <div>
+        <h2 style="text-align:left;margin:0;">Students</h2>
+        <p class="text-muted" style="margin:0;">Register and manage student records</p>
+      </div>
+      <button class="btn" onclick="openRegisterModal()">+ Register Student</button>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <!-- SEARCH -->
+    <div class="card mb-3">
+      <div class="form-row">
+        <div class="form-group" style="margin:0;">
+          <input type="text" id="searchInput" placeholder="Search by name, phone, or student number...">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <select id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="ACTIVE">Active</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="SUSPENDED">Suspended</option>
+            <option value="WITHDRAWN">Withdrawn</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENT TABLE -->
+    <div class="card">
+      <div id="studentsTable"><p class="text-muted">Loading students...</p></div>
+    </div>
+  </main>
+</div>
+
+<!-- REGISTER MODAL -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <h3>Register New Student</h3>
+    <div id="modalAlert"></div>
+
+    <form id="registerForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="regFirstName">First Name *</label>
+          <input type="text" id="regFirstName" required>
+        </div>
+        <div class="form-group">
+          <label for="regLastName">Last Name *</label>
+          <input type="text" id="regLastName" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="regPhone">Phone *</label>
+          <input type="tel" id="regPhone" required placeholder="07XXXXXXXX">
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email</label>
+          <input type="email" id="regEmail">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="regIdNumber">National ID / Passport</label>
+          <input type="text" id="regIdNumber">
+        </div>
+        <div class="form-group">
+          <label for="regProgramme">Programme *</label>
+          <select id="regProgramme" required>
+            <option value="">Select...</option>
+            <option value="DRIVING">Driving</option>
+            <option value="COMPUTER">Computer</option>
+            <option value="PRINTING_DIGITAL">Printing / Digital</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group hidden" id="drivingClassGroup">
+        <label for="regDrivingClass">Driving Class</label>
+        <select id="regDrivingClass">
+          <option value="">Select class...</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="computerCourseGroup">
+        <label for="regComputerCourse">Computer Course</label>
+        <select id="regComputerCourse">
+          <option value="">Select course...</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="regStartDate">Start Date</label>
+        <input type="date" id="regStartDate">
+      </div>
+
+      <div class="form-group">
+        <label for="regNotes">Notes</label>
+        <textarea id="regNotes" rows="2"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" onclick="closeRegisterModal()">Cancel</button>
+        <button type="submit" class="btn" id="registerBtn">Register Student</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/students.js"></script>
+</body>
+</html>
