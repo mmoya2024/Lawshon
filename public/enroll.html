@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enroll — Lashawn Academy</title>
+<meta name="description" content="Enroll at Lashawn Driving & Computer College. Pick a course, tell us about you, and our team will follow up.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <a class="brand" href="index.html">
+    🎓 <span>Lashawn Driving <span class="dot">&</span> Computer College</span>
+  </a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="courses-ntsa.html">Courses</a>
+    <a href="#why">Why Us</a>
+    <a href="enroll.html" class="cta">Enroll Now</a>
+  </nav>
+</header>
+
+<!-- HERO STRIP -->
+<section style="background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;max-width:none;padding:3rem 1.5rem 2.5rem;">
+  <div style="max-width:720px;margin:0 auto;text-align:center;">
+    <h1 style="font-size:2.2rem;margin:0 0 0.6rem;color:#fff;">Enroll at Lashawn Academy</h1>
+    <p style="color:#cfd9e8;font-size:1.05rem;margin:0;">
+      Takes less than 5 minutes. Pick a programme, tell us about you, and our team will reach out to confirm your slot.
+    </p>
+  </div>
+</section>
+
+<!-- MAIN ENROLLMENT -->
+<section style="max-width:720px;">
+
+  <div id="enrollAlert"></div>
+
+  <div class="card" style="padding:1.8rem;">
+
+    <div style="display:flex;gap:0.6rem;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
+      <span style="font-size:1.6rem;">📝</span>
+      <div>
+        <h2 style="text-align:left;margin:0;font-size:1.2rem;">Enrollment Form</h2>
+        <p class="text-muted" style="margin:0;font-size:0.9rem;">All fields marked * are required</p>
+      </div>
+    </div>
+
+    <form id="enrollForm">
+
+      <!-- PERSONAL -->
+      <h3 style="font-size:1rem;color:var(--navy);margin:0 0 0.8rem;">1. Personal Details</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="eName">Full Name *</label>
+          <input type="text" id="eName" required placeholder="e.g. Jane Wanjiku">
+        </div>
+        <div class="form-group">
+          <label for="ePhone">Phone *</label>
+          <input type="tel" id="ePhone" required placeholder="07XXXXXXXX">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="eEmail">Email</label>
+          <input type="email" id="eEmail" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label for="eIdNumber">National ID / Passport</label>
+          <input type="text" id="eIdNumber" placeholder="Optional">
+        </div>
+      </div>
+
+      <!-- PROGRAMME -->
+      <h3 style="font-size:1rem;color:var(--navy);margin:1.5rem 0 0.8rem;">2. Programme</h3>
+
+      <div class="form-group">
+        <label for="eProgramme">What would you like to study? *</label>
+        <select id="eProgramme" required>
+          <option value="">Select a programme...</option>
+          <option value="DRIVING">🚗 Driving Course</option>
+          <option value="COMPUTER">💻 Computer Course</option>
+          <option value="PRINTING_DIGITAL">🖨️ Printing / Digital Services</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="eDrivingClassGroup">
+        <label for="eDrivingClass">Driving Class</label>
+        <select id="eDrivingClass">
+          <option value="">Select class...</option>
+        </select>
+        <p class="hint">Not sure? Our team will help you choose the right class.</p>
+      </div>
+
+      <div class="form-group hidden" id="eComputerCourseGroup">
+        <label for="eComputerCourse">Computer Course</label>
+        <select id="eComputerCourse">
+          <option value="">Select course...</option>
+        </select>
+      </div>
+
+      <!-- MESSAGE -->
+      <h3 style="font-size:1rem;color:var(--navy);margin:1.5rem 0 0.8rem;">3. Anything Else?</h3>
+
+      <div class="form-group">
+        <label for="eMessage">Message / Questions</label>
+        <textarea id="eMessage" rows="3" placeholder="Preferred start date, payment plan questions, etc."></textarea>
+      </div>
+
+      <button type="submit" class="btn full mt-2" id="enrollBtn">
+        Submit Enquiry
+      </button>
+
+      <p class="text-muted text-center mt-2" style="font-size:0.85rem;margin-bottom:0;">
+        By submitting, you agree to be contacted by our team about your enquiry.
+      </p>
+
+    </form>
+  </div>
+
+  <!-- TRUST SIGNALS -->
+  <div class="grid grid-3 mt-3">
+    <div class="card text-center">
+      <span class="icon">✅</span>
+      <h3 style="font-size:0.95rem;">No Obligation</h3>
+      <p style="font-size:0.85rem;">Submitting an enquiry is free and non-binding.</p>
+    </div>
+    <div class="card text-center">
+      <span class="icon">⚡</span>
+      <h3 style="font-size:0.95rem;">Fast Response</h3>
+      <p style="font-size:0.85rem;">Our team responds within 24 hours.</p>
+    </div>
+    <div class="card text-center">
+      <span class="icon">💳</span>
+      <h3 style="font-size:0.95rem;">Flexible Payment</h3>
+      <p style="font-size:0.85rem;">Installment plans available on request.</p>
+    </div>
+  </div>
+
+</section>
+
+<footer style="text-align:center;color:var(--muted);font-size:0.95rem;padding:2.5rem 1.5rem;">
+  Lashawn Driving & Computer College ·
+  <a href="mailto:info@lashawnacademy.com">info@lashawnacademy.com</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/enroll.js"></script>
+</body>
+</html>
