@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Computer Courses — Lashawn Academy</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="brand">🎓 Lashawn Academy</div>
+    <nav>
+      <a href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="students.html"><span class="icon">👥</span> Students</a>
+      <a href="driving.html"><span class="icon">🚗</span> Driving</a>
+      <a href="computer.html" class="active"><span class="icon">💻</span> Computer</a>
+      <a href="printing.html"><span class="icon">🖨️</span> Printing</a>
+      <a href="finance.html"><span class="icon">💰</span> Finance</a>
+      <a href="vehicles.html"><span class="icon">🚙</span> Vehicles</a>
+      <a href="staff.html"><span class="icon">👔</span> Staff</a>
+      <a href="reports.html"><span class="icon">📈</span> Reports</a>
+      <a href="settings.html"><span class="icon">⚙️</span> Settings</a>
+      <a href="#" onclick="window.signOut();return false;"><span class="icon">🚪</span> Logout</a>
+    </nav>
+  </aside>
+  <main class="main-content">
+    <h2 style="text-align:left;margin:0 0 1rem;">Computer Courses</h2>
+    <div class="card mb-3"><h3 style="margin:0 0 1rem;">Available Courses</h3><div id="coursesTable"><p class="text-muted">Loading...</p></div></div>
+    <div class="card"><h3 style="margin:0 0 1rem;">Student Progress</h3><div id="progressTable"><p class="text-muted">Loading...</p></div></div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/computer.js"></script>
+</body>
+</html>
