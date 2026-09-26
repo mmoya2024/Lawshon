@@ -23,4 +23,75 @@
       <a href="staff.html"><span class="icon">👔</span> Staff</a>
       <a href="reports.html"><span class="icon">📈</span> Reports</a>
       <a href="settings.html"><span class="icon">⚙️</span> Settings</a>
-      <a href="#" onclick="window.signOut();return false;"><span class="icon">🚪</span
+      <a href="#" onclick="window.signOut();return false;"><span class="icon">🚪</span> Logout</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <div class="flex-between mb-3">
+      <div>
+        <h2 style="text-align:left;margin:0;">Dashboard</h2>
+        <p class="text-muted" style="margin:0;">Welcome back, <span id="userName">...</span></p>
+      </div>
+      <a href="students.html" class="btn">+ Register Student</a>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid grid-4 mb-3" id="statsGrid">
+      <div class="stat-card">
+        <span class="stat-label">Active Students</span>
+        <span class="stat-value" id="statActiveStudents">—</span>
+      </div>
+      <div class="stat-card warning">
+        <span class="stat-label">Approaching 6 Weeks</span>
+        <span class="stat-value" id="statApproaching">—</span>
+      </div>
+      <div class="stat-card danger">
+        <span class="stat-label">Over 6 Weeks</span>
+        <span class="stat-value" id="statOverdue">—</span>
+      </div>
+      <div class="stat-card success">
+        <span class="stat-label">Test Ready</span>
+        <span class="stat-value" id="statReady">—</span>
+      </div>
+    </div>
+
+    <!-- TRAINING ALERTS -->
+    <div class="card mb-3">
+      <div class="flex-between mb-2">
+        <h3 style="margin:0;">6-Week Training Tracker</h3>
+        <a href="driving.html" class="btn small secondary">View All</a>
+      </div>
+      <div id="trainingAlerts">
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+
+    <!-- TEST READINESS -->
+    <div class="card mb-3">
+      <div class="flex-between mb-2">
+        <h3 style="margin:0;">Students Due for Test</h3>
+        <a href="driving.html" class="btn small secondary">View All</a>
+      </div>
+      <div id="testReadyList">
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="card">
+      <h3 style="margin:0 0 1rem;">Recent Activity</h3>
+      <div id="recentActivity">
+        <p class="text-muted">Loading...</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
