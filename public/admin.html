@@ -4,667 +4,3550 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin — Lashawn Driving & Computer College</title>
+
 <link rel="stylesheet" href="css/style.css">
+
 <style>
   :root{
-    --navy:#0f2d52; --gold:#d4a017; --bg:#f6f7f9; --card:#ffffff;
-    --text:#1a1e24; --muted:#5b6472; --border:#e2e6eb; --danger:#b3261e; --ok:#1a7a4c;
-  }
-  *{box-sizing:border-box;}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;}
-  a{color:inherit;text-decoration:none;}
-
-  .shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
-  @media (max-width:820px){.shell{grid-template-columns:1fr;}}
-
-  aside{background:var(--navy);color:#fff;padding:1.4rem 1rem;display:flex;flex-direction:column;gap:.3rem;}
-  .brand{font-weight:700;font-size:1rem;padding:0 .5rem 1.2rem;display:flex;gap:.5rem;align-items:center;}
-  .brand .dot{color:var(--gold);}
-  .role-tag{font-size:.72rem;color:#cfd9e8;padding:0 .5rem 1rem;text-transform:uppercase;letter-spacing:.04em;}
-  nav.tabs{display:flex;flex-direction:column;gap:.2rem;}
-  nav.tabs button{all:unset;cursor:pointer;padding:.65rem .8rem;border-radius:8px;font-size:.9rem;color:#dbe3ee;}
-  nav.tabs button:hover{background:rgba(255,255,255,.08);}
-  nav.tabs button.active{background:var(--gold);color:#241900;font-weight:700;}
-  .side-foot{margin-top:auto;font-size:.78rem;color:#9fb0c8;padding:.5rem;}
-  .side-foot a{color:#fff;text-decoration:underline;}
-
-  main{padding:1.8rem 2rem;max-width:1180px;}
-  h1{font-size:1.5rem;color:var(--navy);margin:0 0 .2rem;}
-  .lede{color:var(--muted);font-size:.92rem;margin:0 0 1.6rem;}
-
-  .panel{display:none;} .panel.active{display:block;}
-
-  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.8rem;}
-  .stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.2rem;}
-  .stat .num{font-size:1.55rem;font-weight:800;color:var(--navy);}
-  .stat .label{color:var(--muted);font-size:.82rem;margin-top:.2rem;}
-
-  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1.5rem;}
-  .card h2{font-size:1.05rem;color:var(--navy);margin:0 0 1rem;}
-
-  table{border-collapse:collapse;width:100%;font-size:.85rem;}
-  thead th{background:#eef2f7;color:var(--navy);text-align:left;padding:.6rem .7rem;font-size:.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;}
-  tbody td{padding:.6rem .7rem;border-bottom:1px solid var(--border);vertical-align:middle;}
-  .tbl-wrap{overflow-x:auto;}
-
-  .tag-pill{display:inline-block;padding:.15rem .55rem;border-radius:999px;font-size:.72rem;font-weight:600;}
-  .tag-pill.paid{background:#e4f5ec;color:var(--ok);}
-  .tag-pill.partial{background:#fdf1d8;color:#8a5a00;}
-  .tag-pill.pending{background:#fbe7e5;color:var(--danger);}
-
-  .btn{display:inline-block;background:var(--gold);color:#241900;border:none;padding:.55rem 1rem;border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer;}
-  .btn.outline{background:transparent;border:1px solid var(--border);color:var(--text);}
-  .btn.small{padding:.35rem .7rem;font-size:.78rem;}
-
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-  @media (max-width:600px){.form-row{grid-template-columns:1fr;}}
-  .form-group{margin-bottom:1rem;}
-  .form-group label{display:block;font-size:.82rem;font-weight:600;margin-bottom:.3rem;color:var(--muted);}
-  .form-group input, .form-group select, .form-group textarea{
-    width:100%;padding:.6rem .75rem;border:1px solid var(--border);border-radius:8px;font-size:.9rem;
+    --navy:#0f2d52;
+    --gold:#d4a017;
+    --bg:#f6f7f9;
+    --card:#ffffff;
+    --text:#1a1e24;
+    --muted:#5b6472;
+    --border:#e2e6eb;
+    --danger:#b3261e;
+    --ok:#1a7a4c;
+    --info:#1769aa;
+    --info-bg:#eef7ff;
   }
 
-  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;}
-  .search{padding:.5rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;min-width:220px;}
+  *{
+    box-sizing:border-box;
+  }
 
-  .toast{position:fixed;bottom:1.2rem;right:1.2rem;background:var(--navy);color:#fff;padding:.8rem 1.1rem;border-radius:8px;font-size:.85rem;display:none;z-index:2000;}
-  .toast.show{display:block;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+  }
 
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:1rem;}
-  .modal-overlay.active{display:flex;}
-  .modal{background:#fff;border-radius:12px;padding:1.5rem;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;}
-  .modal h3{margin:0 0 1rem;color:var(--navy);}
+  a{
+    color:inherit;
+    text-decoration:none;
+  }
 
-  .alert{padding:.9rem 1.1rem;border-radius:10px;margin-bottom:1rem;font-size:.9rem;border:1px solid;}
-  .alert-success{background:#dafbe1;border-color:var(--ok);color:var(--ok);}
-  .alert-danger{background:#ffebe9;border-color:var(--danger);color:var(--danger);}
+  .hidden{
+    display:none !important;
+  }
 
-  .fee-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.8rem;margin:1rem 0;font-size:.82rem;}
-  .fee-summary .item{padding:.6rem;background:#f8f9fb;border-radius:8px;}
-  .fee-summary .item .k{color:var(--muted);}
-  .fee-summary .item .v{font-weight:700;color:var(--navy);font-size:1rem;margin-top:.15rem;}
+  .shell{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    min-height:100vh;
+  }
+
+  @media (max-width:820px){
+    .shell{
+      grid-template-columns:1fr;
+    }
+  }
+
+  aside{
+    background:var(--navy);
+    color:#fff;
+    padding:1.4rem 1rem;
+    display:flex;
+    flex-direction:column;
+    gap:.3rem;
+  }
+
+  .brand{
+    font-weight:700;
+    font-size:1rem;
+    padding:0 .5rem 1.2rem;
+    display:flex;
+    gap:.5rem;
+    align-items:center;
+  }
+
+  .brand .dot{
+    color:var(--gold);
+  }
+
+  .role-tag{
+    font-size:.72rem;
+    color:#cfd9e8;
+    padding:0 .5rem 1rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+
+  nav.tabs{
+    display:flex;
+    flex-direction:column;
+    gap:.2rem;
+  }
+
+  nav.tabs button{
+    all:unset;
+    cursor:pointer;
+    padding:.65rem .8rem;
+    border-radius:8px;
+    font-size:.9rem;
+    color:#dbe3ee;
+  }
+
+  nav.tabs button:hover{
+    background:rgba(255,255,255,.08);
+  }
+
+  nav.tabs button.active{
+    background:var(--gold);
+    color:#241900;
+    font-weight:700;
+  }
+
+  .side-foot{
+    margin-top:auto;
+    font-size:.78rem;
+    color:#9fb0c8;
+    padding:.5rem;
+  }
+
+  .side-foot a{
+    color:#fff;
+    text-decoration:underline;
+  }
+
+  main{
+    padding:1.8rem 2rem;
+    max-width:1180px;
+    width:100%;
+  }
+
+  h1{
+    font-size:1.5rem;
+    color:var(--navy);
+    margin:0 0 .2rem;
+  }
+
+  .lede{
+    color:var(--muted);
+    font-size:.92rem;
+    margin:0 0 1.6rem;
+  }
+
+  .panel{
+    display:none;
+  }
+
+  .panel.active{
+    display:block;
+  }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:1rem;
+    margin-bottom:1.8rem;
+  }
+
+  .stat{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:1.1rem 1.2rem;
+  }
+
+  .stat .num{
+    font-size:1.55rem;
+    font-weight:800;
+    color:var(--navy);
+  }
+
+  .stat .label{
+    color:var(--muted);
+    font-size:.82rem;
+    margin-top:.2rem;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:1.4rem;
+    margin-bottom:1.5rem;
+  }
+
+  .card h2{
+    font-size:1.05rem;
+    color:var(--navy);
+    margin:0 0 1rem;
+  }
+
+  table{
+    border-collapse:collapse;
+    width:100%;
+    font-size:.85rem;
+  }
+
+  thead th{
+    background:#eef2f7;
+    color:var(--navy);
+    text-align:left;
+    padding:.6rem .7rem;
+    font-size:.72rem;
+    text-transform:uppercase;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+
+  tbody td{
+    padding:.6rem .7rem;
+    border-bottom:1px solid var(--border);
+    vertical-align:middle;
+  }
+
+  .tbl-wrap{
+    overflow-x:auto;
+  }
+
+  .tag-pill{
+    display:inline-block;
+    padding:.15rem .55rem;
+    border-radius:999px;
+    font-size:.72rem;
+    font-weight:600;
+  }
+
+  .tag-pill.paid{
+    background:#e4f5ec;
+    color:var(--ok);
+  }
+
+  .tag-pill.partial{
+    background:#fdf1d8;
+    color:#8a5a00;
+  }
+
+  .tag-pill.pending{
+    background:#fbe7e5;
+    color:var(--danger);
+  }
+
+  .btn{
+    display:inline-block;
+    background:var(--gold);
+    color:#241900;
+    border:none;
+    padding:.55rem 1rem;
+    border-radius:8px;
+    font-weight:700;
+    font-size:.85rem;
+    cursor:pointer;
+  }
+
+  .btn:hover{
+    filter:brightness(.97);
+  }
+
+  .btn:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+  }
+
+  .btn.outline{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text);
+  }
+
+  .btn.small{
+    padding:.35rem .7rem;
+    font-size:.78rem;
+  }
+
+  .form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1rem;
+  }
+
+  @media (max-width:600px){
+    .form-row{
+      grid-template-columns:1fr;
+    }
+  }
+
+  .form-group{
+    margin-bottom:1rem;
+  }
+
+  .form-group label{
+    display:block;
+    font-size:.82rem;
+    font-weight:600;
+    margin-bottom:.3rem;
+    color:var(--muted);
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea{
+    width:100%;
+    padding:.6rem .75rem;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:.9rem;
+    background:#fff;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus{
+    outline:none;
+    border-color:var(--gold);
+    box-shadow:0 0 0 2px rgba(212,160,23,.12);
+  }
+
+  .toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    flex-wrap:wrap;
+    margin-bottom:1rem;
+  }
+
+  .search{
+    padding:.5rem .8rem;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:.88rem;
+    min-width:220px;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:1.2rem;
+    right:1.2rem;
+    background:var(--navy);
+    color:#fff;
+    padding:.8rem 1.1rem;
+    border-radius:8px;
+    font-size:.85rem;
+    display:none;
+    z-index:2000;
+  }
+
+  .toast.show{
+    display:block;
+  }
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+    padding:1rem;
+  }
+
+  .modal-overlay.active{
+    display:flex;
+  }
+
+  .modal{
+    background:#fff;
+    border-radius:12px;
+    padding:1.5rem;
+    max-width:560px;
+    width:100%;
+    max-height:90vh;
+    overflow-y:auto;
+  }
+
+  .modal h3{
+    margin:0 0 1rem;
+    color:var(--navy);
+  }
+
+  .alert{
+    padding:.9rem 1.1rem;
+    border-radius:10px;
+    margin-bottom:1rem;
+    font-size:.9rem;
+    border:1px solid;
+  }
+
+  .alert-success{
+    background:#dafbe1;
+    border-color:var(--ok);
+    color:var(--ok);
+  }
+
+  .alert-danger{
+    background:#ffebe9;
+    border-color:var(--danger);
+    color:var(--danger);
+  }
+
+  .fee-summary{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+    gap:.8rem;
+    margin:1rem 0;
+    font-size:.82rem;
+  }
+
+  .fee-summary .item{
+    padding:.6rem;
+    background:#f8f9fb;
+    border-radius:8px;
+  }
+
+  .fee-summary .item .k{
+    color:var(--muted);
+  }
+
+  .fee-summary .item .v{
+    font-weight:700;
+    color:var(--navy);
+    font-size:1rem;
+    margin-top:.15rem;
+  }
+
+  /* PAYMENT INSTRUCTIONS */
+
+  .payment-instructions{
+    border:1px solid #cfe3f5;
+    background:var(--info-bg);
+    border-radius:10px;
+    padding:1rem;
+    margin:0 0 1rem;
+  }
+
+  .payment-instructions .title{
+    font-size:.86rem;
+    font-weight:800;
+    color:var(--navy);
+    margin-bottom:.55rem;
+  }
+
+  .payment-instructions .instruction-row{
+    display:flex;
+    justify-content:space-between;
+    gap:1rem;
+    padding:.35rem 0;
+    border-bottom:1px solid rgba(23,105,170,.12);
+    font-size:.85rem;
+  }
+
+  .payment-instructions .instruction-row:last-child{
+    border-bottom:none;
+  }
+
+  .payment-instructions .instruction-label{
+    color:var(--muted);
+  }
+
+  .payment-instructions .instruction-value{
+    font-weight:800;
+    color:var(--navy);
+    text-align:right;
+    letter-spacing:.03em;
+  }
+
+  .payment-note{
+    margin-top:.65rem;
+    font-size:.76rem;
+    color:var(--muted);
+  }
+
+  .reference-help{
+    font-size:.75rem;
+    color:var(--muted);
+    margin-top:.3rem;
+  }
+
+  .required-note{
+    color:var(--danger);
+  }
+
+  .spinner{
+    display:inline-block;
+    width:12px;
+    height:12px;
+    border:2px solid rgba(0,0,0,.25);
+    border-top-color:#000;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    margin-right:6px;
+    vertical-align:-2px;
+  }
+
+  @keyframes spin{
+    to{
+      transform:rotate(360deg);
+    }
+  }
+
+  .text-muted{
+    color:var(--muted);
+  }
 </style>
 </head>
+
 <body>
 
 <div class="shell">
+
   <aside>
-    <div class="brand">🎓 <span>Lashawn <span class="dot">Admin</span></span></div>
-    <div class="role-tag" id="roleTag">Admin</div>
-    <nav class="tabs">
-      <button data-panel="overview" class="active">Overview</button>
-      <button data-panel="enroll">New Enrolment</button>
-      <button data-panel="students">Students</button>
-      <button data-panel="fees">Fees</button>
-    </nav>
-    <div class="side-foot">
-      <span id="sideName">Admin</span><br>
-      <a href="index.html">← Back to site</a><br>
-      <a href="#" onclick="window.signOut();return false;">Logout</a>
+
+    <div class="brand">
+      🎓
+      <span>
+        Lashawn
+        <span class="dot">Admin</span>
+      </span>
     </div>
+
+    <div class="role-tag" id="roleTag">Admin</div>
+
+    <nav class="tabs">
+
+      <button data-panel="overview" class="active">
+        Overview
+      </button>
+
+      <button data-panel="enroll">
+        New Enrolment
+      </button>
+
+      <button data-panel="students">
+        Students
+      </button>
+
+      <button data-panel="fees">
+        Fees
+      </button>
+
+    </nav>
+
+    <div class="side-foot">
+
+      <span id="sideName">Admin</span>
+      <br>
+
+      <a href="index.html">
+        ← Back to site
+      </a>
+
+      <br>
+
+      <a href="#" onclick="window.signOut();return false;">
+        Logout
+      </a>
+
+    </div>
+
   </aside>
+
 
   <main>
 
-    <!-- OVERVIEW -->
+    <!-- ======================================================
+         OVERVIEW
+         ====================================================== -->
+
     <section class="panel active" id="panel-overview">
+
       <h1>Welcome</h1>
-      <p class="lede">You have access to enrolment and fee top-up.</p>
+
+      <p class="lede">
+        You have access to enrolment and fee top-up.
+      </p>
 
       <div class="stat-grid">
-        <div class="stat"><div class="num" id="stat-students">—</div><div class="label">Total students</div></div>
-        <div class="stat"><div class="num" id="stat-active">—</div><div class="label">Active enrolments</div></div>
-        <div class="stat"><div class="num" id="stat-today">—</div><div class="label">Enrolled today</div></div>
+
+        <div class="stat">
+          <div class="num" id="stat-students">—</div>
+          <div class="label">Total students</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="stat-active">—</div>
+          <div class="label">Active enrolments</div>
+        </div>
+
+        <div class="stat">
+          <div class="num" id="stat-today">—</div>
+          <div class="label">Enrolled today</div>
+        </div>
+
       </div>
+
 
       <div class="card">
-        <h2>Quick actions</h2>
-        <button class="btn" onclick="goTab('enroll')">+ New Enrolment</button>
-        <button class="btn outline" onclick="goTab('fees')" style="margin-left:.5rem;">View Fees</button>
+
+        <h2>
+          Quick actions
+        </h2>
+
+        <button
+          class="btn"
+          onclick="goTab('enroll')">
+          + New Enrolment
+        </button>
+
+        <button
+          class="btn outline"
+          onclick="goTab('fees')"
+          style="margin-left:.5rem;">
+          View Fees
+        </button>
+
       </div>
+
     </section>
 
-    <!-- NEW ENROLMENT -->
+
+    <!-- ======================================================
+         NEW ENROLMENT
+         ====================================================== -->
+
     <section class="panel" id="panel-enroll">
-      <h1>New Enrolment</h1>
-      <p class="lede">Register a new student and enrol them in a programme.</p>
+
+      <h1>
+        New Enrolment
+      </h1>
+
+      <p class="lede">
+        Register a new student and enrol them in a programme.
+      </p>
+
 
       <div id="enrollAlert"></div>
 
+
       <div class="card">
+
         <form id="enrollForm">
 
-          <h3 style="font-size:1rem;color:var(--navy);margin:0 0 .8rem;">Personal Details</h3>
-          <div class="form-row">
-            <div class="form-group"><label>First Name *</label><input type="text" id="eFirstName" required></div>
-            <div class="form-group"><label>Last Name *</label><input type="text" id="eLastName" required></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Phone *</label><input type="tel" id="ePhone" required placeholder="07XXXXXXXX"></div>
-            <div class="form-group"><label>Email</label><input type="email" id="eEmail"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>National ID / Passport</label><input type="text" id="eId"></div>
-            <div class="form-group"><label>Date of Birth</label><input type="date" id="eDob"></div>
-          </div>
+          <h3 style="font-size:1rem;color:var(--navy);margin:0 0 .8rem;">
+            Personal Details
+          </h3>
 
-          <h3 style="font-size:1rem;color:var(--navy);margin:1.5rem 0 .8rem;">Enrolment</h3>
+
           <div class="form-row">
-            <div class="form-group"><label>Programme *</label>
-              <select id="eProgramme" required>
-                <option value="">Select...</option>
-                <option value="DRIVING">Driving</option>
-                <option value="COMPUTER">Computer</option>
-                <option value="PRINTING_DIGITAL">Printing</option>
-              </select>
+
+            <div class="form-group">
+
+              <label>
+                First Name *
+              </label>
+
+              <input
+                type="text"
+                id="eFirstName"
+                required>
+
             </div>
-            <div class="form-group"><label>Start Date</label><input type="date" id="eStartDate"></div>
-          </div>
-          <div class="form-group hidden" id="drivingClassGroup">
-            <label>Driving Class *</label>
-            <select id="eDrivingClass"><option value="">Select class...</option></select>
-          </div>
-          <div class="form-group hidden" id="computerCourseGroup">
-            <label>Computer Course *</label>
-            <select id="eComputerCourse"><option value="">Select course...</option></select>
+
+
+            <div class="form-group">
+
+              <label>
+                Last Name *
+              </label>
+
+              <input
+                type="text"
+                id="eLastName"
+                required>
+
+            </div>
+
           </div>
 
-          <h3 style="font-size:1rem;color:var(--navy);margin:1.5rem 0 .8rem;">Initial Payment (Optional)</h3>
+
           <div class="form-row">
-            <div class="form-group"><label>Amount Paid</label><input type="number" id="eAmountPaid" min="0" placeholder="0"></div>
-            <div class="form-group"><label>Payment Method</label>
+
+            <div class="form-group">
+
+              <label>
+                Phone *
+              </label>
+
+              <input
+                type="tel"
+                id="ePhone"
+                required
+                placeholder="07XXXXXXXX">
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>
+                Email
+              </label>
+
+              <input
+                type="email"
+                id="eEmail">
+
+            </div>
+
+          </div>
+
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label>
+                National ID / Passport
+              </label>
+
+              <input
+                type="text"
+                id="eId">
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>
+                Date of Birth
+              </label>
+
+              <input
+                type="date"
+                id="eDob">
+
+            </div>
+
+          </div>
+
+
+          <h3 style="font-size:1rem;color:var(--navy);margin:1.5rem 0 .8rem;">
+            Enrolment
+          </h3>
+
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label>
+                Programme *
+              </label>
+
+              <select
+                id="eProgramme"
+                required>
+
+                <option value="">
+                  Select...
+                </option>
+
+                <option value="DRIVING">
+                  Driving
+                </option>
+
+                <option value="COMPUTER">
+                  Computer
+                </option>
+
+                <option value="PRINTING_DIGITAL">
+                  Printing
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>
+                Start Date
+              </label>
+
+              <input
+                type="date"
+                id="eStartDate">
+
+            </div>
+
+          </div>
+
+
+          <div
+            class="form-group hidden"
+            id="drivingClassGroup">
+
+            <label>
+              Driving Class *
+            </label>
+
+            <select id="eDrivingClass">
+
+              <option value="">
+                Select class...
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div
+            class="form-group hidden"
+            id="computerCourseGroup">
+
+            <label>
+              Computer Course *
+            </label>
+
+            <select id="eComputerCourse">
+
+              <option value="">
+                Select course...
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <h3 style="font-size:1rem;color:var(--navy);margin:1.5rem 0 .8rem;">
+            Initial Payment (Optional)
+          </h3>
+
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label>
+                Amount Paid
+              </label>
+
+              <input
+                type="number"
+                id="eAmountPaid"
+                min="0"
+                placeholder="0">
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>
+                Payment Method
+              </label>
+
               <select id="ePaymentMethod">
-                <option value="CASH">Cash</option>
-                <option value="MPESA">M-Pesa</option>
-                <option value="BANK">Bank</option>
-                <option value="CARD">Card</option>
+
+                <option value="CASH">
+                  Cash
+                </option>
+
+                <option value="MPESA">
+                  M-Pesa PayBill
+                </option>
+
+                <option value="BANK">
+                  Bank Transfer
+                </option>
+
+                <option value="CARD">
+                  Card
+                </option>
+
               </select>
+
             </div>
+
           </div>
 
-          <button type="submit" class="btn" id="enrollBtn" style="margin-top:1rem;">Register & Enrol Student</button>
+
+          <!-- INITIAL PAYMENT INSTRUCTIONS -->
+
+          <div
+            id="initialPaymentInstructions"
+            class="payment-instructions hidden">
+
+            <div class="title">
+              Payment Instructions
+            </div>
+
+            <div class="instruction-row">
+              <span class="instruction-label">
+                PayBill
+              </span>
+
+              <span class="instruction-value">
+                522522
+              </span>
+            </div>
+
+            <div class="instruction-row">
+              <span class="instruction-label">
+                Account Number
+              </span>
+
+              <span class="instruction-value">
+                1352522772
+              </span>
+            </div>
+
+            <div class="payment-note">
+              Use the payment transaction/reference number when recording
+              the payment below.
+            </div>
+
+          </div>
+
+
+          <div
+            class="form-group hidden"
+            id="initialPaymentReferenceGroup">
+
+            <label id="initialPaymentReferenceLabel">
+              Payment Reference
+            </label>
+
+            <input
+              type="text"
+              id="ePaymentReference"
+              placeholder="Transaction / reference number">
+
+            <div class="reference-help">
+              Required when the initial payment is made through
+              M-Pesa or Bank Transfer.
+            </div>
+
+          </div>
+
+
+          <button
+            type="submit"
+            class="btn"
+            id="enrollBtn"
+            style="margin-top:1rem;">
+
+            Register & Enrol Student
+
+          </button>
+
         </form>
+
       </div>
+
     </section>
 
-    <!-- STUDENTS -->
+
+    <!-- ======================================================
+         STUDENTS
+         ====================================================== -->
+
     <section class="panel" id="panel-students">
-      <h1>Students</h1>
-      <p class="lede">View and search student records.</p>
+
+      <h1>
+        Students
+      </h1>
+
+      <p class="lede">
+        View and search student records.
+      </p>
+
 
       <div class="toolbar">
-        <input type="text" class="search" id="studentSearch" placeholder="Search name, phone, or student number...">
+
+        <input
+          type="text"
+          class="search"
+          id="studentSearch"
+          placeholder="Search name, phone, or student number...">
+
       </div>
 
+
       <div class="card">
-        <div class="tbl-wrap"><table>
-          <thead><tr>
-            <th>Student No.</th><th>Name</th><th>Phone</th><th>Status</th><th>Registered</th><th></th>
-          </tr></thead>
-          <tbody id="studentsTable"></tbody>
-        </table></div>
+
+        <div class="tbl-wrap">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Student No.
+                </th>
+
+                <th>
+                  Name
+                </th>
+
+                <th>
+                  Phone
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Registered
+                </th>
+
+                <th></th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="studentsTable"></tbody>
+
+          </table>
+
+        </div>
+
       </div>
+
     </section>
 
-    <!-- FEES -->
+
+    <!-- ======================================================
+         FEES
+         ====================================================== -->
+
     <section class="panel" id="panel-fees">
-      <h1>Fee Balances & Top-Up</h1>
-      <p class="lede">Record payments against student fees.</p>
+
+      <h1>
+        Fee Balances & Top-Up
+      </h1>
+
+      <p class="lede">
+        Record payments against student fees.
+      </p>
+
 
       <div class="toolbar">
-        <input type="text" class="search" id="feeSearch" placeholder="Search student...">
+
+        <input
+          type="text"
+          class="search"
+          id="feeSearch"
+          placeholder="Search student...">
+
       </div>
 
+
       <div class="card">
-        <div class="tbl-wrap"><table>
-          <thead><tr>
-            <th>Student</th><th>Invoiced</th><th>Paid</th><th>Balance</th><th>Actions</th>
-          </tr></thead>
-          <tbody id="feeTable"></tbody>
-        </table></div>
+
+        <div class="tbl-wrap">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Student
+                </th>
+
+                <th>
+                  Invoiced
+                </th>
+
+                <th>
+                  Paid
+                </th>
+
+                <th>
+                  Balance
+                </th>
+
+                <th>
+                  Actions
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="feeTable"></tbody>
+
+          </table>
+
+        </div>
+
       </div>
+
     </section>
 
   </main>
+
 </div>
 
-<!-- PAYMENT MODAL -->
-<div class="modal-overlay" id="paymentModal">
+
+<!-- ==========================================================
+     PAYMENT MODAL
+     ========================================================== -->
+
+<div
+  class="modal-overlay"
+  id="paymentModal">
+
   <div class="modal">
-    <h3>Record Payment / Fee Top-Up</h3>
+
+    <h3>
+      Record Payment / Fee Top-Up
+    </h3>
+
+
     <div id="paymentAlert"></div>
 
-    <div id="paymentStudentInfo" class="fee-summary"></div>
+
+    <div
+      id="paymentStudentInfo"
+      class="fee-summary">
+    </div>
+
 
     <form id="paymentForm">
-      <input type="hidden" id="payEnrolmentId">
-      <input type="hidden" id="payStudentId">
+
+      <input
+        type="hidden"
+        id="payEnrolmentId">
+
+      <input
+        type="hidden"
+        id="payStudentId">
+
 
       <div class="form-row">
+
         <div class="form-group">
-          <label>Amount *</label>
-          <input type="number" id="payAmount" min="1" required>
+
+          <label>
+            Amount *
+          </label>
+
+          <input
+            type="number"
+            id="payAmount"
+            min="1"
+            required>
+
         </div>
+
+
         <div class="form-group">
-          <label>Method *</label>
-          <select id="payMethod" required>
-            <option value="CASH">Cash</option>
-            <option value="MPESA">M-Pesa</option>
-            <option value="BANK">Bank Transfer</option>
-            <option value="CARD">Card</option>
-            <option value="CHEQUE">Cheque</option>
-            <option value="OTHER">Other</option>
+
+          <label>
+            Method *
+          </label>
+
+          <select
+            id="payMethod"
+            required>
+
+            <option value="CASH">
+              Cash
+            </option>
+
+            <option value="MPESA">
+              M-Pesa PayBill
+            </option>
+
+            <option value="BANK">
+              Bank Transfer
+            </option>
+
+            <option value="CARD">
+              Card
+            </option>
+
+            <option value="CHEQUE">
+              Cheque
+            </option>
+
+            <option value="OTHER">
+              Other
+            </option>
+
           </select>
+
         </div>
+
       </div>
+
+
+      <!-- ====================================================
+           PAYMENT INSTRUCTIONS
+           ==================================================== -->
+
+      <div
+        id="paymentInstructions"
+        class="payment-instructions hidden">
+
+        <div
+          class="title"
+          id="paymentInstructionTitle">
+          Payment Instructions
+        </div>
+
+
+        <div
+          id="mpesaInstructions"
+          class="hidden">
+
+          <div class="instruction-row">
+
+            <span class="instruction-label">
+              M-Pesa PayBill
+            </span>
+
+            <span class="instruction-value">
+              522522
+            </span>
+
+          </div>
+
+
+          <div class="instruction-row">
+
+            <span class="instruction-label">
+              Account Number
+            </span>
+
+            <span class="instruction-value">
+              1352522772
+            </span>
+
+          </div>
+
+          <div class="payment-note">
+            Enter the M-Pesa transaction code in the
+            reference field below.
+          </div>
+
+        </div>
+
+
+        <div
+          id="bankInstructions"
+          class="hidden">
+
+          <div class="instruction-row">
+
+            <span class="instruction-label">
+              Account Number
+            </span>
+
+            <span class="instruction-value">
+              1352522772
+            </span>
+
+          </div>
+
+          <div class="payment-note">
+            Enter the bank transaction/reference number
+            in the reference field below.
+          </div>
+
+        </div>
+
+
+        <div
+          id="cashInstructions"
+          class="hidden">
+
+          <div class="payment-note">
+            Record the cash payment received from the student.
+          </div>
+
+        </div>
+
+
+        <div
+          id="cardInstructions"
+          class="hidden">
+
+          <div class="payment-note">
+            Record the card transaction/reference number
+            if available.
+          </div>
+
+        </div>
+
+
+        <div
+          id="chequeInstructions"
+          class="hidden">
+
+          <div class="payment-note">
+            Enter the cheque number in the reference field.
+          </div>
+
+        </div>
+
+
+        <div
+          id="otherInstructions"
+          class="hidden">
+
+          <div class="payment-note">
+            Add the relevant payment details in the
+            reference and notes fields.
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ====================================================
+           PAYMENT REFERENCE
+           ==================================================== -->
 
       <div class="form-group">
-        <label>Reference (M-Pesa code, cheque no.)</label>
-        <input type="text" id="payReference">
+
+        <label id="payReferenceLabel">
+          Reference
+        </label>
+
+        <input
+          type="text"
+          id="payReference">
+
+        <div
+          class="reference-help"
+          id="payReferenceHelp">
+          Optional reference.
+        </div>
+
       </div>
+
 
       <div class="form-group">
-        <label>Notes</label>
-        <textarea id="payNotes" rows="2"></textarea>
+
+        <label>
+          Notes
+        </label>
+
+        <textarea
+          id="payNotes"
+          rows="2"></textarea>
+
       </div>
 
-      <div style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:1rem;">
-        <button type="button" class="btn outline" onclick="closePaymentModal()">Cancel</button>
-        <button type="submit" class="btn" id="paySubmitBtn">Record Payment</button>
+
+      <div
+        style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:1rem;">
+
+        <button
+          type="button"
+          class="btn outline"
+          onclick="closePaymentModal()">
+
+          Cancel
+
+        </button>
+
+
+        <button
+          type="submit"
+          class="btn"
+          id="paySubmitBtn">
+
+          Record Payment
+
+        </button>
+
       </div>
+
     </form>
+
   </div>
+
 </div>
 
-<div class="toast" id="toast"></div>
+
+<div
+  class="toast"
+  id="toast">
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/role-guard.js"></script>
+
 <script>
+
 /* ============================================================
-   ADMIN DASHBOARD — Enrolment + Fee Top-Up Only
+   ADMIN DASHBOARD
+   ENROLMENT + FEE TOP-UP
    ============================================================ */
 
 var ALL_STUDENTS = [];
 var ALL_FEES = [];
 var ALL_ENROLMENTS = [];
 
+
+/* ============================================================
+   PAGE INITIALIZATION
+   ============================================================ */
+
 document.addEventListener("DOMContentLoaded", async () => {
-  // Guard: only admins can access
+
+  /* ----------------------------------------------------------
+     ADMIN ACCESS
+     ---------------------------------------------------------- */
+
   const role = await window.requireAdminAccess();
-  if (!role || role === "NONE") return;
 
-  // Update role tag
-  document.getElementById("roleTag").textContent = role.replace(/_/g, " ");
+  if (!role || role === "NONE") {
+    return;
+  }
 
-  // Load profile name
+
+  /* ----------------------------------------------------------
+     ROLE DISPLAY
+     ---------------------------------------------------------- */
+
+  document.getElementById("roleTag").textContent =
+    role.replace(/_/g, " ");
+
+
+  /* ----------------------------------------------------------
+     LOAD PROFILE
+     ---------------------------------------------------------- */
+
   try {
-    const { data } = await LashawnDB.rpc("get_my_profile");
+
+    const { data } =
+      await LashawnDB.rpc("get_my_profile");
+
     if (data && data.first_name) {
+
       document.getElementById("sideName").textContent =
         `${data.first_name} ${data.last_name || ""} (${role.replace(/_/g, " ")})`;
+
     }
-  } catch (e) {}
 
-  // Tabs
-  document.querySelectorAll("nav.tabs button").forEach((btn) => {
-    btn.addEventListener("click", () => goTab(btn.dataset.panel));
-  });
+  } catch (e) {
 
-  // Set default start date
-  document.getElementById("eStartDate").value = new Date().toISOString().slice(0, 10);
+    console.warn("Could not load profile:", e);
 
-  // Programme toggle
-  document.getElementById("eProgramme").addEventListener("change", (e) => {
-    const v = e.target.value;
-    document.getElementById("drivingClassGroup").classList.toggle("hidden", v !== "DRIVING");
-    document.getElementById("computerCourseGroup").classList.toggle("hidden", v !== "COMPUTER");
-  });
+  }
 
-  // Wire forms
-  document.getElementById("enrollForm").addEventListener("submit", handleEnrol);
-  document.getElementById("paymentForm").addEventListener("submit", handlePayment);
-  document.getElementById("studentSearch").addEventListener("input", renderStudents);
-  document.getElementById("feeSearch").addEventListener("input", renderFees);
+
+  /* ----------------------------------------------------------
+     TABS
+     ---------------------------------------------------------- */
+
+  document
+    .querySelectorAll("nav.tabs button")
+    .forEach((btn) => {
+
+      btn.addEventListener("click", () => {
+        goTab(btn.dataset.panel);
+      });
+
+    });
+
+
+  /* ----------------------------------------------------------
+     DEFAULT START DATE
+     ---------------------------------------------------------- */
+
+  document.getElementById("eStartDate").value =
+    new Date().toISOString().slice(0, 10);
+
+
+  /* ----------------------------------------------------------
+     PROGRAMME TOGGLE
+     ---------------------------------------------------------- */
+
+  document
+    .getElementById("eProgramme")
+    .addEventListener("change", (e) => {
+
+      updateProgrammeFields(e.target.value);
+
+    });
+
+
+  /* ----------------------------------------------------------
+     INITIAL PAYMENT METHOD
+     ---------------------------------------------------------- */
+
+  document
+    .getElementById("ePaymentMethod")
+    .addEventListener("change", () => {
+
+      updateInitialPaymentInstructions();
+
+    });
+
+
+  /* ----------------------------------------------------------
+     PAYMENT MODAL METHOD
+     ---------------------------------------------------------- */
+
+  document
+    .getElementById("payMethod")
+    .addEventListener("change", () => {
+
+      updatePaymentInstructions();
+
+    });
+
+
+  /* ----------------------------------------------------------
+     FORMS
+     ---------------------------------------------------------- */
+
+  document
+    .getElementById("enrollForm")
+    .addEventListener("submit", handleEnrol);
+
+
+  document
+    .getElementById("paymentForm")
+    .addEventListener("submit", handlePayment);
+
+
+  /* ----------------------------------------------------------
+     SEARCH
+     ---------------------------------------------------------- */
+
+  document
+    .getElementById("studentSearch")
+    .addEventListener("input", renderStudents);
+
+
+  document
+    .getElementById("feeSearch")
+    .addEventListener("input", renderFees);
+
+
+  /* ----------------------------------------------------------
+     INITIAL PAYMENT UI
+     ---------------------------------------------------------- */
+
+  updateInitialPaymentInstructions();
+
+
+  /* ----------------------------------------------------------
+     LOAD DATA
+     ---------------------------------------------------------- */
 
   await Promise.all([
+
     loadReferenceData(),
+
     loadStudents(),
+
     loadFees(),
-    loadStats(),
+
+    loadStats()
+
   ]);
+
 });
 
+
+/* ============================================================
+   TABS
+   ============================================================ */
+
 function goTab(name) {
-  document.querySelectorAll("nav.tabs button").forEach((b) => {
-    b.classList.toggle("active", b.dataset.panel === name);
-  });
-  document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
-  document.getElementById("panel-" + name).classList.add("active");
+
+  document
+    .querySelectorAll("nav.tabs button")
+    .forEach((b) => {
+
+      b.classList.toggle(
+        "active",
+        b.dataset.panel === name
+      );
+
+    });
+
+
+  document
+    .querySelectorAll(".panel")
+    .forEach((p) => {
+
+      p.classList.remove("active");
+
+    });
+
+
+  const panel =
+    document.getElementById("panel-" + name);
+
+  if (panel) {
+
+    panel.classList.add("active");
+
+  }
+
 }
 
-function money(n) { return "KSh " + Number(n || 0).toLocaleString(); }
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function money(n) {
+
+  return "KSh " +
+    Number(n || 0).toLocaleString();
+
+}
+
+
 function esc(s) {
-  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+
+  return String(
+    s == null ? "" : s
+  ).replace(
+    /[&<>"']/g,
+    (c) => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[c])
+  );
+
 }
+
+
 function toast(msg) {
-  const t = document.getElementById("toast");
+
+  const t =
+    document.getElementById("toast");
+
   t.textContent = msg;
+
   t.classList.add("show");
+
   clearTimeout(window.__tt);
-  window.__tt = setTimeout(() => t.classList.remove("show"), 2400);
+
+  window.__tt =
+    setTimeout(
+      () => t.classList.remove("show"),
+      2400
+    );
+
 }
 
-/* -------- STATS -------- */
-async function loadStats() {
-  try {
-    const { count: total } = await LashawnDB
-      .from("students").select("*", { count: "exact", head: true });
 
-    const { count: active } = await LashawnDB
-      .from("enrolments").select("*", { count: "exact", head: true })
+/* ============================================================
+   PROGRAMME FIELDS
+   ============================================================ */
+
+function updateProgrammeFields(programme) {
+
+  const drivingGroup =
+    document.getElementById("drivingClassGroup");
+
+  const computerGroup =
+    document.getElementById("computerCourseGroup");
+
+
+  drivingGroup.classList.toggle(
+    "hidden",
+    programme !== "DRIVING"
+  );
+
+
+  computerGroup.classList.toggle(
+    "hidden",
+    programme !== "COMPUTER"
+  );
+
+
+  document.getElementById("eDrivingClass").required =
+    programme === "DRIVING";
+
+
+  document.getElementById("eComputerCourse").required =
+    programme === "COMPUTER";
+
+}
+
+
+/* ============================================================
+   INITIAL PAYMENT INSTRUCTIONS
+   ============================================================ */
+
+function updateInitialPaymentInstructions() {
+
+  const method =
+    document.getElementById("ePaymentMethod").value;
+
+  const amount =
+    Number(
+      document.getElementById("eAmountPaid").value || 0
+    );
+
+
+  const instructions =
+    document.getElementById(
+      "initialPaymentInstructions"
+    );
+
+
+  const referenceGroup =
+    document.getElementById(
+      "initialPaymentReferenceGroup"
+    );
+
+
+  const reference =
+    document.getElementById(
+      "ePaymentReference"
+    );
+
+
+  const label =
+    document.getElementById(
+      "initialPaymentReferenceLabel"
+    );
+
+
+  if (
+    amount > 0 &&
+    (method === "MPESA" || method === "BANK")
+  ) {
+
+    instructions.classList.remove("hidden");
+
+    referenceGroup.classList.remove("hidden");
+
+    reference.required = true;
+
+
+    if (method === "MPESA") {
+
+      label.textContent =
+        "M-Pesa Transaction Code *";
+
+      reference.placeholder =
+        "e.g. QK12345678";
+
+    } else {
+
+      label.textContent =
+        "Bank Transaction / Reference Number *";
+
+      reference.placeholder =
+        "Enter bank transaction reference";
+
+    }
+
+  } else {
+
+    instructions.classList.add("hidden");
+
+    referenceGroup.classList.toggle(
+      "hidden",
+      amount <= 0
+    );
+
+    reference.required = false;
+
+    label.textContent =
+      "Payment Reference";
+
+    reference.placeholder =
+      "Optional reference";
+
+  }
+
+}
+
+
+/* ============================================================
+   STATS
+   ============================================================ */
+
+async function loadStats() {
+
+  try {
+
+    const {
+      count: total
+    } = await LashawnDB
+      .from("students")
+      .select("*", {
+        count: "exact",
+        head: true
+      });
+
+
+    const {
+      count: active
+    } = await LashawnDB
+      .from("enrolments")
+      .select("*", {
+        count: "exact",
+        head: true
+      })
       .eq("status", "ACTIVE");
 
-    const today = new Date().toISOString().slice(0, 10);
-    const { count: todayCount } = await LashawnDB
-      .from("students").select("*", { count: "exact", head: true })
+
+    const today =
+      new Date()
+        .toISOString()
+        .slice(0, 10);
+
+
+    const {
+      count: todayCount
+    } = await LashawnDB
+      .from("students")
+      .select("*", {
+        count: "exact",
+        head: true
+      })
       .eq("registration_date", today);
 
-    document.getElementById("stat-students").textContent = total || 0;
-    document.getElementById("stat-active").textContent = active || 0;
-    document.getElementById("stat-today").textContent = todayCount || 0;
+
+    document.getElementById(
+      "stat-students"
+    ).textContent = total || 0;
+
+
+    document.getElementById(
+      "stat-active"
+    ).textContent = active || 0;
+
+
+    document.getElementById(
+      "stat-today"
+    ).textContent = todayCount || 0;
+
+
   } catch (err) {
-    console.warn("Stats error:", err);
+
+    console.warn(
+      "Stats error:",
+      err
+    );
+
   }
+
 }
 
-/* -------- REFERENCE DATA -------- */
+
+/* ============================================================
+   REFERENCE DATA
+   ============================================================ */
+
 async function loadReferenceData() {
+
   try {
-    const [dc, cc] = await Promise.all([
-      LashawnDB.from("driving_classes").select("id, class_code, class_name").eq("is_active", true).order("class_code"),
-      LashawnDB.from("computer_courses").select("id, course_code, course_name").eq("is_active", true).order("course_code"),
+
+    const [
+      dc,
+      cc
+    ] = await Promise.all([
+
+      LashawnDB
+        .from("driving_classes")
+        .select(
+          "id, class_code, class_name"
+        )
+        .eq("is_active", true)
+        .order("class_code"),
+
+
+      LashawnDB
+        .from("computer_courses")
+        .select(
+          "id, course_code, course_name"
+        )
+        .eq("is_active", true)
+        .order("course_code")
+
     ]);
-    const dcSel = document.getElementById("eDrivingClass");
-    (dc.data || []).forEach((c) => {
-      const o = document.createElement("option");
-      o.value = c.id;
-      o.textContent = `${c.class_code} — ${c.class_name}`;
-      dcSel.appendChild(o);
-    });
-    const ccSel = document.getElementById("eComputerCourse");
-    (cc.data || []).forEach((c) => {
-      const o = document.createElement("option");
-      o.value = c.id;
-      o.textContent = `${c.course_code} — ${c.course_name}`;
-      ccSel.appendChild(o);
-    });
-  } catch (err) { console.warn("Ref data error:", err); }
-}
 
-/* -------- NEW ENROLMENT -------- */
-async function handleEnrol(e) {
-  e.preventDefault();
-  const btn = document.getElementById("enrollBtn");
-  const alertBox = document.getElementById("enrollAlert");
 
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Processing...';
-  alertBox.innerHTML = "";
-
-  const firstName = document.getElementById("eFirstName").value.trim();
-  const lastName  = document.getElementById("eLastName").value.trim();
-  const phone     = document.getElementById("ePhone").value.trim();
-  const email     = document.getElementById("eEmail").value.trim() || null;
-  const idNumber  = document.getElementById("eId").value.trim() || null;
-  const dob       = document.getElementById("eDob").value || null;
-  const programme = document.getElementById("eProgramme").value;
-  const startDate = document.getElementById("eStartDate").value || null;
-  const drivingClassId = document.getElementById("eDrivingClass").value || null;
-  const computerCourseId = document.getElementById("eComputerCourse").value || null;
-  const amountPaid = Number(document.getElementById("eAmountPaid").value || 0);
-  const paymentMethod = document.getElementById("ePaymentMethod").value;
-
-  try {
-    // 1. Register student + enrolment via RPC
-    const { data: regData, error: regErr } = await LashawnDB.rpc("register_student", {
-      p_first_name: firstName,
-      p_last_name: lastName,
-      p_phone: phone,
-      p_email: email,
-      p_id_number: idNumber,
-      p_programme: programme,
-      p_driving_class_id: programme === "DRIVING" ? drivingClassId : null,
-      p_computer_course_id: programme === "COMPUTER" ? computerCourseId : null,
-      p_branch_id: null,
-      p_start_date: startDate,
-      p_notes: null,
-    });
-    if (regErr) throw regErr;
-
-    // 2. If initial payment, record it
-    if (amountPaid > 0) {
-      await LashawnDB.from("payments").insert({
-        student_id: regData.student_id,
-        enrolment_id: regData.enrolment_id,
-        amount: amountPaid,
-        payment_method: paymentMethod,
-        status: "CONFIRMED",
-        notes: "Initial payment at enrolment",
-      });
+    if (dc.error) {
+      throw dc.error;
     }
 
-    alertBox.innerHTML = `<div class="alert alert-success">
-      ✅ Student registered: <strong>${esc(regData.student_number)}</strong><br>
-      Enrolment: <strong>${esc(regData.enrolment_number)}</strong>
-      ${amountPaid > 0 ? `<br>Initial payment recorded: <strong>${money(amountPaid)}</strong>` : ""}
-    </div>`;
+
+    if (cc.error) {
+      throw cc.error;
+    }
+
+
+    const dcSel =
+      document.getElementById(
+        "eDrivingClass"
+      );
+
+
+    (dc.data || []).forEach((c) => {
+
+      const o =
+        document.createElement("option");
+
+      o.value = c.id;
+
+      o.textContent =
+        `${c.class_code} — ${c.class_name}`;
+
+      dcSel.appendChild(o);
+
+    });
+
+
+    const ccSel =
+      document.getElementById(
+        "eComputerCourse"
+      );
+
+
+    (cc.data || []).forEach((c) => {
+
+      const o =
+        document.createElement("option");
+
+      o.value = c.id;
+
+      o.textContent =
+        `${c.course_code} — ${c.course_name}`;
+
+      ccSel.appendChild(o);
+
+    });
+
+
+  } catch (err) {
+
+    console.warn(
+      "Reference data error:",
+      err
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   NEW ENROLMENT
+   ============================================================ */
+
+async function handleEnrol(e) {
+
+  e.preventDefault();
+
+
+  const btn =
+    document.getElementById(
+      "enrollBtn"
+    );
+
+
+  const alertBox =
+    document.getElementById(
+      "enrollAlert"
+    );
+
+
+  btn.disabled = true;
+
+  btn.innerHTML =
+    '<span class="spinner"></span> Processing...';
+
+
+  alertBox.innerHTML = "";
+
+
+  const firstName =
+    document
+      .getElementById("eFirstName")
+      .value
+      .trim();
+
+
+  const lastName =
+    document
+      .getElementById("eLastName")
+      .value
+      .trim();
+
+
+  const phone =
+    document
+      .getElementById("ePhone")
+      .value
+      .trim();
+
+
+  const email =
+    document
+      .getElementById("eEmail")
+      .value
+      .trim() || null;
+
+
+  const idNumber =
+    document
+      .getElementById("eId")
+      .value
+      .trim() || null;
+
+
+  const dob =
+    document
+      .getElementById("eDob")
+      .value || null;
+
+
+  const programme =
+    document
+      .getElementById("eProgramme")
+      .value;
+
+
+  const startDate =
+    document
+      .getElementById("eStartDate")
+      .value || null;
+
+
+  const drivingClassId =
+    document
+      .getElementById("eDrivingClass")
+      .value || null;
+
+
+  const computerCourseId =
+    document
+      .getElementById("eComputerCourse")
+      .value || null;
+
+
+  const amountPaid =
+    Number(
+      document
+        .getElementById("eAmountPaid")
+        .value || 0
+    );
+
+
+  const paymentMethod =
+    document
+      .getElementById("ePaymentMethod")
+      .value;
+
+
+  const paymentReference =
+    document
+      .getElementById("ePaymentReference")
+      .value
+      .trim() || null;
+
+
+  /* ----------------------------------------------------------
+     VALIDATION
+     ---------------------------------------------------------- */
+
+  if (amountPaid > 0) {
+
+    if (
+      paymentMethod === "MPESA" ||
+      paymentMethod === "BANK"
+    ) {
+
+      if (!paymentReference) {
+
+        alertBox.innerHTML =
+          '<div class="alert alert-danger">' +
+          'Enter the payment transaction/reference number.' +
+          '</div>';
+
+        btn.disabled = false;
+
+        btn.textContent =
+          "Register & Enrol Student";
+
+        return;
+
+      }
+
+    }
+
+  }
+
+
+  try {
+
+    /* --------------------------------------------------------
+       REGISTER STUDENT + ENROLMENT
+       -------------------------------------------------------- */
+
+    const {
+      data: regData,
+      error: regErr
+    } = await LashawnDB.rpc(
+      "register_student",
+      {
+        p_first_name: firstName,
+        p_last_name: lastName,
+        p_phone: phone,
+        p_email: email,
+        p_id_number: idNumber,
+        p_programme: programme,
+
+        p_driving_class_id:
+          programme === "DRIVING"
+            ? drivingClassId
+            : null,
+
+        p_computer_course_id:
+          programme === "COMPUTER"
+            ? computerCourseId
+            : null,
+
+        p_branch_id: null,
+
+        p_start_date: startDate,
+
+        p_notes: null
+      }
+    );
+
+
+    if (regErr) {
+
+      throw regErr;
+
+    }
+
+
+    if (!regData) {
+
+      throw new Error(
+        "Student registration did not return any data."
+      );
+
+    }
+
+
+    /* --------------------------------------------------------
+       INITIAL PAYMENT
+       -------------------------------------------------------- */
+
+    if (amountPaid > 0) {
+
+      const {
+        error: paymentError
+      } = await LashawnDB
+        .from("payments")
+        .insert({
+
+          student_id:
+            regData.student_id,
+
+          enrolment_id:
+            regData.enrolment_id,
+
+          amount:
+            amountPaid,
+
+          payment_method:
+            paymentMethod,
+
+          transaction_reference:
+            paymentReference,
+
+          status:
+            "CONFIRMED",
+
+          notes:
+            "Initial payment at enrolment"
+
+        });
+
+
+      if (paymentError) {
+
+        throw paymentError;
+
+      }
+
+    }
+
+
+    /* --------------------------------------------------------
+       SUCCESS
+       -------------------------------------------------------- */
+
+    alertBox.innerHTML = `
+      <div class="alert alert-success">
+
+        ✅ Student registered:
+        <strong>
+          ${esc(regData.student_number)}
+        </strong>
+
+        <br>
+
+        Enrolment:
+        <strong>
+          ${esc(regData.enrolment_number)}
+        </strong>
+
+        ${
+          amountPaid > 0
+            ? `
+              <br>
+              Initial payment recorded:
+              <strong>
+                ${money(amountPaid)}
+              </strong>
+            `
+            : ""
+        }
+
+      </div>
+    `;
+
 
     e.target.reset();
-    document.getElementById("eStartDate").value = new Date().toISOString().slice(0, 10);
-    document.getElementById("drivingClassGroup").classList.add("hidden");
-    document.getElementById("computerCourseGroup").classList.add("hidden");
 
-    setTimeout(async () => {
-      await Promise.all([loadStudents(), loadFees(), loadStats()]);
-    }, 800);
+
+    document.getElementById(
+      "eStartDate"
+    ).value =
+      new Date()
+        .toISOString()
+        .slice(0, 10);
+
+
+    updateProgrammeFields("");
+
+
+    document
+      .getElementById(
+        "initialPaymentInstructions"
+      )
+      .classList.add("hidden");
+
+
+    document
+      .getElementById(
+        "initialPaymentReferenceGroup"
+      )
+      .classList.add("hidden");
+
+
+    setTimeout(
+      async () => {
+
+        await Promise.all([
+
+          loadStudents(),
+
+          loadFees(),
+
+          loadStats()
+
+        ]);
+
+      },
+      800
+    );
+
+
   } catch (err) {
+
     console.error(err);
-    alertBox.innerHTML = `<div class="alert alert-danger">${esc(err.message || "Enrolment failed.")}</div>`;
+
+
+    alertBox.innerHTML = `
+      <div class="alert alert-danger">
+        ${esc(
+          err.message ||
+          "Enrolment failed."
+        )}
+      </div>
+    `;
+
   } finally {
+
     btn.disabled = false;
-    btn.textContent = "Register & Enrol Student";
+
+    btn.textContent =
+      "Register & Enrol Student";
+
   }
+
 }
 
-/* -------- STUDENTS -------- */
+
+/* ============================================================
+   STUDENTS
+   ============================================================ */
+
 async function loadStudents() {
-  try {
-    const { data, error } = await LashawnDB
-      .from("students").select("*")
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    ALL_STUDENTS = data || [];
-    renderStudents();
-  } catch (err) {
-    document.getElementById("studentsTable").innerHTML =
-      '<tr><td colspan="6" class="text-muted">Could not load students.</td></tr>';
-  }
-}
-
-function renderStudents() {
-  const q = document.getElementById("studentSearch").value.toLowerCase();
-  let rows = ALL_STUDENTS;
-  if (q) rows = rows.filter((s) =>
-    (s.first_name + " " + s.last_name).toLowerCase().includes(q) ||
-    (s.phone || "").includes(q) ||
-    (s.student_number || "").toLowerCase().includes(q)
-  );
-
-  const tbody = document.getElementById("studentsTable");
-  if (rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-muted">No students found.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = rows.map((s) => `
-    <tr>
-      <td><strong>${esc(s.student_number)}</strong></td>
-      <td>${esc(s.first_name + " " + s.last_name)}</td>
-      <td>${esc(s.phone || "—")}</td>
-      <td><span class="tag-pill ${s.status === "ACTIVE" ? "paid" : "pending"}">${esc(s.status)}</span></td>
-      <td>${s.registration_date || "—"}</td>
-      <td><a class="btn small outline" href="student-profile.html?id=${s.id}">View</a></td>
-    </tr>`).join("");
-}
-
-/* -------- FEES -------- */
-async function loadFees() {
-  try {
-    const { data: balances } = await LashawnDB.from("student_balances").select("*");
-    const { data: enrolments } = await LashawnDB.from("enrolments").select("id, student_id");
-
-    const eMap = {};
-    (enrolments || []).forEach((e) => { eMap[e.student_id] = e; });
-
-    ALL_FEES = (balances || []).map((b) => ({
-      student_id: b.student_id,
-      student_number: b.student_number,
-      name: b.student_name,
-      invoiced: b.invoiced || 0,
-      paid: b.paid || 0,
-      balance: b.balance || 0,
-      enrolment_id: eMap[b.student_id] ? eMap[b.student_id].id : null,
-    }));
-    renderFees();
-  } catch (err) {
-    console.warn("Fees error:", err);
-    document.getElementById("feeTable").innerHTML =
-      '<tr><td colspan="5" class="text-muted">Could not load fees.</td></tr>';
-  }
-}
-
-function renderFees() {
-  const q = document.getElementById("feeSearch").value.toLowerCase();
-  let rows = ALL_FEES;
-  if (q) rows = rows.filter((f) =>
-    (f.name || "").toLowerCase().includes(q) ||
-    (f.student_number || "").toLowerCase().includes(q)
-  );
-
-  const tbody = document.getElementById("feeTable");
-  if (rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="text-muted">No fee records.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = rows.map((f) => `
-    <tr>
-      <td>${esc(f.student_number)}<br><small class="text-muted">${esc(f.name)}</small></td>
-      <td>${money(f.invoiced)}</td>
-      <td>${money(f.paid)}</td>
-      <td><strong style="color:${f.balance > 0 ? '#b3261e' : '#1a7a4c'};">${money(f.balance)}</strong></td>
-      <td>
-        <button class="btn small" onclick="openPayment('${f.student_id}','${f.enrolment_id || ""}','${esc(f.name)}',${f.balance},${f.paid},${f.invoiced})">
-          + Top Up
-        </button>
-      </td>
-    </tr>`).join("");
-}
-
-/* -------- PAYMENT MODAL -------- */
-window.openPayment = function (studentId, enrolmentId, name, balance, paid, invoiced) {
-  document.getElementById("payStudentId").value = studentId || "";
-  document.getElementById("payEnrolmentId").value = enrolmentId || "";
-  document.getElementById("payAmount").value = balance > 0 ? balance : "";
-
-  document.getElementById("paymentStudentInfo").innerHTML = `
-    <div class="item"><div class="k">Student</div><div class="v">${esc(name)}</div></div>
-    <div class="item"><div class="k">Invoiced</div><div class="v">${money(invoiced)}</div></div>
-    <div class="item"><div class="k">Paid</div><div class="v">${money(paid)}</div></div>
-    <div class="item"><div class="k">Balance</div><div class="v" style="color:${balance > 0 ? '#b3261e' : '#1a7a4c'};">${money(balance)}</div></div>
-  `;
-
-  document.getElementById("paymentAlert").innerHTML = "";
-  document.getElementById("paymentModal").classList.add("active");
-};
-
-window.closePaymentModal = function () {
-  document.getElementById("paymentModal").classList.remove("active");
-};
-
-async function handlePayment(e) {
-  e.preventDefault();
-  const btn = document.getElementById("paySubmitBtn");
-  const alertBox = document.getElementById("paymentAlert");
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Recording...';
-  alertBox.innerHTML = "";
-
-  const studentId = document.getElementById("payStudentId").value;
-  const enrolmentId = document.getElementById("payEnrolmentId").value || null;
-  const amount = Number(document.getElementById("payAmount").value);
-  const method = document.getElementById("payMethod").value;
-  const reference = document.getElementById("payReference").value.trim() || null;
-  const notes = document.getElementById("payNotes").value.trim() || null;
-
-  if (!amount || amount <= 0) {
-    alertBox.innerHTML = '<div class="alert alert-danger">Enter a valid amount.</div>';
-    btn.disabled = false;
-    btn.textContent = "Record Payment";
-    return;
-  }
 
   try {
-    const { error } = await LashawnDB.from("payments").insert({
-      student_id: studentId,
-      enrolment_id: enrolmentId,
-      amount: amount,
-      payment_method: method,
-      transaction_reference: reference,
-      status: "CONFIRMED",
-      notes: notes,
-    });
-    if (error) throw error;
 
-    // Update invoice if exists
-    if (enrolmentId) {
-      const { data: invoices } = await LashawnDB
-        .from("invoices").select("*")
-        .eq("enrolment_id", enrolmentId)
-        .order("created_at", { ascending: false }).limit(1);
+    const {
+      data,
+      error
+    } = await LashawnDB
+      .from("students")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
 
-      if (invoices && invoices.length > 0) {
-        const inv = invoices[0];
-        const newPaid = Number(inv.amount_paid || 0) + amount;
-        const newBalance = Math.max(0, Number(inv.total_amount || 0) - newPaid);
-        const newStatus = newBalance <= 0 ? "PAID" : newPaid > 0 ? "PARTIAL" : inv.status;
 
-        await LashawnDB.from("invoices").update({
-          amount_paid: newPaid,
-          balance: newBalance,
-          status: newStatus,
-        }).eq("id", inv.id);
-      }
+    if (error) {
+
+      throw error;
+
     }
 
-    alertBox.innerHTML = '<div class="alert alert-success">Payment recorded successfully.</div>';
-    toast("Top-up recorded: " + money(amount));
 
-    setTimeout(async () => {
-      closePaymentModal();
-      await Promise.all([loadFees(), loadStats()]);
-    }, 1200);
+    ALL_STUDENTS =
+      data || [];
+
+
+    renderStudents();
+
+
   } catch (err) {
-    console.error(err);
-    alertBox.innerHTML = `<div class="alert alert-danger">${esc(err.message || "Could not record payment.")}</div>`;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Record Payment";
+
+    console.error(
+      "Students error:",
+      err
+    );
+
+
+    document.getElementById(
+      "studentsTable"
+    ).innerHTML =
+      '<tr>' +
+      '<td colspan="6" class="text-muted">' +
+      'Could not load students.' +
+      '</td>' +
+      '</tr>';
+
   }
+
 }
+
+
+function renderStudents() {
+
+  const q =
+    document
+      .getElementById("studentSearch")
+      .value
+      .toLowerCase();
+
+
+  let rows =
+    ALL_STUDENTS;
+
+
+  if (q) {
+
+    rows =
+      rows.filter((s) => {
+
+        const name =
+          `${s.first_name || ""} ${s.last_name || ""}`
+            .toLowerCase();
+
+
+        return (
+          name.includes(q) ||
+
+          (s.phone || "")
+            .toLowerCase()
+            .includes(q) ||
+
+          (s.student_number || "")
+            .toLowerCase()
+            .includes(q)
+        );
+
+      });
+
+  }
+
+
+  const tbody =
+    document.getElementById(
+      "studentsTable"
+    );
+
+
+  if (rows.length === 0) {
+
+    tbody.innerHTML =
+      '<tr>' +
+      '<td colspan="6" class="text-muted">' +
+      'No students found.' +
+      '</td>' +
+      '</tr>';
+
+    return;
+
+  }
+
+
+  tbody.innerHTML =
+    rows.map((s) => `
+
+      <tr>
+
+        <td>
+          <strong>
+            ${esc(s.student_number)}
+          </strong>
+        </td>
+
+        <td>
+          ${esc(
+            `${s.first_name || ""} ${s.last_name || ""}`
+          )}
+        </td>
+
+        <td>
+          ${esc(s.phone || "—")}
+        </td>
+
+        <td>
+
+          <span
+            class="tag-pill ${
+              s.status === "ACTIVE"
+                ? "paid"
+                : "pending"
+            }">
+
+            ${esc(s.status || "—")}
+
+          </span>
+
+        </td>
+
+        <td>
+          ${s.registration_date || "—"}
+        </td>
+
+        <td>
+
+          <a
+            class="btn small outline"
+            href="student-profile.html?id=${encodeURIComponent(s.id)}">
+
+            View
+
+          </a>
+
+        </td>
+
+      </tr>
+
+    `).join("");
+
+}
+
+
+/* ============================================================
+   FEES
+   ============================================================ */
+
+async function loadFees() {
+
+  try {
+
+    const {
+      data: balances,
+      error: balanceError
+    } = await LashawnDB
+      .from("student_balances")
+      .select("*");
+
+
+    if (balanceError) {
+
+      throw balanceError;
+
+    }
+
+
+    const {
+      data: enrolments,
+      error: enrolmentError
+    } = await LashawnDB
+      .from("enrolments")
+      .select(
+        "id, student_id"
+      );
+
+
+    if (enrolmentError) {
+
+      throw enrolmentError;
+
+    }
+
+
+    const eMap = {};
+
+
+    (enrolments || [])
+      .forEach((e) => {
+
+        eMap[e.student_id] =
+          e;
+
+      });
+
+
+    ALL_FEES =
+      (balances || []).map((b) => ({
+
+        student_id:
+          b.student_id,
+
+        student_number:
+          b.student_number,
+
+        name:
+          b.student_name,
+
+        invoiced:
+          b.invoiced || 0,
+
+        paid:
+          b.paid || 0,
+
+        balance:
+          b.balance || 0,
+
+        enrolment_id:
+          eMap[b.student_id]
+            ? eMap[b.student_id].id
+            : null
+
+      }));
+
+
+    renderFees();
+
+
+  } catch (err) {
+
+    console.warn(
+      "Fees error:",
+      err
+    );
+
+
+    document.getElementById(
+      "feeTable"
+    ).innerHTML =
+      '<tr>' +
+      '<td colspan="5" class="text-muted">' +
+      'Could not load fees.' +
+      '</td>' +
+      '</tr>';
+
+  }
+
+}
+
+
+function renderFees() {
+
+  const q =
+    document
+      .getElementById("feeSearch")
+      .value
+      .toLowerCase();
+
+
+  let rows =
+    ALL_FEES;
+
+
+  if (q) {
+
+    rows =
+      rows.filter((f) =>
+
+        (f.name || "")
+          .toLowerCase()
+          .includes(q) ||
+
+        (f.student_number || "")
+          .toLowerCase()
+          .includes(q)
+
+      );
+
+  }
+
+
+  const tbody =
+    document.getElementById(
+      "feeTable"
+    );
+
+
+  if (rows.length === 0) {
+
+    tbody.innerHTML =
+      '<tr>' +
+      '<td colspan="5" class="text-muted">' +
+      'No fee records.' +
+      '</td>' +
+      '</tr>';
+
+    return;
+
+  }
+
+
+  tbody.innerHTML =
+    rows.map((f) => `
+
+      <tr>
+
+        <td>
+
+          ${esc(f.student_number)}
+
+          <br>
+
+          <small class="text-muted">
+            ${esc(f.name)}
+          </small>
+
+        </td>
+
+
+        <td>
+          ${money(f.invoiced)}
+        </td>
+
+
+        <td>
+          ${money(f.paid)}
+        </td>
+
+
+        <td>
+
+          <strong
+            style="color:${
+              f.balance > 0
+                ? "#b3261e"
+                : "#1a7a4c"
+            };">
+
+            ${money(f.balance)}
+
+          </strong>
+
+        </td>
+
+
+        <td>
+
+          <button
+            class="btn small"
+            onclick="openPayment(
+              '${esc(f.student_id)}',
+              '${esc(f.enrolment_id || "")}',
+              '${esc(f.name)}',
+              ${Number(f.balance || 0)},
+              ${Number(f.paid || 0)},
+              ${Number(f.invoiced || 0)}
+            )">
+
+            + Top Up
+
+          </button>
+
+        </td>
+
+      </tr>
+
+    `).join("");
+
+}
+
+
+/* ============================================================
+   PAYMENT MODAL
+   ============================================================ */
+
+window.openPayment =
+function(
+  studentId,
+  enrolmentId,
+  name,
+  balance,
+  paid,
+  invoiced
+) {
+
+  document.getElementById(
+    "payStudentId"
+  ).value =
+    studentId || "";
+
+
+  document.getElementById(
+    "payEnrolmentId"
+  ).value =
+    enrolmentId || "";
+
+
+  document.getElementById(
+    "payAmount"
+  ).value =
+    balance > 0
+      ? balance
+      : "";
+
+
+  document.getElementById(
+    "paymentStudentInfo"
+  ).innerHTML = `
+
+    <div class="item">
+
+      <div class="k">
+        Student
+      </div>
+
+      <div class="v">
+        ${esc(name)}
+      </div>
+
+    </div>
+
+
+    <div class="item">
+
+      <div class="k">
+        Invoiced
+      </div>
+
+      <div class="v">
+        ${money(invoiced)}
+      </div>
+
+    </div>
+
+
+    <div class="item">
+
+      <div class="k">
+        Paid
+      </div>
+
+      <div class="v">
+        ${money(paid)}
+      </div>
+
+    </div>
+
+
+    <div class="item">
+
+      <div class="k">
+        Balance
+      </div>
+
+      <div
+        class="v"
+        style="color:${
+          balance > 0
+            ? "#b3261e"
+            : "#1a7a4c"
+        };">
+
+        ${money(balance)}
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.getElementById(
+    "paymentAlert"
+  ).innerHTML = "";
+
+
+  /* Reset payment fields */
+
+  document.getElementById(
+    "payMethod"
+  ).value =
+    "CASH";
+
+
+  document.getElementById(
+    "payReference"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "payNotes"
+  ).value =
+    "";
+
+
+  updatePaymentInstructions();
+
+
+  document.getElementById(
+    "paymentModal"
+  ).classList.add("active");
+
+};
+
+
+/* ============================================================
+   CLOSE PAYMENT MODAL
+   ============================================================ */
+
+window.closePaymentModal =
+function() {
+
+  document
+    .getElementById(
+      "paymentModal"
+    )
+    .classList.remove("active");
+
+};
+
+
+/* ============================================================
+   PAYMENT INSTRUCTIONS
+   ============================================================ */
+
+function updatePaymentInstructions() {
+
+  const method =
+    document.getElementById(
+      "payMethod"
+    ).value;
+
+
+  const instructions =
+    document.getElementById(
+      "paymentInstructions"
+    );
+
+
+  const reference =
+    document.getElementById(
+      "payReference"
+    );
+
+
+  const referenceLabel =
+    document.getElementById(
+      "payReferenceLabel"
+    );
+
+
+  const referenceHelp =
+    document.getElementById(
+      "payReferenceHelp"
+    );
+
+
+  const sections = [
+
+    "mpesaInstructions",
+
+    "bankInstructions",
+
+    "cashInstructions",
+
+    "cardInstructions",
+
+    "chequeInstructions",
+
+    "otherInstructions"
+
+  ];
+
+
+  sections.forEach((id) => {
+
+    document
+      .getElementById(id)
+      .classList.add("hidden");
+
+  });
+
+
+  /* ----------------------------------------------------------
+     M-PESA
+     ---------------------------------------------------------- */
+
+  if (method === "MPESA") {
+
+    instructions.classList.remove("hidden");
+
+    document
+      .getElementById(
+        "mpesaInstructions"
+      )
+      .classList.remove("hidden");
+
+
+    referenceLabel.textContent =
+      "M-Pesa Transaction Code *";
+
+
+    reference.placeholder =
+      "e.g. QK12345678";
+
+
+    referenceHelp.textContent =
+      "Enter the M-Pesa transaction code.";
+
+
+    reference.required =
+      true;
+
+    return;
+
+  }
+
+
+  /* ----------------------------------------------------------
+     BANK
+     ---------------------------------------------------------- */
+
+  if (method === "BANK") {
+
+    instructions.classList.remove("hidden");
+
+    document
+      .getElementById(
+        "bankInstructions"
+      )
+      .classList.remove("hidden");
+
+
+    referenceLabel.textContent =
+      "Bank Transaction / Reference Number *";
+
+
+    reference.placeholder =
+      "Enter bank transaction reference";
+
+
+    referenceHelp.textContent =
+      "Enter the bank transaction/reference number.";
+
+
+    reference.required =
+      true;
+
+    return;
+
+  }
+
+
+  /* ----------------------------------------------------------
+     CASH
+     ---------------------------------------------------------- */
+
+  if (method === "CASH") {
+
+    instructions.classList.remove("hidden");
+
+    document
+      .getElementById(
+        "cashInstructions"
+      )
+      .classList.remove("hidden");
+
+
+    referenceLabel.textContent =
+      "Reference";
+
+
+    reference.placeholder =
+      "Optional reference";
+
+
+    referenceHelp.textContent =
+      "Optional reference for the cash payment.";
+
+
+    reference.required =
+      false;
+
+    return;
+
+  }
+
+
+  /* ----------------------------------------------------------
+     CARD
+     ---------------------------------------------------------- */
+
+  if (method === "CARD") {
+
+    instructions.classList.remove("hidden");
+
+    document
+      .getElementById(
+        "cardInstructions"
+      )
+      .classList.remove("hidden");
+
+
+    referenceLabel.textContent =
+      "Card Transaction Reference";
+
+
+    reference.placeholder =
+      "Optional card transaction reference";
+
+
+    referenceHelp.textContent =
+      "Enter the card transaction/reference if available.";
+
+
+    reference.required =
+      false;
+
+    return;
+
+  }
+
+
+  /* ----------------------------------------------------------
+     CHEQUE
+     ---------------------------------------------------------- */
+
+  if (method === "CHEQUE") {
+
+    instructions.classList.remove("hidden");
+
+    document
+      .getElementById(
+        "chequeInstructions"
+      )
+      .classList.remove("hidden");
+
+
+    referenceLabel.textContent =
+      "Cheque Number";
+
+
+    reference.placeholder =
+      "Enter cheque number";
+
+
+    referenceHelp.textContent =
+      "Enter the cheque number.";
+
+
+    reference.required =
+      true;
+
+    return;
+
+  }
+
+
+  /* ----------------------------------------------------------
+     OTHER
+     ---------------------------------------------------------- */
+
+  instructions.classList.remove("hidden");
+
+  document
+    .getElementById(
+      "otherInstructions"
+    )
+    .classList.remove("hidden");
+
+
+  referenceLabel.textContent =
+    "Reference";
+
+
+  reference.placeholder =
+    "Optional reference";
+
+
+  referenceHelp.textContent =
+    "Add relevant payment reference if available.";
+
+
+  reference.required =
+    false;
+
+}
+
+
+/* ============================================================
+   HANDLE PAYMENT
+   ============================================================ */
+
+async function handlePayment(e) {
+
+  e.preventDefault();
+
+
+  const btn =
+    document.getElementById(
+      "paySubmitBtn"
+    );
+
+
+  const alertBox =
+    document.getElementById(
+      "paymentAlert"
+    );
+
+
+  btn.disabled = true;
+
+  btn.innerHTML =
+    '<span class="spinner"></span> Recording...';
+
+
+  alertBox.innerHTML = "";
+
+
+  const studentId =
+    document.getElementById(
+      "payStudentId"
+    ).value;
+
+
+  const enrolmentId =
+    document.getElementById(
+      "payEnrolmentId"
+    ).value || null;
+
+
+  const amount =
+    Number(
+      document.getElementById(
+        "payAmount"
+      ).value
+    );
+
+
+  const method =
+    document.getElementById(
+      "payMethod"
+    ).value;
+
+
+  const reference =
+    document.getElementById(
+      "payReference"
+    ).value
+    .trim() || null;
+
+
+  const notes =
+    document.getElementById(
+      "payNotes"
+    ).value
+    .trim() || null;
+
+
+  /* ----------------------------------------------------------
+     VALIDATE AMOUNT
+     ---------------------------------------------------------- */
+
+  if (!amount || amount <= 0) {
+
+    alertBox.innerHTML =
+      '<div class="alert alert-danger">' +
+      'Enter a valid amount.' +
+      '</div>';
+
+
+    btn.disabled = false;
+
+    btn.textContent =
+      "Record Payment";
+
+    return;
+
+  }
+
+
+  /* ----------------------------------------------------------
+     VALIDATE REFERENCES
+     ---------------------------------------------------------- */
+
+  if (
+    (
+      method === "MPESA" ||
+      method === "BANK" ||
+      method === "CHEQUE"
+    ) &&
+    !reference
+  ) {
+
+    let message =
+      "Enter the payment reference.";
+
+
+    if (method === "MPESA") {
+
+      message =
+        "Enter the M-Pesa transaction code.";
+
+    }
+
+
+    if (method === "BANK") {
+
+      message =
+        "Enter the bank transaction/reference number.";
+
+    }
+
+
+    if (method === "CHEQUE") {
+
+      message =
+        "Enter the cheque number.";
+
+    }
+
+
+    alertBox.innerHTML =
+      `<div class="alert alert-danger">
+        ${esc(message)}
+      </div>`;
+
+
+    btn.disabled = false;
+
+    btn.textContent =
+      "Record Payment";
+
+    return;
+
+  }
+
+
+  try {
+
+    /* --------------------------------------------------------
+       INSERT PAYMENT
+       -------------------------------------------------------- */
+
+    const {
+      error
+    } = await LashawnDB
+      .from("payments")
+      .insert({
+
+        student_id:
+          studentId,
+
+        enrolment_id:
+          enrolmentId,
+
+        amount:
+          amount,
+
+        payment_method:
+          method,
+
+        transaction_reference:
+          reference,
+
+        status:
+          "CONFIRMED",
+
+        notes:
+          notes
+
+      });
+
+
+    if (error) {
+
+      throw error;
+
+    }
+
+
+    /* --------------------------------------------------------
+       UPDATE LATEST INVOICE
+       -------------------------------------------------------- */
+
+    if (enrolmentId) {
+
+      const {
+        data: invoices,
+        error: invoiceError
+      } = await LashawnDB
+        .from("invoices")
+        .select("*")
+        .eq(
+          "enrolment_id",
+          enrolmentId
+        )
+        .order(
+          "created_at",
+          {
+            ascending:false
+          }
+        )
+        .limit(1);
+
+
+      if (invoiceError) {
+
+        console.warn(
+          "Invoice lookup error:",
+          invoiceError
+        );
+
+      }
+
+
+      if (
+        invoices &&
+        invoices.length > 0
+      ) {
+
+        const inv =
+          invoices[0];
+
+
+        const newPaid =
+          Number(
+            inv.amount_paid || 0
+          ) + amount;
+
+
+        const newBalance =
+          Math.max(
+            0,
+            Number(
+              inv.total_amount || 0
+            ) - newPaid
+          );
+
+
+        const newStatus =
+          newBalance <= 0
+            ? "PAID"
+            : newPaid > 0
+              ? "PARTIAL"
+              : inv.status;
+
+
+        const {
+          error: invoiceUpdateError
+        } = await LashawnDB
+          .from("invoices")
+          .update({
+
+            amount_paid:
+              newPaid,
+
+            balance:
+              newBalance,
+
+            status:
+              newStatus
+
+          })
+          .eq(
+            "id",
+            inv.id
+          );
+
+
+        if (invoiceUpdateError) {
+
+          console.warn(
+            "Invoice update error:",
+            invoiceUpdateError
+          );
+
+        }
+
+      }
+
+    }
+
+
+    /* --------------------------------------------------------
+       SUCCESS
+       -------------------------------------------------------- */
+
+    alertBox.innerHTML =
+      '<div class="alert alert-success">' +
+      'Payment recorded successfully.' +
+      '</div>';
+
+
+    toast(
+      "Top-up recorded: " +
+      money(amount)
+    );
+
+
+    setTimeout(
+      async () => {
+
+        closePaymentModal();
+
+        await Promise.all([
+
+          loadFees(),
+
+          loadStats()
+
+        ]);
+
+      },
+      1200
+    );
+
+
+  } catch (err) {
+
+    console.error(err);
+
+
+    alertBox.innerHTML =
+      `<div class="alert alert-danger">
+        ${esc(
+          err.message ||
+          "Could not record payment."
+        )}
+      </div>`;
+
+  } finally {
+
+    btn.disabled = false;
+
+    btn.textContent =
+      "Record Payment";
+
+  }
+
+}
+
+
+/* ============================================================
+   CLOSE MODAL WHEN CLICKING OUTSIDE
+   ============================================================ */
+
+document
+  .getElementById("paymentModal")
+  .addEventListener(
+    "click",
+    function(e) {
+
+      if (
+        e.target === this
+      ) {
+
+        closePaymentModal();
+
+      }
+
+    }
+  );
+
+
+/* ============================================================
+   ESCAPE KEY CLOSES PAYMENT MODAL
+   ============================================================ */
+
+document.addEventListener(
+  "keydown",
+  function(e) {
+
+    if (
+      e.key === "Escape"
+    ) {
+
+      const modal =
+        document.getElementById(
+          "paymentModal"
+        );
+
+
+      if (
+        modal.classList.contains(
+          "active"
+        )
+      ) {
+
+        closePaymentModal();
+
+      }
+
+    }
+
+  }
+);
+
 </script>
+
 </body>
 </html>
