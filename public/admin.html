@@ -163,7 +163,7 @@ input[readonly]{background:#f5f7fa}
 
 <div class="modal" id="receiptModal"><div class="modal-box">
   <div class="receipt" id="receiptContent"></div>
-  <div class="actions"><button class="btn" onclick="window.print()">Print</button><button class="btn outline" id="closeReceipt">Close</button></div>
+  <div class="actions"><button class="btn" onclick="printReceipt()">Print</button><button class="btn outline" id="closeReceipt">Close</button></div>
 </div></div>
 <div class="modal" id="payModal"><div class="modal-box" style="width:min(460px,100%)">
   <h2 style="margin-top:0">Receive Payment</h2>
@@ -463,6 +463,27 @@ function showReceipt(d){
     ${d.invoice?.invoice_number?row("Invoice No.",d.invoice.invoice_number):""}${row("Amount Received",money(d.paid))}${d.balance!=null?row("Balance Remaining",money(d.balance)):""}${row("Method",d.method)}${row("Reference",d.reference||"—")}<hr>
     <p style="text-align:center;font-size:12px">Thank you for choosing Lashawn Academy.</p>`;
   $("receiptModal").classList.add("open");
+}
+
+/* ---------- Print ---------- */
+function printReceipt(){
+  const html=$("receiptContent").innerHTML;
+  const old=document.getElementById("printFrame"); if(old) old.remove();
+  const f=document.createElement("iframe");
+  f.id="printFrame";
+  f.style.cssText="position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+  document.body.appendChild(f);
+  const d=f.contentWindow.document;
+  d.open();
+  d.write(`<!DOCTYPE html><html><head><title>Receipt</title><style>
+    @page{margin:10mm}
+    body{font-family:Arial,Helvetica,sans-serif;color:#000;max-width:380px;margin:0 auto;font-size:13px}
+    h2{text-align:center;margin:0}
+    hr{border:0;border-top:1px dashed #999;margin:12px 0}
+    .receipt-row{display:flex;justify-content:space-between;gap:16px;padding:4px 0}
+  </style></head><body>${html}</body></html>`);
+  d.close();
+  setTimeout(()=>{ f.contentWindow.focus(); f.contentWindow.print(); },250);
 }
 
 /* ---------- Receipting ---------- */
