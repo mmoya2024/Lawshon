@@ -176,7 +176,7 @@ const DB = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE
 const T = {
   students:"students", enrolments:"enrolments", invoices:"invoices", payments:"payments",
   fees:"fee_structures", driving:"driving_classes", computer:"computer_courses",
-  status:"academy_student_training_status"
+  status:"academy_student_training_status", balances:"student_balances"
 };
 
 let DRIVING=[], COMPUTER=[], FEES=[], STUDENT_ROWS=[];
@@ -221,8 +221,8 @@ async function guard(){
 /* ---------- Reference data ---------- */
 async function loadReference(){
   const [d,c,f] = await Promise.all([
-    DB.from(T.driving).select("id,class_code,class_name,training_weeks,minimum_age").order("class_code"),
-    DB.from(T.computer).select("id,course_code,course_name,duration_weeks,fee").eq("is_active",true).order("course_name"),
+    DB.from(T.driving).select("id,class_code,class_name,description,minimum_age,training_weeks,theory_required,practical_required,is_active").eq("is_active",true).order("class_code"),
+    DB.from(T.computer).select("id,course_code,course_name,description,duration_weeks,duration_hours,fee,is_active").eq("is_active",true).order("course_name"),
     DB.from(T.fees).select("id,name,programme,driving_class_id,computer_course_id,amount,description,option_code,unit,quantity_based")
       .eq("is_active",true).order("programme").order("name")
   ]);
@@ -287,13 +287,10 @@ async function saveEnrolment(e){
   try{
     const {data,error}=await DB.rpc("register_student",{
       p_first_name:$("firstName").value.trim(),
-      p_middle_name:$("middleName").value.trim()||null,
       p_last_name:$("lastName").value.trim(),
       p_phone:$("phone").value.trim(),
       p_email:$("email").value.trim()||null,
       p_id_number:$("idNumber").value.trim()||null,
-      p_date_of_birth:$("dob").value||null,
-      p_gender:$("gender").value||null,
       p_programme:programme,
       p_driving_class_id:programme==="DRIVING"?($("drivingClass").value||null):null,
       p_computer_course_id:programme==="COMPUTER"?($("computerCourse").value||null):null,
@@ -304,6 +301,15 @@ async function saveEnrolment(e){
     if(error) throw error;
     const r=Array.isArray(data)?data[0]:data;
     if(!r?.student_id||!r?.enrolment_id) throw new Error("register_student did not return student_id and enrolment_id.");
+
+    if($("middleName").value.trim()||$("dob").value||$("gender").value){
+      const {error:upErr}=await DB.from(T.students).update({
+        middle_name:$("middleName").value.trim()||null,
+        date_of_birth:$("dob").value||null,
+        gender:$("gender").value||null
+      }).eq("id",r.student_id);
+      if(upErr) throw new Error("Student saved (No. "+r.student_number+") but optional details failed: "+upErr.message);
+    }
 
     const {data:invoice,error:invErr}=await DB.from(T.invoices).insert({
       student_id:r.student_id,
@@ -369,8 +375,7 @@ async function loadOverview(){
 /* ---------- Students (from training status view) ---------- */
 async function loadStudents(){
   const {data,error}=await DB.from(T.status)
-    .select("student_id,enrolment_id,student_number,student_name,phone,programme,class_code,start_date,days_remaining,training_alert,status")
-    .order("start_date",{ascending:false}).limit(1000);
+    .select("*").order("start_date",{ascending:false}).limit(1000);
   if(error) throw error;
   STUDENT_ROWS=data||[];
   renderStudents();
