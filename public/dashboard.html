@@ -1,307 +1,430 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Dashboard — Lashawn Academy</title>
+    <title>Admin Dashboard | Lashawn Academy</title>
 
-<link rel="stylesheet" href="css/style.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .header {
+            height: 70px;
+            background: #0f172a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+        }
+
+        .logout {
+            border: 0;
+            background: #dc2626;
+            color: white;
+            padding: 9px 15px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #111827;
+            padding: 20px 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 13px 22px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #1e293b;
+            color: white;
+        }
+
+        .main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .welcome p {
+            color: #64748b;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(200px, 1fr));
+
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+
+            box-shadow:
+                0 4px 15px rgba(0,0,0,.06);
+        }
+
+        .card-title {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        #loading {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #0f172a;
+            color: white;
+
+            font-size: 18px;
+        }
+
+        #dashboard {
+            display: none;
+        }
+
+        .error {
+            color: #fca5a5;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        @media(max-width: 700px) {
+
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .admin-info span {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="dashboard-layout">
+<div id="loading">
+    Checking administrator session...
+</div>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
+
+<div id="dashboard">
+
+    <header class="header">
 
         <div class="brand">
             🎓 Lashawn Academy
         </div>
 
-        <nav>
+        <div class="admin-info">
 
-            <a href="dashboard.html" class="active">
-                <span class="icon">📊</span>
-                Dashboard
+            <span id="adminName">
+                Administrator
+            </span>
+
+            <button
+                class="logout"
+                id="logoutButton"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <div class="layout">
+
+        <aside class="sidebar">
+
+            <a
+                href="dashboard.html"
+                class="active"
+            >
+                📊 Dashboard
             </a>
 
             <a href="students.html">
-                <span class="icon">👥</span>
-                Students
+                👥 Students
             </a>
 
             <a href="driving.html">
-                <span class="icon">🚗</span>
-                Driving
+                🚗 Driving
             </a>
 
             <a href="computer.html">
-                <span class="icon">💻</span>
-                Computer
+                💻 Computer
             </a>
 
             <a href="printing.html">
-                <span class="icon">🖨️</span>
-                Printing
+                🖨️ Printing
             </a>
 
             <a href="finance.html">
-                <span class="icon">💰</span>
-                Finance
+                💰 Finance
             </a>
 
             <a href="vehicles.html">
-                <span class="icon">🚙</span>
-                Vehicles
+                🚙 Vehicles
             </a>
 
             <a href="staff.html">
-                <span class="icon">👔</span>
-                Staff
+                👔 Staff
             </a>
 
             <a href="reports.html">
-                <span class="icon">📈</span>
-                Reports
+                📈 Reports
             </a>
 
             <a href="settings.html">
-                <span class="icon">⚙️</span>
-                Settings
+                ⚙️ Settings
             </a>
 
-            <a href="#" id="logoutLink">
-                <span class="icon">🚪</span>
-                Logout
-            </a>
-
-        </nav>
-
-    </aside>
+        </aside>
 
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
+        <main class="main">
 
-        <!-- HEADER -->
-        <div class="flex-between mb-3">
+            <div class="welcome">
 
-            <div>
-
-                <h2 style="text-align:left;margin:0;">
+                <h1>
                     Dashboard
-                </h2>
+                </h1>
 
-                <p class="text-muted" style="margin:0;">
+                <p>
                     Welcome back,
-                    <span id="userName">...</span>
+                    <strong id="welcomeName">
+                        Administrator
+                    </strong>
                 </p>
 
             </div>
 
-            <a href="students.html" class="btn">
-                + Register Student
-            </a>
 
-        </div>
+            <div class="cards">
 
+                <div class="card">
+                    <div class="card-title">
+                        Active Students
+                    </div>
 
-        <!-- STAT CARDS -->
-        <div class="grid grid-4 mb-3" id="statsGrid">
-
-            <div class="stat-card">
-
-                <span class="stat-label">
-                    Active Students
-                </span>
-
-                <span
-                    class="stat-value"
-                    id="statActiveStudents">
-                    —
-                </span>
-
-            </div>
+                    <div
+                        class="card-value"
+                        id="activeStudents"
+                    >
+                        —
+                    </div>
+                </div>
 
 
-            <div class="stat-card warning">
+                <div class="card">
+                    <div class="card-title">
+                        Approaching 6 Weeks
+                    </div>
 
-                <span class="stat-label">
-                    Approaching 6 Weeks
-                </span>
-
-                <span
-                    class="stat-value"
-                    id="statApproaching">
-                    —
-                </span>
-
-            </div>
-
-
-            <div class="stat-card danger">
-
-                <span class="stat-label">
-                    Over 6 Weeks
-                </span>
-
-                <span
-                    class="stat-value"
-                    id="statOverdue">
-                    —
-                </span>
-
-            </div>
+                    <div
+                        class="card-value"
+                        id="approaching"
+                    >
+                        —
+                    </div>
+                </div>
 
 
-            <div class="stat-card success">
+                <div class="card">
+                    <div class="card-title">
+                        Over 6 Weeks
+                    </div>
 
-                <span class="stat-label">
-                    Test Ready
-                </span>
+                    <div
+                        class="card-value"
+                        id="overdue"
+                    >
+                        —
+                    </div>
+                </div>
 
-                <span
-                    class="stat-value"
-                    id="statReady">
-                    —
-                </span>
+
+                <div class="card">
+                    <div class="card-title">
+                        Test Ready
+                    </div>
+
+                    <div
+                        class="card-value"
+                        id="testReady"
+                    >
+                        —
+                    </div>
+                </div>
 
             </div>
 
-        </div>
+        </main>
 
-
-        <!-- TRAINING ALERTS -->
-        <div class="card mb-3">
-
-            <div class="flex-between mb-2">
-
-                <h3 style="margin:0;">
-                    6-Week Training Tracker
-                </h3>
-
-                <a
-                    href="driving.html"
-                    class="btn small secondary">
-                    View All
-                </a>
-
-            </div>
-
-            <div id="trainingAlerts">
-
-                <p class="text-muted">
-                    Loading...
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <!-- TEST READINESS -->
-        <div class="card mb-3">
-
-            <div class="flex-between mb-2">
-
-                <h3 style="margin:0;">
-                    Students Due for Test
-                </h3>
-
-                <a
-                    href="driving.html"
-                    class="btn small secondary">
-                    View All
-                </a>
-
-            </div>
-
-            <div id="testReadyList">
-
-                <p class="text-muted">
-                    Loading...
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <!-- RECENT ACTIVITY -->
-        <div class="card">
-
-            <h3 style="margin:0 0 1rem;">
-                Recent Activity
-            </h3>
-
-            <div id="recentActivity">
-
-                <p class="text-muted">
-                    Loading...
-                </p>
-
-            </div>
-
-        </div>
-
-    </main>
+    </div>
 
 </div>
 
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- LASHAWN SUPABASE CLIENT -->
-<script src="js/supabase.js"></script>
-
-<!-- DASHBOARD LOGIC -->
-<script src="js/dashboard.js"></script>
-
-
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
 
-    const db = window.LashawnDB;
+"use strict";
 
-    if (!db) {
-        console.error("LashawnDB is not available.");
-        window.location.href = "login.html";
-        return;
+
+/* ============================================================
+   LASHAWN ADMIN DASHBOARD
+   ============================================================ */
+
+const SUPABASE_URL =
+    "https://qjfinbftcserrjiedduf.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
+
+
+const db = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+        auth: {
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true
+        }
     }
+);
+
+
+/* Elements */
+
+const loading =
+    document.getElementById("loading");
+
+const dashboard =
+    document.getElementById("dashboard");
+
+const adminName =
+    document.getElementById("adminName");
+
+const welcomeName =
+    document.getElementById("welcomeName");
+
+const logoutButton =
+    document.getElementById("logoutButton");
+
+
+/* ============================================================
+   CHECK ADMIN
+   ============================================================ */
+
+async function checkAdmin() {
 
     try {
 
-        /*
-         * Check current authentication session
-         */
         const {
             data: sessionData,
             error: sessionError
         } = await db.auth.getSession();
 
+
         if (sessionError) {
+
             console.error(sessionError);
-            window.location.href = "login.html";
+
+            window.location.href =
+                "admin-login.html";
+
             return;
         }
 
-        if (!sessionData || !sessionData.session) {
-            window.location.href = "login.html";
+
+        const session =
+            sessionData.session;
+
+
+        if (!session) {
+
+            window.location.href =
+                "admin-login.html";
+
             return;
         }
 
 
-        /*
-         * Get logged-in user
-         */
-        const user = sessionData.session.user;
+        console.log(
+            "Dashboard authenticated user:",
+            session.user
+        );
 
-        /*
-         * Get staff profile
-         */
+
+        /* ---------------------------------------------
+           GET STAFF PROFILE
+        --------------------------------------------- */
+
         const {
             data: staff,
             error: staffError
@@ -309,6 +432,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             .from("staff")
             .select(`
                 id,
+                auth_user_id,
                 staff_number,
                 first_name,
                 last_name,
@@ -317,25 +441,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                 branch_id,
                 is_active
             `)
-            .eq("auth_user_id", user.id)
+            .eq(
+                "auth_user_id",
+                session.user.id
+            )
             .maybeSingle();
 
 
         if (staffError) {
 
             console.error(
-                "Staff profile error:",
+                "Staff lookup error:",
                 staffError
             );
 
-            alert(
-                "Unable to load your staff profile."
-            );
-
-            await db.auth.signOut();
-
             window.location.href =
-                "login.html";
+                "admin-login.html";
 
             return;
         }
@@ -343,104 +464,101 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!staff) {
 
-            alert(
-                "No staff profile is linked to this account."
+            console.error(
+                "No staff profile found."
             );
 
             await db.auth.signOut();
 
             window.location.href =
-                "login.html";
+                "admin-login.html";
 
             return;
         }
 
 
-        /*
-         * Check account status
-         */
+        /* ---------------------------------------------
+           ACTIVE CHECK
+        --------------------------------------------- */
+
         if (!staff.is_active) {
 
-            alert(
-                "Your staff account is inactive."
-            );
-
             await db.auth.signOut();
 
             window.location.href =
-                "login.html";
+                "admin-login.html";
 
             return;
         }
 
 
-        /*
-         * Display staff name
-         */
-        const userName =
-            document.getElementById("userName");
+        /* ---------------------------------------------
+           ADMIN ROLE CHECK
+        --------------------------------------------- */
 
-        if (userName) {
+        const adminRoles = [
+            "SUPER_ADMIN",
+            "ADMIN"
+        ];
 
-            userName.textContent =
-                `${staff.first_name} ${staff.last_name}`;
 
+        if (!adminRoles.includes(staff.role)) {
+
+            await db.auth.signOut();
+
+            window.location.href =
+                "admin-login.html";
+
+            return;
         }
 
 
-        /*
-         * Save staff profile
-         */
+        /* ---------------------------------------------
+           SAVE SESSION
+        --------------------------------------------- */
+
         sessionStorage.setItem(
             "lashawn_staff",
             JSON.stringify(staff)
         );
 
 
-        /*
-         * Make staff information available
-         */
-        window.LashawnStaff = staff;
+        /* ---------------------------------------------
+           DISPLAY ADMIN
+        --------------------------------------------- */
+
+        const fullName =
+            staff.first_name +
+            " " +
+            staff.last_name;
+
+
+        adminName.textContent =
+            fullName;
+
+
+        welcomeName.textContent =
+            fullName;
+
+
+        /* ---------------------------------------------
+           SHOW DASHBOARD
+        --------------------------------------------- */
+
+        loading.style.display =
+            "none";
+
+        dashboard.style.display =
+            "block";
 
 
         console.log(
-            "Lashawn staff authenticated:",
-            staff
+            "Admin dashboard loaded successfully."
         );
 
+    }
 
-        /*
-         * Logout
-         */
-        const logoutLink =
-            document.getElementById("logoutLink");
-
-        if (logoutLink) {
-
-            logoutLink.addEventListener(
-                "click",
-                async (event) => {
-
-                    event.preventDefault();
-
-                    logoutLink.textContent =
-                        "🚪 Signing out...";
-
-                    await db.auth.signOut();
-
-                    sessionStorage.removeItem(
-                        "lashawn_staff"
-                    );
-
-                    window.location.href =
-                        "login.html";
-
-                }
-            );
-
-        }
-
-    } catch (error) {
+    catch (error) {
 
         console.error(
             "Dashboard authentication error:",
@@ -448,11 +566,44 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
 
         window.location.href =
-            "login.html";
-
+            "admin-login.html";
     }
+}
 
-});
+
+/* ============================================================
+   LOGOUT
+   ============================================================ */
+
+logoutButton.addEventListener(
+    "click",
+    async function () {
+
+        logoutButton.disabled =
+            true;
+
+        logoutButton.textContent =
+            "Logging out...";
+
+
+        sessionStorage.removeItem(
+            "lashawn_staff"
+        );
+
+
+        await db.auth.signOut();
+
+
+        window.location.href =
+            "admin-login.html";
+    }
+);
+
+
+/* START */
+
+checkAdmin();
+
 </script>
 
 </body>
