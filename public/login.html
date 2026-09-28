@@ -1,140 +1,1186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Staff Login — Lashawn Driving School & Computer College</title>
-<style>
-:root{--blue:#1455d9;--border:#dfe5ee;--text:#172033;--muted:#697386}
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#0b1730 0%,#12356e 55%,#1455d9 100%);display:flex;align-items:center;justify-content:center;padding:20px;color:var(--text)}
-.wrap{width:100%;max-width:430px}
-.brand{text-align:center;color:#fff;margin-bottom:20px}
-.brand img{height:84px;border-radius:12px;background:#fff;padding:4px;margin-bottom:10px}
-.brand h1{margin:0;font-size:24px;font-weight:800}.brand h1 span{color:#6ee7a1}
-.brand p{margin:6px 0 0;color:#cbd7e8;font-size:13px}
-.card{background:#fff;border-radius:18px;padding:30px;box-shadow:0 25px 70px rgba(0,0,0,.28)}
-.card h2{margin:0 0 6px;font-size:22px}.sub{margin:0 0 20px;color:var(--muted);font-size:13px}
-.field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
-.field label{font-size:13px;font-weight:700}
-.field input{width:100%;padding:12px 13px;border:1px solid var(--border);border-radius:10px;outline:none;font:inherit;color:var(--text)}
-.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(20,85,217,.1)}
-.pw{position:relative}.pw input{padding-right:70px}
-.show{position:absolute;right:9px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--blue);cursor:pointer;font-size:12px;font-weight:700}
-.btn{width:100%;border:0;border-radius:10px;padding:13px 16px;background:var(--blue);color:#fff;font-weight:800;font-size:15px;cursor:pointer}
-.btn:disabled{opacity:.6;cursor:not-allowed}
-.link{display:block;text-align:center;margin-top:14px;font-size:13px;color:var(--blue);background:none;border:0;cursor:pointer;width:100%}
-.notice{padding:11px 13px;border-radius:9px;margin-bottom:16px;font-size:13px;line-height:1.45}
-.notice.error{background:#fdecec;color:#9d2020}.notice.success{background:#e8f7ee;color:#126d35}.notice.info{background:#eaf1ff;color:#1f4da6}
-.hidden{display:none}
-.footer{text-align:center;color:#cbd7e8;font-size:12px;margin-top:18px}.footer a{color:#fff;text-decoration:none}
-.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:7px}
-@keyframes spin{to{transform:rotate(360deg)}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Staff Login — Lashawn Driving & Computer College</title>
+
+    <style>
+        :root {
+            --blue: #1455d9;
+            --blue-dark: #0b1730;
+            --border: #dfe5ee;
+            --text: #172033;
+            --muted: #697386;
+            --success-bg: #e8f7ee;
+            --success-text: #126d35;
+            --error-bg: #fdecec;
+            --error-text: #9d2020;
+            --info-bg: #eaf1ff;
+            --info-text: #1f4da6;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0b1730 0%,
+                    #12356e 55%,
+                    #1455d9 100%
+                );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 430px;
+        }
+
+        .brand {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .brand img {
+            height: 84px;
+            max-width: 160px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 4px;
+            margin-bottom: 10px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .brand h1 span {
+            color: #6ee7a1;
+        }
+
+        .brand p {
+            margin: 6px 0 0;
+            color: #cbd7e8;
+            font-size: 13px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.28);
+        }
+
+        .card h2 {
+            margin: 0 0 6px;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .sub {
+            margin: 0 0 20px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            font: inherit;
+            color: var(--text);
+            background: #ffffff;
+        }
+
+        .field input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(20, 85, 217, 0.10);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 70px;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+
+            border: 0;
+            background: transparent;
+
+            color: var(--blue);
+            cursor: pointer;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .show-password:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            border: 0;
+            border-radius: 10px;
+
+            padding: 13px 16px;
+
+            background: var(--blue);
+            color: #ffffff;
+
+            font-weight: 800;
+            font-size: 15px;
+
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn:hover {
+            opacity: 0.92;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .forgot-button {
+            display: block;
+            width: 100%;
+
+            margin-top: 14px;
+
+            border: 0;
+            background: transparent;
+
+            color: var(--blue);
+
+            font-size: 13px;
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .forgot-button:hover {
+            text-decoration: underline;
+        }
+
+        .notice {
+            padding: 11px 13px;
+            border-radius: 9px;
+            margin-bottom: 16px;
+
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .notice.error {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        .notice.success {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .notice.info {
+            background: var(--info-bg);
+            color: var(--info-text);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            color: #cbd7e8;
+
+            font-size: 12px;
+            line-height: 1.5;
+
+            margin-top: 18px;
+        }
+
+        .footer a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .spinner {
+            display: inline-block;
+
+            width: 15px;
+            height: 15px;
+
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #ffffff;
+
+            border-radius: 50%;
+
+            animation: spin 0.7s linear infinite;
+
+            vertical-align: -3px;
+            margin-right: 7px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 24px;
+            }
+
+            .brand h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
+
 <body>
+
 <div class="wrap">
-  <div class="brand">
-    <img src="images/logo.png" alt="Lashawn logo" onerror="this.style.display='none'">
-    <h1>Lashawn <span>Academy</span></h1>
-    <p>Driving School &amp; Computer College</p>
-  </div>
-  <div class="card">
-    <h2>Staff Login</h2>
-    <p class="sub">Sign in to manage students, enrolments, fees and payments.</p>
-    <div id="notice" class="hidden"></div>
-    <form id="loginForm" novalidate>
-      <div class="field"><label for="email">Email Address</label>
-        <input id="email" type="email" autocomplete="username" placeholder="Enter your email address" required></div>
-      <div class="field"><label for="password">Password</label>
-        <div class="pw"><input id="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
-        <button type="button" class="show" id="toggle">Show</button></div></div>
-      <button type="submit" class="btn" id="loginBtn">Sign In</button>
-      <button type="button" class="link" id="forgot">Forgot password?</button>
-    </form>
-  </div>
-  <div class="footer">Lashawn Driving &amp; Computer College<br><a href="index.html">← Back to website</a></div>
+
+    <!-- BRAND -->
+    <div class="brand">
+
+        <img
+            src="images/logo.png"
+            alt="Lashawn Academy logo"
+            onerror="this.style.display='none'"
+        >
+
+        <h1>
+            Lashawn
+            <span>Academy</span>
+        </h1>
+
+        <p>
+            Driving School &amp; Computer College
+        </p>
+
+    </div>
+
+
+    <!-- LOGIN CARD -->
+    <div class="card">
+
+        <h2>Staff Login</h2>
+
+        <p class="sub">
+            Sign in to manage students, enrolments,
+            fees and payments.
+        </p>
+
+
+        <!-- MESSAGE -->
+        <div
+            id="notice"
+            class="hidden"
+            role="alert"
+            aria-live="polite"
+        ></div>
+
+
+        <!-- LOGIN FORM -->
+        <form
+            id="loginForm"
+            novalidate
+        >
+
+            <!-- EMAIL -->
+            <div class="field">
+
+                <label for="email">
+                    Email Address
+                </label>
+
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autocomplete="username"
+                    placeholder="Enter your email address"
+                    required
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+            <div class="field">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <div class="password-wrapper">
+
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autocomplete="current-password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="show-password"
+                        id="togglePassword"
+                    >
+                        Show
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- SIGN IN -->
+            <button
+                type="submit"
+                class="btn"
+                id="loginButton"
+            >
+                Sign In
+            </button>
+
+
+            <!-- FORGOT PASSWORD -->
+            <button
+                type="button"
+                class="forgot-button"
+                id="forgotPassword"
+            >
+                Forgot password?
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <div class="footer">
+
+        Lashawn Driving &amp; Computer College
+
+        <br>
+
+        <a href="index.html">
+            &larr; Back to website
+        </a>
+
+    </div>
+
 </div>
 
+
+<!-- =========================================================
+     SUPABASE
+     ========================================================= -->
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="js/supabase.js"></script>
+
+
+<!-- =========================================================
+     LOGIN APPLICATION
+     ========================================================= -->
+
 <script>
+
+"use strict";
+
+
+/* -----------------------------------------------------------
+   SUPABASE CLIENT
+   ----------------------------------------------------------- */
+
 const DB = window.LashawnDB;
-const $ = id => document.getElementById(id);
-const DEST = "admin.html";
 
-function notice(msg, type){ const b=$("notice"); b.className="notice "+type; b.textContent=msg; }
-function clearNotice(){ $("notice").className="hidden"; $("notice").textContent=""; }
-function busy(on){ const b=$("loginBtn"); b.disabled=on; b.innerHTML=on?'<span class="spinner"></span>Signing in...':"Sign In"; }
 
-// Same rule as js/role-guard.js
-function isStaff(user){
-  const a=user.app_metadata||{}, u=user.user_metadata||{};
-  return a.role==="admin"||a.role==="staff"||u.role==="admin"||u.role==="staff"||
-         a.account_type==="admin"||a.account_type==="staff"||u.account_type==="admin"||u.account_type==="staff"||
-         u.office_role==="Office Admin";
+/* -----------------------------------------------------------
+   DESTINATION
+   Office Admin page
+   ----------------------------------------------------------- */
+
+const DESTINATION = "admin.html";
+
+
+/* -----------------------------------------------------------
+   DOM HELPER
+   ----------------------------------------------------------- */
+
+function getElement(id) {
+
+    return document.getElementById(id);
+
 }
 
-function friendly(err){
-  const m=(err&&err.message||"").toLowerCase();
-  if(m.includes("invalid login credentials")) return "Invalid email or password.";
-  if(m.includes("email not confirmed")) return "This email is not confirmed yet. Check your inbox for the confirmation link.";
-  if(m.includes("failed to fetch")||m.includes("network")) return "Network problem. Check your internet connection and try again.";
-  if(m.includes("rate limit")||m.includes("too many")) return "Too many attempts. Please wait a minute and try again.";
-  return (err&&err.message)||"Unable to sign in.";
-}
 
-async function login(e){
-  e.preventDefault(); clearNotice();
-  const email=$("email").value.trim(), password=$("password").value;
-  if(!email||!password) return notice("Please enter your email address and password.","error");
-  if(!DB||!DB.auth) return notice("System is not configured. Please add the Supabase key in js/supabase.js.","error");
-  busy(true);
-  try{
-    const {data,error}=await DB.auth.signInWithPassword({email,password});
-    if(error) throw error;
-    if(!data||!data.session) throw new Error("Login succeeded but no session was created.");
-    if(!isStaff(data.user)){
-      await DB.auth.signOut();
-      throw new Error("This account does not have staff access. Contact the administrator.");
+/* -----------------------------------------------------------
+   SHOW MESSAGE
+   ----------------------------------------------------------- */
+
+function showNotice(message, type) {
+
+    const notice = getElement("notice");
+
+    if (!notice) {
+        return;
     }
-    notice("Login successful. Opening Office Admin...","success");
-    setTimeout(()=>location.replace(DEST),400);
-  }catch(err){
-    console.error("Login error:",err);
-    notice(friendly(err),"error");
-    busy(false);
-  }
+
+    notice.className = "notice " + type;
+
+    notice.textContent = message;
+
 }
 
-async function forgot(){
-  clearNotice();
-  const email=$("email").value.trim();
-  if(!email) return notice("Enter your email address above, then click Forgot password.","info");
-  if(!DB||!DB.auth) return notice("System is not configured.","error");
-  const {error}=await DB.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
-  if(error) return notice(friendly(error),"error");
-  notice("If that email has an account, a password reset link has been sent.","success");
-}
 
-$("loginForm").addEventListener("submit",login);
-$("forgot").addEventListener("click",forgot);
-$("toggle").addEventListener("click",function(){
-  const i=$("password"), show=i.type==="password";
-  i.type=show?"text":"password"; this.textContent=show?"Hide":"Show";
-});
+/* -----------------------------------------------------------
+   CLEAR MESSAGE
+   ----------------------------------------------------------- */
 
-(async function init(){
-  if(!DB||!DB.auth){ notice("System is not configured. Add your Supabase key in js/supabase.js.","error"); return; }
-  try{
-    const {data}=await DB.auth.getSession();
-    if(data&&data.session){
-      if(isStaff(data.session.user)){ location.replace(DEST); return; }
-      await DB.auth.signOut();
+function clearNotice() {
+
+    const notice = getElement("notice");
+
+    if (!notice) {
+        return;
     }
-  }catch(e){ console.error("Session check error:",e); }
-  $("email").focus();
-})();
+
+    notice.className = "hidden";
+
+    notice.textContent = "";
+
+}
+
+
+/* -----------------------------------------------------------
+   BUTTON STATE
+   ----------------------------------------------------------- */
+
+function setLoginBusy(isBusy) {
+
+    const button = getElement("loginButton");
+
+    if (!button) {
+        return;
+    }
+
+    button.disabled = isBusy;
+
+    if (isBusy) {
+
+        button.innerHTML =
+            '<span class="spinner"></span>Signing in...';
+
+    } else {
+
+        button.textContent = "Sign In";
+
+    }
+
+}
+
+
+/* -----------------------------------------------------------
+   CHECK STAFF ROLE
+   ----------------------------------------------------------- */
+
+function isStaff(user) {
+
+    if (!user) {
+        return false;
+    }
+
+    const appMetadata =
+        user.app_metadata || {};
+
+    const userMetadata =
+        user.user_metadata || {};
+
+
+    const role =
+        appMetadata.role ||
+        userMetadata.role ||
+        "";
+
+
+    const accountType =
+        appMetadata.account_type ||
+        userMetadata.account_type ||
+        "";
+
+
+    const officeRole =
+        userMetadata.office_role ||
+        "";
+
+
+    return (
+
+        role === "admin" ||
+
+        role === "staff" ||
+
+        accountType === "admin" ||
+
+        accountType === "staff" ||
+
+        officeRole === "Office Admin"
+
+    );
+
+}
+
+
+/* -----------------------------------------------------------
+   FRIENDLY ERROR
+   ----------------------------------------------------------- */
+
+function friendlyError(error) {
+
+    const message =
+        error && error.message
+            ? error.message.toLowerCase()
+            : "";
+
+
+    if (
+        message.includes(
+            "invalid login credentials"
+        )
+    ) {
+
+        return "Invalid email or password.";
+
+    }
+
+
+    if (
+        message.includes(
+            "email not confirmed"
+        )
+    ) {
+
+        return "This email has not been confirmed yet.";
+
+    }
+
+
+    if (
+        message.includes("failed to fetch") ||
+        message.includes("network")
+    ) {
+
+        return "Network problem. Check your internet connection and try again.";
+
+    }
+
+
+    if (
+        message.includes("rate limit") ||
+        message.includes("too many")
+    ) {
+
+        return "Too many attempts. Please wait a moment and try again.";
+
+    }
+
+
+    if (
+        error &&
+        error.message
+    ) {
+
+        return error.message;
+
+    }
+
+
+    return "Unable to sign in.";
+
+}
+
+
+/* -----------------------------------------------------------
+   LOGIN
+   ----------------------------------------------------------- */
+
+async function handleLogin(event) {
+
+    event.preventDefault();
+
+    clearNotice();
+
+
+    const emailInput =
+        getElement("email");
+
+    const passwordInput =
+        getElement("password");
+
+
+    const email =
+        emailInput.value.trim();
+
+    const password =
+        passwordInput.value;
+
+
+    /* Validate fields */
+
+    if (!email) {
+
+        showNotice(
+            "Please enter your email address.",
+            "error"
+        );
+
+        emailInput.focus();
+
+        return;
+
+    }
+
+
+    if (!password) {
+
+        showNotice(
+            "Please enter your password.",
+            "error"
+        );
+
+        passwordInput.focus();
+
+        return;
+
+    }
+
+
+    /* Check Supabase */
+
+    if (
+        !DB ||
+        !DB.auth
+    ) {
+
+        console.error(
+            "LashawnDB is not available.",
+            DB
+        );
+
+        showNotice(
+            "Supabase is not available. Check js/supabase.js.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    setLoginBusy(true);
+
+
+    try {
+
+        console.log(
+            "Lashawn login started for:",
+            email
+        );
+
+
+        /* Supabase authentication */
+
+        const response =
+            await DB.auth.signInWithPassword({
+
+                email: email,
+
+                password: password
+
+            });
+
+
+        const data =
+            response.data;
+
+        const error =
+            response.error;
+
+
+        console.log(
+            "Supabase authentication response:",
+            response
+        );
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        if (
+            !data ||
+            !data.session ||
+            !data.user
+        ) {
+
+            throw new Error(
+                "Login succeeded but no active session was created."
+            );
+
+        }
+
+
+        console.log(
+            "Authenticated user:",
+            data.user.email
+        );
+
+
+        console.log(
+            "App metadata:",
+            data.user.app_metadata
+        );
+
+
+        console.log(
+            "User metadata:",
+            data.user.user_metadata
+        );
+
+
+        /* Check Office Admin access */
+
+        if (
+            !isStaff(data.user)
+        ) {
+
+            console.error(
+                "Authenticated user has no Office Admin role."
+            );
+
+
+            await DB.auth.signOut();
+
+
+            throw new Error(
+                "This account does not have Office Admin access. Contact the administrator."
+            );
+
+        }
+
+
+        /* Successful login */
+
+        showNotice(
+            "Login successful. Opening Office Admin...",
+            "success"
+        );
+
+
+        console.log(
+            "Office Admin access granted."
+        );
+
+
+        setTimeout(
+            function () {
+
+                window.location.replace(
+                    DESTINATION
+                );
+
+            },
+            500
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Lashawn login error:",
+            error
+        );
+
+
+        showNotice(
+            friendlyError(error),
+            "error"
+        );
+
+
+        setLoginBusy(false);
+
+    }
+
+}
+
+
+/* -----------------------------------------------------------
+   FORGOT PASSWORD
+   ----------------------------------------------------------- */
+
+async function handleForgotPassword() {
+
+    clearNotice();
+
+
+    const emailInput =
+        getElement("email");
+
+
+    const email =
+        emailInput.value.trim();
+
+
+    if (!email) {
+
+        showNotice(
+            "Enter your email address first, then click Forgot password.",
+            "info"
+        );
+
+        emailInput.focus();
+
+        return;
+
+    }
+
+
+    if (
+        !DB ||
+        !DB.auth
+    ) {
+
+        showNotice(
+            "Supabase is not available. Check js/supabase.js.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await DB.auth.resetPasswordForEmail(
+                email,
+                {
+                    redirectTo:
+                        window.location.origin +
+                        window.location.pathname
+                }
+            );
+
+
+        if (response.error) {
+
+            throw response.error;
+
+        }
+
+
+        showNotice(
+            "If that email has an account, a password reset link has been sent.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Password reset error:",
+            error
+        );
+
+
+        showNotice(
+            friendlyError(error),
+            "error"
+        );
+
+    }
+
+}
+
+
+/* -----------------------------------------------------------
+   TOGGLE PASSWORD
+   ----------------------------------------------------------- */
+
+function togglePassword() {
+
+    const passwordInput =
+        getElement("password");
+
+    const toggleButton =
+        getElement("togglePassword");
+
+
+    if (
+        passwordInput.type === "password"
+    ) {
+
+        passwordInput.type = "text";
+
+        toggleButton.textContent =
+            "Hide";
+
+    } else {
+
+        passwordInput.type = "password";
+
+        toggleButton.textContent =
+            "Show";
+
+    }
+
+}
+
+
+/* -----------------------------------------------------------
+   CHECK EXISTING SESSION
+   ----------------------------------------------------------- */
+
+async function checkExistingSession() {
+
+    console.log(
+        "Checking existing Lashawn session..."
+    );
+
+
+    if (
+        !DB ||
+        !DB.auth
+    ) {
+
+        console.error(
+            "LashawnDB is not available."
+        );
+
+
+        showNotice(
+            "Supabase is not available. Check js/supabase.js.",
+            "error"
+        );
+
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await DB.auth.getSession();
+
+
+        if (response.error) {
+
+            throw response.error;
+
+        }
+
+
+        const session =
+            response.data.session;
+
+
+        if (
+            session &&
+            session.user
+        ) {
+
+            console.log(
+                "Existing session found:",
+                session.user.email
+            );
+
+
+            if (
+                isStaff(session.user)
+            ) {
+
+                console.log(
+                    "Existing Office Admin session found. Opening admin.html."
+                );
+
+
+                window.location.replace(
+                    DESTINATION
+                );
+
+
+                return;
+
+            }
+
+
+            console.log(
+                "Existing user is not an Office Admin. Signing out."
+            );
+
+
+            await DB.auth.signOut();
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Session check error:",
+            error
+        );
+
+    }
+
+
+    const emailInput =
+        getElement("email");
+
+
+    if (emailInput) {
+
+        emailInput.focus();
+
+    }
+
+}
+
+
+/* -----------------------------------------------------------
+   EVENT LISTENERS
+   ----------------------------------------------------------- */
+
+const loginForm =
+    getElement("loginForm");
+
+
+if (loginForm) {
+
+    loginForm.addEventListener(
+        "submit",
+        handleLogin
+    );
+
+}
+
+
+const forgotButton =
+    getElement("forgotPassword");
+
+
+if (forgotButton) {
+
+    forgotButton.addEventListener(
+        "click",
+        handleForgotPassword
+    );
+
+}
+
+
+const toggleButton =
+    getElement("togglePassword");
+
+
+if (toggleButton) {
+
+    toggleButton.addEventListener(
+        "click",
+        togglePassword
+    );
+
+}
+
+
+/* -----------------------------------------------------------
+   START
+   ----------------------------------------------------------- */
+
+checkExistingSession();
+
 </script>
+
 </body>
 </html>
