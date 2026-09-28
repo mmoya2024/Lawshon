@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Super Admin — Lashawn Driving & Computer College</title>
+<title>Super Admin Dashboard — Lashawn Driving & Computer College</title>
 <link rel="stylesheet" href="css/style.css">
 <style>
   :root{
@@ -109,6 +109,19 @@
   .fee-summary .item{padding:.6rem;background:#f8f9fb;border-radius:8px;}
   .fee-summary .item .k{color:var(--muted);}
   .fee-summary .item .v{font-weight:700;color:var(--navy);font-size:1rem;margin-top:.15rem;}
+
+  .receipt-modal{max-width:720px;}
+  .receipt-head{text-align:center;border-bottom:2px solid var(--navy);padding-bottom:1rem;margin-bottom:1rem;}
+  .receipt-head h2{margin:0;color:var(--navy);font-size:1.25rem;}
+  .receipt-head .sub{font-size:.78rem;color:var(--muted);margin-top:.25rem;}
+  .receipt-meta{display:flex;justify-content:space-between;gap:1rem;margin-bottom:1rem;}
+  .receipt-box{background:#f8f9fb;border:1px solid var(--border);border-radius:8px;padding:.75rem;}
+  .receipt-label{font-size:.72rem;color:var(--muted);}
+  .receipt-value{font-weight:700;color:var(--navy);margin-top:.15rem;}
+  .receipt-total{margin-top:1rem;background:#f8f9fb;border-radius:8px;padding:1rem;text-align:center;}
+  .receipt-total .label{font-size:.75rem;color:var(--muted);}
+  .receipt-total .amount{font-size:1.6rem;font-weight:900;color:var(--navy);}
+  @media print{.no-print{display:none!important;}body{background:#fff!important;}.receipt-print-page{display:block!important;}}
 </style>
 </head>
 <body>
@@ -116,7 +129,7 @@
 <div class="shell">
   <aside>
     <div class="brand">🎓 <span>Lashawn <span class="dot">Admin</span></span></div>
-    <div class="role-tag">Super Admin</div>
+    <div class="role-tag">Super Admin Dashboard</div>
     <nav class="tabs">
       <button data-panel="overview" class="active">Overview</button>
       <button data-panel="tracker">6-Week Tracker</button>
@@ -321,6 +334,66 @@
         <button type="submit" class="btn" id="paySubmitBtn">Record Payment</button>
       </div>
     </form>
+  </div>
+</div>
+
+
+<!-- ============================ RECEIPT MODAL ============================ -->
+<div class="modal-overlay" id="receiptModal">
+  <div class="modal receipt-modal">
+    <div id="receiptContent" class="receipt-print-page">
+      <div class="receipt-head">
+        <h2>LASHAWN DRIVING & COMPUTER COLLEGE</h2>
+        <div class="sub">OFFICIAL PAYMENT RECEIPT</div>
+      </div>
+
+      <div class="receipt-meta">
+        <div>
+          <div class="receipt-label">Receipt No.</div>
+          <div class="receipt-value" id="receiptNumber">—</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="receipt-label">Date</div>
+          <div class="receipt-value" id="receiptDate">—</div>
+        </div>
+      </div>
+
+      <div class="fee-summary">
+        <div class="receipt-box"><div class="receipt-label">Student No.</div><div class="receipt-value" id="receiptStudentNumber">—</div></div>
+        <div class="receipt-box"><div class="receipt-label">Student</div><div class="receipt-value" id="receiptStudentName">—</div></div>
+        <div class="receipt-box"><div class="receipt-label">Enrolment No.</div><div class="receipt-value" id="receiptEnrolmentNumber">—</div></div>
+        <div class="receipt-box"><div class="receipt-label">Programme</div><div class="receipt-value" id="receiptProgramme">—</div></div>
+      </div>
+
+      <table style="margin-top:1rem;">
+        <thead><tr><th>Description</th><th style="text-align:right;">Amount</th></tr></thead>
+        <tbody><tr><td id="receiptDescription">Payment</td><td id="receiptAmount" style="text-align:right;font-weight:800;">KSh 0</td></tr></tbody>
+      </table>
+
+      <div style="margin-top:1rem;">
+        <div class="receipt-meta" style="margin:.35rem 0;border-bottom:1px solid var(--border);padding:.45rem 0;">
+          <span class="receipt-label">Payment Method</span><strong id="receiptPaymentMethod">—</strong>
+        </div>
+        <div class="receipt-meta" style="margin:.35rem 0;border-bottom:1px solid var(--border);padding:.45rem 0;">
+          <span class="receipt-label">Reference</span><strong id="receiptReference">—</strong>
+        </div>
+      </div>
+
+      <div class="receipt-total">
+        <div class="label">AMOUNT PAID</div>
+        <div class="amount" id="receiptTotal">KSh 0</div>
+      </div>
+
+      <div style="text-align:center;margin-top:1.2rem;font-size:.75rem;color:var(--muted);">
+        Thank you for choosing Lashawn Driving & Computer College.<br>
+        Please retain this receipt for your records.
+      </div>
+    </div>
+
+    <div class="no-print" style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.4rem;">
+      <button type="button" class="btn outline" onclick="closeReceiptModal()">Close</button>
+      <button type="button" class="btn" onclick="printReceipt()">🖨 Print Receipt</button>
+    </div>
   </div>
 </div>
 
@@ -835,15 +908,19 @@ async function handlePaymentSubmit(e) {
 
   try {
     // Insert payment
-    const { error: payErr } = await LashawnDB.from("payments").insert({
-      student_id: studentId,
-      enrolment_id: enrolmentId,
-      amount: amount,
-      payment_method: method,
-      transaction_reference: reference,
-      status: "CONFIRMED",
-      notes: notes,
-    });
+    const { data: paymentData, error: payErr } = await LashawnDB
+      .from("payments")
+      .insert({
+        student_id: studentId,
+        enrolment_id: enrolmentId,
+        amount: amount,
+        payment_method: method,
+        transaction_reference: reference,
+        status: "CONFIRMED",
+        notes: notes,
+      })
+      .select("id, payment_number, payment_date")
+      .single();
     if (payErr) throw payErr;
 
     // Update invoice paid/balance if one exists
@@ -867,6 +944,31 @@ async function handlePaymentSubmit(e) {
       }).eq("id", inv.id);
     }
 
+    // Load receipt details and show the official receipt.
+    const [{ data: student }, { data: enrolment }] = await Promise.all([
+      LashawnDB.from("students")
+        .select("student_number, first_name, middle_name, last_name")
+        .eq("id", studentId)
+        .single(),
+      LashawnDB.from("enrolments")
+        .select("enrolment_number, programme")
+        .eq("id", enrolmentId)
+        .single()
+    ]);
+
+    showReceipt({
+      receiptNumber: paymentData?.payment_number || generateReceiptNumber(),
+      receiptDate: paymentData?.payment_date || new Date().toISOString(),
+      studentNumber: student?.student_number || "—",
+      studentName: [student?.first_name, student?.middle_name, student?.last_name].filter(Boolean).join(" ") || "—",
+      enrolmentNumber: enrolment?.enrolment_number || "—",
+      programme: enrolment?.programme || "—",
+      description: "Fee payment",
+      amount: amount,
+      paymentMethod: method,
+      reference: reference || "—"
+    });
+
     alertBox.innerHTML = '<div class="alert alert-success">Payment recorded successfully.</div>';
     toast("Payment recorded: " + money(amount));
 
@@ -882,6 +984,55 @@ async function handlePaymentSubmit(e) {
     btn.textContent = "Record Payment";
   }
 }
+
+/* ---------- RECEIPTS ---------- */
+function generateReceiptNumber() {
+  const d = new Date();
+  const date = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
+  const random = Math.floor(100000 + Math.random() * 900000);
+  return `LSH-${date}-${random}`;
+}
+
+function paymentMethodLabel(method) {
+  return ({
+    CASH:"Cash", MPESA:"M-Pesa", BANK:"Bank Transfer", CARD:"Card", CHEQUE:"Cheque", OTHER:"Other"
+  })[method] || method || "—";
+}
+
+window.showReceipt = function(data) {
+  document.getElementById("receiptNumber").textContent = data.receiptNumber || generateReceiptNumber();
+  document.getElementById("receiptDate").textContent = new Date(data.receiptDate || Date.now()).toLocaleString("en-KE", {dateStyle:"medium", timeStyle:"short"});
+  document.getElementById("receiptStudentNumber").textContent = data.studentNumber || "—";
+  document.getElementById("receiptStudentName").textContent = data.studentName || "—";
+  document.getElementById("receiptEnrolmentNumber").textContent = data.enrolmentNumber || "—";
+  document.getElementById("receiptProgramme").textContent = data.programme || "—";
+  document.getElementById("receiptDescription").textContent = data.description || "Payment";
+  document.getElementById("receiptAmount").textContent = money(data.amount);
+  document.getElementById("receiptTotal").textContent = money(data.amount);
+  document.getElementById("receiptPaymentMethod").textContent = paymentMethodLabel(data.paymentMethod);
+  document.getElementById("receiptReference").textContent = data.reference || "—";
+  document.getElementById("receiptModal").classList.add("active");
+};
+
+window.closeReceiptModal = function() {
+  document.getElementById("receiptModal").classList.remove("active");
+};
+
+window.printReceipt = function() {
+  const receipt = document.getElementById("receiptContent").innerHTML;
+  const w = window.open("", "_blank", "width=850,height=900");
+  if (!w) { toast("Please allow pop-ups to print the receipt."); return; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Lashawn Payment Receipt</title><style>
+    *{box-sizing:border-box} body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:30px;color:#1a1e24}
+    .receipt{max-width:700px;margin:auto}.receipt-head{text-align:center;border-bottom:2px solid #0f2d52;padding-bottom:16px;margin-bottom:16px}.receipt-head h2{margin:0;color:#0f2d52;font-size:20px}.sub{font-size:12px;color:#5b6472;margin-top:4px}.receipt-meta{display:flex;justify-content:space-between;gap:16px}.fee-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.receipt-box{background:#f8f9fb;border:1px solid #e2e6eb;border-radius:8px;padding:10px}.receipt-label{font-size:11px;color:#5b6472}.receipt-value{font-weight:700;color:#0f2d52;margin-top:2px}table{width:100%;border-collapse:collapse;margin-top:16px}th{background:#eef2f7;color:#0f2d52;text-align:left;padding:10px;border-bottom:1px solid #ddd}td{padding:10px;border-bottom:1px solid #ddd}.receipt-total{margin-top:16px;background:#f8f9fb;border-radius:8px;padding:16px;text-align:center}.receipt-total .label{font-size:11px;color:#5b6472}.receipt-total .amount{font-size:24px;font-weight:900;color:#0f2d52}@media print{body{padding:0}}
+  </style></head><body><div class="receipt">${receipt}</div><script>window.onload=function(){window.print();};<\/script></body></html>`);
+  w.document.close();
+};
+
+document.getElementById("receiptModal").addEventListener("click", function(e) {
+  if (e.target === this) closeReceiptModal();
+});
+
 </script>
 </body>
 </html>
