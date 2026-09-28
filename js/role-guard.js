@@ -1,59 +1,140 @@
-/* ============================================================
-   LASHAWN ACADEMY - ROLE GUARD
-   Redirects users based on their role.
-   Include AFTER js/supabase.js
-   ============================================================ */
+// ============================================================
+// LASHAWN ACADEMY
+// OFFICE ADMIN ROLE GUARD
+// ============================================================
 
 (function () {
-  window.LashawnRoles = {
-    SUPER_ADMIN: "SUPER_ADMIN",
-    ADMIN: "ADMIN",
-    BRANCH_MANAGER: "BRANCH_MANAGER",
-    RECEPTIONIST: "RECEPTIONIST",
-    INSTRUCTOR: "INSTRUCTOR",
-    FINANCE: "FINANCE",
-    COMPUTER_TRAINER: "COMPUTER_TRAINER",
-    AUDITOR: "AUDITOR",
-    NONE: "NONE",
-  };
+    'use strict';
 
-  // Fetch the current user's role from Supabase
-  window.getMyRole = async function () {
-    try {
-      const { data, error } = await LashawnDB.rpc("get_my_role");
-      if (error) throw error;
-      return data || "NONE";
-    } catch (err) {
-      console.warn("Could not determine role:", err);
-      return "NONE";
-    }
-  };
+    const DB = window.LashawnDB;
 
-  // Redirect helpers
-  window.requireSuperAdmin = async function () {
-    const role = await window.getMyRole();
-    if (role === "SUPER_ADMIN" || role === "ADMIN") return role;
+    // ---------------------------------------------------------
+    // Require authenticated Office Admin
+    // ---------------------------------------------------------
+    window.requireAdminAccess = async function () {
 
-    if (role === "FINANCE" || role === "RECEPTIONIST" || role === "BRANCH_MANAGER") {
-      window.location.href = "admin.html";
-      return role;
-    }
+        if (!DB) {
+            console.error('Lashawn Supabase is not configured.');
+            window.location.replace('login.html');
+            return false;
+        }
 
-    // Anyone else: kick out
-    await window.signOut();
-    return role;
-  };
+        try {
 
-  window.requireAdminAccess = async function () {
-    const role = await window.getMyRole();
-    const allowed = [
-      "SUPER_ADMIN", "ADMIN", "BRANCH_MANAGER",
-      "RECEPTIONIST", "FINANCE",
-    ];
-    if (allowed.includes(role)) return role;
+            const {
+                data: { session },
+                error: sessionError
+            } = await DB.auth.getSession();
 
-    // Not allowed — sign out
-    await window.signOut();
-    return role;
-  };
+            if (sessionError) {
+                console.error('Session error:', sessionError);
+                window.location.replace('login.html');
+                return false;
+            }
+
+            if (!session || !session.user) {
+                console.warn('No authenticated user.');
+                window.location.replace('login.html');
+                return false;
+            }
+
+            const user = session.user;
+
+            // -------------------------------------------------
+            // Read roles from Supabase Auth metadata
+            // -------------------------------------------------
+
+            const appMetadata = user.app_metadata || {};
+            const userMetadata = user.user_metadata || {};
+
+            const role =
+                appMetadata.role ||
+                userMetadata.role ||
+                '';
+
+            const accountType =
+                appMetadata.account_type ||
+                userMetadata.account_type ||
+                '';
+
+            const officeRole =
+                userMetadata.office_role ||
+                '';
+
+            console.log('Logged-in user:', user.email);
+            console.log('Role:', role);
+            console.log('Account type:', accountType);
+            console.log('Office role:', officeRole);
+
+            // -------------------------------------------------
+            // Allowed Office Admin roles
+            // -------------------------------------------------
+
+            const allowed =
+                role === 'admin' ||
+                role === 'staff' ||
+                accountType === 'admin' ||
+                accountType === 'staff' ||
+                officeRole === 'Office Admin';
+
+            if (!allowed) {
+
+                console.error(
+                    'User authenticated but does not have admin/staff access.'
+                );
+
+                await DB.auth.signOut();
+
+                alert('You do not have Office Admin access.');
+
+                window.location.replace('login.html');
+
+                return false;
+            }
+
+            // -------------------------------------------------
+            // Successfully authenticated
+            // -------------------------------------------------
+
+            console.log('Office Admin access granted.');
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                'Office Admin authentication error:',
+                error
+            );
+
+            window.location.replace('login.html');
+
+            return false;
+        }
+    };
+
+
+    // ---------------------------------------------------------
+    // Logout helper
+    // ---------------------------------------------------------
+
+    window.logoutAdmin = async function () {
+
+        try {
+
+            if (DB) {
+                await DB.auth.signOut();
+            }
+
+        } catch (error) {
+
+            console.error('Logout error:', error);
+
+        } finally {
+
+            window.location.replace('login.html');
+
+        }
+    };
+
 })();
