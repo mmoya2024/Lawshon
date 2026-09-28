@@ -1,80 +1,90 @@
 // ============================================================
-// LASHAWN ACADEMY
-// CENTRAL SUPABASE CLIENT
+// LASHAWN ACADEMY - SUPABASE CONNECTION
 // ============================================================
 
+console.log("========================================");
+console.log("LASHAWN SUPABASE.JS STARTED");
+console.log("========================================");
+
 (function () {
-    'use strict';
+
+    "use strict";
 
     const SUPABASE_URL =
-        'https://qjfinbftcserrjiedduf.supabase.co';
+        "https://qjfinbftcserrjiedduf.supabase.co";
 
     const SUPABASE_KEY =
-        'sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5';
+        "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
 
-    console.log('Lashawn: loading js/supabase.js');
+    console.log(
+        "Supabase URL:",
+        SUPABASE_URL
+    );
 
-    // ----------------------------------------------------------
-    // Check Supabase CDN
-    // ----------------------------------------------------------
+    console.log(
+        "Supabase key present:",
+        !!SUPABASE_KEY
+    );
 
-    if (!window.supabase) {
+
+    // --------------------------------------------------------
+    // CHECK SUPABASE LIBRARY
+    // --------------------------------------------------------
+
+    if (typeof window.supabase === "undefined") {
+
         console.error(
-            'Lashawn ERROR: Supabase JavaScript library was not loaded.'
+            "ERROR: window.supabase is undefined."
+        );
+
+        console.error(
+            "The Supabase CDN did not load."
         );
 
         window.LashawnDB = null;
+
         return;
     }
 
-    // ----------------------------------------------------------
-    // Check configuration
-    // ----------------------------------------------------------
 
-    if (!SUPABASE_URL || !SUPABASE_KEY) {
-        console.error(
-            'Lashawn ERROR: Supabase URL or key is missing.'
-        );
+    console.log(
+        "Supabase CDN loaded successfully."
+    );
 
-        window.LashawnDB = null;
-        return;
-    }
 
-    // ----------------------------------------------------------
-    // Create ONE shared Supabase client
-    // ----------------------------------------------------------
+    // --------------------------------------------------------
+    // CREATE CLIENT
+    // --------------------------------------------------------
 
     try {
 
-        window.LashawnDB = window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY,
-            {
-                auth: {
-                    persistSession: true,
-                    autoRefreshToken: true,
-                    detectSessionInUrl: true
-                }
-            }
-        );
+        window.LashawnDB =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            );
+
 
         console.log(
-            'Lashawn: Supabase client created successfully.'
+            "LashawnDB created:",
+            window.LashawnDB
         );
 
+
         console.log(
-            'Lashawn Supabase URL:',
-            SUPABASE_URL
+            "Lashawn Supabase connection initialized successfully."
         );
+
 
     } catch (error) {
 
         console.error(
-            'Lashawn ERROR: Failed to create Supabase client:',
+            "ERROR CREATING SUPABASE CLIENT:",
             error
         );
 
         window.LashawnDB = null;
+
     }
 
 })();
