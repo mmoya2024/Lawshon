@@ -1,5 +1,5 @@
 // ============================================================
-// LASHAWN ACADEMY - SUPABASE CONFIGURATION
+// LASHAWN ACADEMY - SUPABASE CLIENT
 // ============================================================
 
 (function () {
@@ -7,31 +7,40 @@
 
     const SUPABASE_URL = 'https://qjfinbftcserrjiedduf.supabase.co';
 
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    // IMPORTANT:
+    // Paste your Supabase Publishable/Anon key between the quotes.
+    const SUPABASE_KEY = 'PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE';
 
-    // Make sure Supabase library is loaded
     if (!window.supabase) {
-        console.error('Supabase JS library is not loaded.');
+        console.error('Supabase JavaScript library is missing.');
         return;
     }
 
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-        console.error('Supabase URL or Anon Key is missing.');
+    if (
+        !SUPABASE_URL ||
+        !SUPABASE_KEY ||
+        SUPABASE_KEY === 'PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE'
+    ) {
+        console.error('Supabase URL or key is missing.');
         return;
     }
 
     try {
+
         window.LashawnDB = window.supabase.createClient(
             SUPABASE_URL,
-            SUPABASE_ANON_KEY
+            SUPABASE_KEY
         );
 
-        console.log('Lashawn Academy Supabase connected.');
+        console.log('LashawnDB initialized successfully.');
 
     } catch (error) {
+
         console.error(
-            'Failed to initialize Lashawn Supabase:',
+            'Failed to initialize LashawnDB:',
             error
         );
+
     }
+
 })();
