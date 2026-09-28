@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Office Admin — Lashawn Driving & Computer College</title>
+<style>
+:root{--navy:#0b1730;--blue:#1455d9;--green:#159447;--bg:#f4f7fb;--card:#fff;--border:#dfe5ee;--text:#172033;--muted:#697386;--danger:#c62828;--warn:#a66a00}*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit}.shell{display:grid;grid-template-columns:245px 1fr;min-height:100vh}.side{background:var(--navy);color:#fff;padding:22px 16px;position:sticky;top:0;height:100vh}.brand{font-size:20px;font-weight:800;margin-bottom:5px}.brand span{color:#6ee7a1}.role{font-size:12px;color:#b9c5d8;margin-bottom:24px}.nav button{width:100%;text-align:left;border:0;background:transparent;color:#d9e2f2;padding:12px 13px;border-radius:9px;cursor:pointer;margin:3px 0}.nav button:hover,.nav button.active{background:#17315e;color:#fff}.foot{position:absolute;bottom:18px;left:16px;right:16px;font-size:12px;color:#aebbd0}.foot a{color:#fff}.main{padding:28px;max-width:1500px;width:100%;margin:auto}.panel{display:none}.panel.active{display:block}h1{margin:0 0 6px;font-size:28px}h2{font-size:18px;margin:0 0 14px}.lede{color:var(--muted);margin:0 0 22px}.grid{display:grid;gap:16px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:18px}.stat,.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}.stat .num{font-size:25px;font-weight:800}.stat .label{font-size:12px;color:var(--muted);margin-top:5px}.two{grid-template-columns:1.5fr 1fr}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:13px;font-weight:700}.field input,.field select,.field textarea{border:1px solid var(--border);border-radius:9px;padding:11px;background:#fff;color:var(--text);outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(20,85,217,.1)}.readonly{background:#f0f3f7!important;font-weight:700}.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.btn{border:0;border-radius:9px;background:var(--blue);color:#fff;padding:11px 16px;font-weight:700;cursor:pointer}.btn.secondary{background:#e9eef7;color:#1b2b49}.btn.green{background:var(--green)}.btn:disabled{opacity:.55;cursor:not-allowed}.notice{padding:11px 13px;border-radius:9px;margin:12px 0;font-size:13px}.notice.ok{background:#e8f7ee;color:#126d35}.notice.err{background:#fdecec;color:#9d2020}.notice.info{background:#eaf1ff;color:#1f4da6}.fee-box{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:11px;padding:14px}.toolbar{display:flex;gap:10px;margin-bottom:14px}.toolbar input,.toolbar select{padding:10px;border:1px solid var(--border);border-radius:9px;background:#fff}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 9px;border-bottom:1px solid var(--border);font-size:13px}th{font-size:12px;color:var(--muted);text-transform:uppercase}td.right,th.right{text-align:right}.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#e9eef7}.paid{background:#e8f7ee;color:#126d35}.partial{background:#fff4dc;color:#8a5b00}.unpaid{background:#fdecec;color:#9d2020}.modal{display:none;position:fixed;inset:0;background:rgba(3,12,28,.6);z-index:20;padding:30px;overflow:auto}.modal.show{display:block}.modal-card{background:#fff;max-width:720px;margin:20px auto;border-radius:16px;padding:24px}.receipt{max-width:650px;margin:auto;background:#fff;padding:30px;border:1px solid #ddd}.receipt-head{text-align:center;border-bottom:2px solid #111;padding-bottom:15px}.receipt-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.receipt-total{display:flex;justify-content:space-between;border-top:2px solid #111;padding-top:15px;font-size:18px;font-weight:800}.no-print{margin-top:16px}.loading{color:var(--muted);padding:20px;text-align:center}@media(max-width:900px){.shell{grid-template-columns:1fr}.side{position:relative;height:auto}.foot{position:static;margin-top:25px}.stats,.two,.form-grid,.fee-box{grid-template-columns:1fr}.main{padding:18px}.toolbar{flex-direction:column}}
+@media print{body{background:#fff}.side,.main>header,.no-print{display:none!important}.modal{display:block!important;position:static;background:#fff;padding:0}.modal-card{box-shadow:none;margin:0;max-width:none}.receipt{border:0}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="side">
+  <div class="brand">🎓 Lashawn <span>Admin</span></div>
+  <div class="role">OFFICE ADMINISTRATION</div>
+  <nav class="nav">
+    <button class="active" data-panel="overview">Overview</button>
+    <button data-panel="enrolment">➕ New Enrolment</button>
+    <button data-panel="students">Students</button>
+    <button data-panel="fees">Fees & Balances</button>
+    <button data-panel="payments">Payments</button>
+    <button data-panel="services">Services & Pricing</button>
+  </nav>
+  <div class="foot">Signed in as <strong id="adminName">Office Admin</strong><br><a href="index.html">← Back to site</a> · <a href="#" id="logout">Logout</a></div>
+</aside>
+<main class="main">
+<header style="margin-bottom:22px"><h1 id="pageTitle">Office Admin</h1><p class="lede">Daily enrolment, fee, payment and student operations.</p></header>
+
+<section class="panel active" id="panel-overview">
+  <div class="grid stats">
+    <div class="stat"><div class="num" id="statStudents">—</div><div class="label">Students</div></div>
+    <div class="stat"><div class="num" id="statEnrolments">—</div><div class="label">Enrolments</div></div>
+    <div class="stat"><div class="num" id="statRevenue">—</div><div class="label">Confirmed payments</div></div>
+    <div class="stat"><div class="num" id="statFees">—</div><div class="label">Active fee structures</div></div>
+  </div>
+  <div class="card"><h2>Recent activity</h2><div id="recentActivity" class="loading">Loading…</div></div>
+</section>
+
+<section class="panel" id="panel-enrolment">
+  <h1>New Enrolment</h1><p class="lede">Register a student and create the enrolment fee from the active Supabase fee structure. Prices are never hard-coded here.</p>
+  <div id="enrolNotice"></div>
+  <form id="enrolForm" class="card">
+    <h2>Student details</h2>
+    <div class="grid form-grid">
+      <div class="field"><label>First name *</label><input id="firstName" required></div>
+      <div class="field"><label>Last name *</label><input id="lastName" required></div>
+      <div class="field"><label>Middle name</label><input id="middleName"></div>
+      <div class="field"><label>Phone *</label><input id="phone" required></div>
+      <div class="field"><label>Email</label><input id="email" type="email"></div>
+      <div class="field"><label>National ID / Passport</label><input id="idNumber"></div>
+      <div class="field"><label>Date of birth</label><input id="dob" type="date"></div>
+      <div class="field"><label>Gender</label><select id="gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+    </div>
+    <hr style="border:0;border-top:1px solid var(--border);margin:24px 0">
+    <h2>Training / service</h2>
+    <div class="grid form-grid">
+      <div class="field"><label>Programme *</label><select id="programme" required><option value="">Select programme</option><option value="DRIVING">Driving</option><option value="COMPUTER">Computer</option><option value="PRINTING_DIGITAL">Printing / Digital</option></select></div>
+      <div class="field"><label>Start date *</label><input id="startDate" type="date" required></div>
+      <div class="field" id="drivingClassWrap"><label>Driving class *</label><select id="drivingClass"><option value="">Select class</option></select></div>
+      <div class="field" id="computerCourseWrap"><label>Computer course</label><select id="computerCourse"><option value="">Select course</option></select></div>
+      <div class="field full"><label>Fee option *</label><select id="feeOption" required disabled><option value="">Select programme/class first</option></select></div>
+    </div>
+    <div class="fee-box" style="margin-top:16px">
+      <div class="field"><label>Unit fee</label><input id="unitFee" class="readonly" readonly value="KSh 0"></div>
+      <div class="field"><label>Quantity</label><input id="quantity" type="number" min="1" step="1" value="1"></div>
+      <div class="field"><label>Total fee</label><input id="totalFee" class="readonly" readonly value="KSh 0"></div>
+    </div>
+    <div id="feeDescription" class="notice info" style="display:none"></div>
+    <hr style="border:0;border-top:1px solid var(--border);margin:24px 0">
+    <h2>Initial payment</h2>
+    <div class="grid form-grid">
+      <div class="field"><label>Amount paid now</label><input id="amountPaid" type="number" min="0" step="0.01" value="0"></div>
+      <div class="field"><label>Balance after payment</label><input id="balance" class="readonly" readonly value="KSh 0"></div>
+      <div class="field"><label>Payment method</label><select id="paymentMethod"><option value="CASH">Cash</option><option value="MPESA">M-Pesa</option><option value="BANK">Bank</option><option value="CARD">Card</option><option value="CHEQUE">Cheque</option><option value="OTHER">Other</option></select></div>
+      <div class="field"><label>Payment reference</label><input id="paymentReference" placeholder="M-Pesa code / receipt / cheque no."></div>
+      <div class="field full"><label>Notes</label><textarea id="notes" rows="3"></textarea></div>
+    </div>
+    <div class="actions"><button class="btn secondary" type="reset">Clear</button><button class="btn green" id="saveEnrolment" type="submit">Save Enrolment</button></div>
+  </form>
+</section>
+
+<section class="panel" id="panel-students"><h1>Students</h1><p class="lede">Students registered through the office and other authorized channels.</p><div class="card"><div class="toolbar"><input id="studentSearch" placeholder="Search name, number or phone…"></div><div style="overflow:auto"><table><thead><tr><th>Student No.</th><th>Name</th><th>Phone</th><th>Programme</th><th>Registered</th></tr></thead><tbody id="studentsTable"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody></table></div></div></section>
+
+<section class="panel" id="panel-fees"><h1>Fees & Balances</h1><p class="lede">Fee structures and invoice balances stored in Supabase.</p><div class="card"><div style="overflow:auto"><table><thead><tr><th>Student</th><th>Enrolment</th><th>Programme</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead><tbody id="feesTable"><tr><td colspan="7" class="loading">Loading…</td></tr></tbody></table></div></div></section>
+
+<section class="panel" id="panel-payments"><h1>Payments</h1><p class="lede">Confirmed payments recorded by office staff.</p><div class="card"><div style="overflow:auto"><table><thead><tr><th>Payment No.</th><th>Date</th><th>Student</th><th>Method</th><th>Reference</th><th class="right">Amount</th></tr></thead><tbody id="paymentsTable"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody></table></div></div></section>
+
+<section class="panel" id="panel-services"><h1>Services & Pricing</h1><p class="lede">Live fee structures from Supabase. Edit prices in the database / authorized management interface, not in this HTML file.</p><div class="card"><div style="overflow:auto"><table><thead><tr><th>Programme</th><th>Service</th><th>Option</th><th>Unit</th><th>Quantity based</th><th class="right">Amount</th></tr></thead><tbody id="servicesTable"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody></table></div></div></section>
+</main></div>
+
+<div class="modal" id="receiptModal"><div class="modal-card"><div class="receipt" id="receiptPrint"><div class="receipt-head"><h2 style="margin:0">LASHAWN ACADEMY</h2><div>Driving & Computer College</div><div style="font-size:12px;margin-top:5px">OFFICIAL PAYMENT RECEIPT</div></div><div class="receipt-meta"><div><small>Receipt / Payment No.</small><br><strong id="rPaymentNo">—</strong></div><div style="text-align:right"><small>Date</small><br><strong id="rDate">—</strong></div><div><small>Student No.</small><br><strong id="rStudentNo">—</strong></div><div style="text-align:right"><small>Enrolment No.</small><br><strong id="rEnrolmentNo">—</strong></div><div><small>Student</small><br><strong id="rStudent">—</strong></div><div style="text-align:right"><small>Programme</small><br><strong id="rProgramme">—</strong></div></div><table><thead><tr><th>Description</th><th class="right">Amount</th></tr></thead><tbody><tr><td id="rDescription">Fee payment</td><td class="right" id="rAmount">KSh 0</td></tr></tbody></table><div class="receipt-meta"><div><small>Method</small><br><strong id="rMethod">—</strong></div><div style="text-align:right"><small>Reference</small><br><strong id="rReference">—</strong></div></div><div class="receipt-total"><span>AMOUNT PAID</span><span id="rTotal">KSh 0</span></div><p style="text-align:center;font-size:12px;color:#666;margin-bottom:0">Thank you for choosing Lashawn Academy. Please retain this receipt.</p></div><div class="actions no-print"><button class="btn secondary" onclick="closeReceipt()">Close</button><button class="btn" onclick="window.print()">🖨 Print Receipt</button></div></div></div>
+<div id="toast" style="position:fixed;right:20px;bottom:20px;background:#111827;color:#fff;padding:12px 16px;border-radius:9px;display:none;z-index:30"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/role-guard.js"></script>
+<script>
+const DB=window.LashawnDB;let DRIVING=[],COMPUTER=[],FEES=[],STUDENTS=[],ENROLS=[];
+const $=id=>document.getElementById(id);const money=n=>'KSh '+Number(n||0).toLocaleString('en-KE',{minimumFractionDigits:0,maximumFractionDigits:2});
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(window.__tt);window.__tt=setTimeout(()=>t.style.display='none',2600)}
+function notice(id,msg,type='info'){ $(id).innerHTML=msg?`<div class="notice ${type}">${esc(msg)}</div>`:'' }
+function showPanel(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.panel===name));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+name));$('pageTitle').textContent={overview:'Office Admin',enrolment:'New Enrolment',students:'Students',fees:'Fees & Balances',payments:'Payments',services:'Services & Pricing'}[name]||'Office Admin';if(name==='students')loadStudents();if(name==='fees')loadInvoices();if(name==='payments')loadPayments();if(name==='services')renderServices()}
+async function guard(){try{if(window.requireAdminAccess){await window.requireAdminAccess()}else{const {data}=await DB.auth.getSession();if(!data.session)location.href='login.html'}}catch(e){console.error(e);location.href='login.html'}}
+async function loadProfile(){try{const {data}=await DB.rpc('get_my_profile');const p=Array.isArray(data)?data[0]:data;if(p)$('adminName').textContent=p.full_name||p.name||p.email||'Office Admin'}catch(e){}}
+async function loadReference(){
+ const [{data:d,error:de},{data:c,error:ce},{data:f,error:fe}]=await Promise.all([
+  DB.from('driving_classes').select('id,class_code,class_name,duration_weeks').order('class_code'),
+  DB.from('computer_courses').select('id,course_code,course_name,duration_weeks,fee').eq('is_active',true).order('course_name'),
+  DB.from('fee_structures').select('id,name,programme,driving_class_id,computer_course_id,amount,description,is_active,option_code,unit,quantity_based').eq('is_active',true).order('programme').order('name')
+ ]);if(de)throw de;if(ce)throw ce;if(fe)throw fe;DRIVING=d||[];COMPUTER=c||[];FEES=f||[];
+ $('drivingClass').innerHTML='<option value="">Select class</option>'+DRIVING.map(x=>`<option value="${x.id}">${esc(x.class_code)} — ${esc(x.class_name)}</option>`).join('');$('computerCourse').innerHTML='<option value="">Select course</option>'+COMPUTER.map(x=>`<option value="${x.id}">${esc(x.course_code||'')} ${esc(x.course_name)}</option>`).join('');renderServices();refreshFeeOptions();
+}
+function programmeChanged(){const p=$('programme').value;$('drivingClassWrap').style.display=p==='DRIVING'?'flex':'none';$('computerCourseWrap').style.display=p==='COMPUTER'?'flex':'none';$('drivingClass').required=p==='DRIVING';$('computerCourse').required=false;$('feeOption').disabled=false;refreshFeeOptions()}
+function refreshFeeOptions(){const p=$('programme').value;let rows=[];if(p==='DRIVING'){const id=$('drivingClass').value;rows=FEES.filter(f=>f.programme==='DRIVING'&&(!id||f.driving_class_id===id))}else if(p==='COMPUTER'){const id=$('computerCourse').value;rows=FEES.filter(f=>f.programme==='COMPUTER'&&(!id||f.computer_course_id===id));if(!rows.length&&id){const course=COMPUTER.find(x=>x.id===id);if(course&&course.fee!=null){/* course fee remains DB-sourced, but not a fee_structure row; enrolment requires fee option */}}}else if(p==='PRINTING_DIGITAL'){rows=FEES.filter(f=>f.programme==='PRINTING_DIGITAL')}
+ $('feeOption').innerHTML='<option value="">Select fee option</option>'+rows.map(f=>`<option value="${f.id}">${esc(f.name)}${f.option_code?' — '+esc(f.option_code):''} — ${money(f.amount)}${f.unit?' / '+esc(f.unit):''}</option>`).join('');$('feeOption').disabled=!p||!rows.length;updateFee();}
+function updateFee(){const f=FEES.find(x=>x.id===$('feeOption').value);const qty=Math.max(1,Number($('quantity').value)||1);const unit=Number(f?.amount||0);const total=unit*(f?.quantity_based?qty:1);$('unitFee').value=money(unit);$('totalFee').value=money(total);$('amountPaid').max=total||0;$('balance').value=money(Math.max(0,total-(Number($('amountPaid').value)||0)));$('quantity').disabled=!f?.quantity_based;$('quantity').value=f?.quantity_based?qty:1;if(f?.description){$('feeDescription').style.display='block';$('feeDescription').textContent=f.description}else $('feeDescription').style.display='none'}
+async function saveEnrolment(e){e.preventDefault();const btn=$('saveEnrolment');btn.disabled=true;notice('enrolNotice','');try{const programme=$('programme').value;const fee=FEES.find(x=>x.id===$('feeOption').value);if(!fee)throw new Error('Select an active fee option.');const qty=fee.quantity_based?Math.max(1,Number($('quantity').value)||1):1;const total=Number(fee.amount)*qty;const paid=Math.max(0,Number($('amountPaid').value)||0);if(paid>total)throw new Error('Amount paid cannot exceed the total fee.');const method=$('paymentMethod').value;const ref=$('paymentReference').value.trim()||null;
+ const {data:reg,error:re}=await DB.rpc('register_student',{p_first_name:$('firstName').value.trim(),p_last_name:$('lastName').value.trim(),p_phone:$('phone').value.trim(),p_email:$('email').value.trim()||null,p_id_number:$('idNumber').value.trim()||null,p_programme:programme,p_driving_class_id:programme==='DRIVING'?($('drivingClass').value||null):null,p_computer_course_id:programme==='COMPUTER'?($('computerCourse').value||null):null,p_branch_id:null,p_start_date:$('startDate').value,p_notes:$('notes').value.trim()||null});if(re)throw re;
+ let r=Array.isArray(reg)?reg[0]:reg;let studentId=r?.student_id||r?.id;let enrolmentId=r?.enrolment_id||r?.enrolment?.id; if(!studentId||!enrolmentId){const {data:recent}=await DB.from('enrolments').select('id,student_id,enrolment_number').order('created_at',{ascending:false}).limit(10);const found=(recent||[]).find(x=>String(x.student_id));if(found){enrolmentId=found.id;studentId=found.student_id}}if(!studentId||!enrolmentId)throw new Error('Student was registered but the new enrolment IDs could not be identified. Check the database response.');
+ let invoice=null;const {data:inv,error:ie}=await DB.from('invoices').insert({enrolment_id:enrolmentId,total_amount:total,amount_paid:paid,balance:Math.max(0,total-paid),status:paid>=total?'PAID':paid>0?'PARTIAL':'PENDING'}).select('*').single();if(!ie)invoice=inv;
+ let payment=null;if(paid>0){const {data:pay,error:pe}=await DB.from('payments').insert({student_id:studentId,enrolment_id:enrolmentId,invoice_id:invoice?.id||null,amount:paid,payment_method:method,transaction_reference:ref,status:'CONFIRMED',notes:$('notes').value.trim()||null}).select('id,payment_number,payment_date').single();if(pe)throw pe;payment=pay}
+ const [{data:s},{data:en}]=await Promise.all([DB.from('students').select('student_number,first_name,middle_name,last_name').eq('id',studentId).single(),DB.from('enrolments').select('enrolment_number,programme').eq('id',enrolmentId).single()]);
+ notice('enrolNotice','Enrolment saved successfully.','ok');toast('Enrolment created');if(payment)showReceipt({paymentNumber:payment.payment_number,date:payment.payment_date,student:s,enrolment:en,amount:paid,method,reference:ref,description:fee.name+(fee.quantity_based?' × '+qty:'')});$('enrolForm').reset();$('startDate').value=new Date().toISOString().slice(0,10);programmeChanged();await loadOverview();
+ }catch(err){console.error(err);notice('enrolNotice',err.message||'Could not save enrolment.','err')}finally{btn.disabled=false}}
+function showReceipt(x){$('rPaymentNo').textContent=x.paymentNumber||'—';$('rDate').textContent=x.date?new Date(x.date).toLocaleString('en-KE'):new Date().toLocaleString('en-KE');$('rStudentNo').textContent=x.student?.student_number||'—';$('rEnrolmentNo').textContent=x.enrolment?.enrolment_number||'—';$('rStudent').textContent=[x.student?.first_name,x.student?.middle_name,x.student?.last_name].filter(Boolean).join(' ')||'—';$('rProgramme').textContent=x.enrolment?.programme||'—';$('rDescription').textContent=x.description||'Fee payment';$('rAmount').textContent=money(x.amount);$('rMethod').textContent=x.method||'—';$('rReference').textContent=x.reference||'—';$('rTotal').textContent=money(x.amount);$('receiptModal').classList.add('show')}
+function closeReceipt(){$('receiptModal').classList.remove('show')}
+async function loadOverview(){const [{count:s},{count:e},{data:p},{count:f}]=await Promise.all([DB.from('students').select('*',{count:'exact',head:true}),DB.from('enrolments').select('*',{count:'exact',head:true}),DB.from('payments').select('amount').eq('status','CONFIRMED').limit(10000),DB.from('fee_structures').select('*',{count:'exact',head:true}).eq('is_active',true)]);$('statStudents').textContent=s??0;$('statEnrolments').textContent=e??0;$('statRevenue').textContent=money((p||[]).reduce((a,x)=>a+Number(x.amount||0),0));$('statFees').textContent=f??0;$('recentActivity').innerHTML=`<div class="notice info">Database connected. New enrolments and payments entered here are stored in Supabase and available to the Super Admin dashboard.</div>`}
+async function loadStudents(){const {data,error}=await DB.from('students').select('id,student_number,first_name,middle_name,last_name,phone,registration_date,created_at').order('created_at',{ascending:false}).limit(300);STUDENTS=data||[];$('studentsTable').innerHTML=error?`<tr><td colspan="5">${esc(error.message)}</td></tr>`:STUDENTS.map(s=>`<tr><td><strong>${esc(s.student_number)}</strong></td><td>${esc([s.first_name,s.middle_name,s.last_name].filter(Boolean).join(' '))}</td><td>${esc(s.phone)}</td><td>—</td><td>${esc(s.registration_date||s.created_at?.slice(0,10)||'')}</td></tr>`).join('')||'<tr><td colspan="5">No students found.</td></tr>';}
+async function loadInvoices(){const {data,error}=await DB.from('invoices').select('id,enrolment_id,total_amount,amount_paid,balance,status,created_at,enrolments:enrolment_id(enrolment_number,programme,students:student_id(student_number,first_name,last_name))').order('created_at',{ascending:false}).limit(300);$('feesTable').innerHTML=error?`<tr><td colspan="7">${esc(error.message)}</td></tr>`:(data||[]).map(i=>{const s=i.enrolments?.students;const bal=Number(i.balance||0);return `<tr><td>${esc(s?.student_number||'—')} — ${esc([s?.first_name,s?.last_name].filter(Boolean).join(' '))}</td><td>${esc(i.enrolments?.enrolment_number||'—')}</td><td>${esc(i.enrolments?.programme||'—')}</td><td>${money(i.total_amount)}</td><td>${money(i.amount_paid)}</td><td><strong>${money(bal)}</strong></td><td><span class="pill ${bal<=0?'paid':Number(i.amount_paid)>0?'partial':'unpaid'}">${esc(i.status||'')}</span></td></tr>`}).join('')||'<tr><td colspan="7">No invoices found.</td></tr>'}
+async function loadPayments(){const {data,error}=await DB.from('payments').select('payment_number,payment_date,amount,payment_method,transaction_reference,students:student_id(student_number,first_name,last_name)').eq('status','CONFIRMED').order('payment_date',{ascending:false}).limit(300);$('paymentsTable').innerHTML=error?`<tr><td colspan="6">${esc(error.message)}</td></tr>`:(data||[]).map(p=>`<tr><td>${esc(p.payment_number||'—')}</td><td>${esc(p.payment_date?new Date(p.payment_date).toLocaleString('en-KE'):'—')}</td><td>${esc(p.students?.student_number||'—')} — ${esc([p.students?.first_name,p.students?.last_name].filter(Boolean).join(' '))}</td><td>${esc(p.payment_method||'—')}</td><td>${esc(p.transaction_reference||'—')}</td><td class="right"><strong>${money(p.amount)}</strong></td></tr>`).join('')||'<tr><td colspan="6">No confirmed payments found.</td></tr>'}
+function renderServices(){if(!FEES.length){$('servicesTable').innerHTML='<tr><td colspan="6">No active fee structures found.</td></tr>';return}$('servicesTable').innerHTML=FEES.map(f=>`<tr><td>${esc(f.programme)}</td><td>${esc(f.name)}</td><td>${esc(f.option_code||'—')}</td><td>${esc(f.unit||'—')}</td><td>${f.quantity_based?'Yes':'No'}</td><td class="right"><strong>${money(f.amount)}</strong></td></tr>`).join('')}
+$('programme').addEventListener('change',programmeChanged);$('drivingClass').addEventListener('change',refreshFeeOptions);$('computerCourse').addEventListener('change',refreshFeeOptions);$('feeOption').addEventListener('change',updateFee);$('quantity').addEventListener('input',updateFee);$('amountPaid').addEventListener('input',updateFee);$('enrolForm').addEventListener('submit',saveEnrolment);$('studentSearch').addEventListener('input',()=>{const q=$('studentSearch').value.toLowerCase();document.querySelectorAll('#studentsTable tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')});document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showPanel(b.dataset.panel)));$('logout').addEventListener('click',async e=>{e.preventDefault();await DB.auth.signOut();location.href='login.html'});
+(async()=>{await guard();$('startDate').value=new Date().toISOString().slice(0,10);await Promise.all([loadProfile(),loadReference(),loadOverview()]);programmeChanged()})();
+</script>
+</body></html>
