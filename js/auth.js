@@ -1,38 +1,31 @@
-/*
-============================================================
-LASHAWN ACADEMY
-AUTHENTICATION
-============================================================
-Requires:
+/* ============================================================
+   LASHAWN ACADEMY
+   AUTHENTICATION
+   ============================================================ */
 
-1. Supabase JS CDN
-2. supabase.js
-3. window.LashawnDB
+"use strict";
 
-Roles currently used:
+document.addEventListener("DOMContentLoaded", () => {
 
-SUPER_ADMIN
-ADMIN
-BRANCH_MANAGER
-RECEPTIONIST
-INSTRUCTOR
-FINANCE
-PRINTING_OPERATOR
-COMPUTER_TRAINER
-AUDITOR
-============================================================
-*/
+    /* --------------------------------------------------------
+       SUPABASE
+       -------------------------------------------------------- */
 
-(function () {
+    const db = window.LashawnDB;
 
-    "use strict";
+    if (!db) {
+        console.error("LashawnDB is not available.");
+        showMessage(
+            "System connection error. Please check the Supabase configuration.",
+            "error"
+        );
+        return;
+    }
 
 
-    /*
-    ============================================================
-    ELEMENTS
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       ELEMENTS
+       -------------------------------------------------------- */
 
     const loginForm = document.getElementById("loginForm");
     const emailInput = document.getElementById("email");
@@ -42,22 +35,18 @@ AUDITOR
     const togglePassword = document.getElementById("togglePassword");
 
 
-    /*
-    ============================================================
-    DASHBOARD
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       DASHBOARD
+       -------------------------------------------------------- */
 
     const DASHBOARD_URL = "dashboard.html";
 
 
-    /*
-    ============================================================
-    ROLE LABELS
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       ROLE NAMES
+       -------------------------------------------------------- */
 
-    const ROLE_LABELS = {
+    const ROLE_NAMES = {
         SUPER_ADMIN: "Super Administrator",
         ADMIN: "Office Administrator",
         BRANCH_MANAGER: "Supervisor",
@@ -70,44 +59,17 @@ AUDITOR
     };
 
 
-    /*
-    ============================================================
-    CHECK SUPABASE
-    ============================================================
-    */
-
-    if (!window.LashawnDB) {
-
-        console.error(
-            "LashawnDB was not found. Check supabase.js."
-        );
-
-        showMessage(
-            "The system could not connect to the database. Please check the Supabase configuration.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    const db = window.LashawnDB;
-
-
-    /*
-    ============================================================
-    MESSAGE
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       MESSAGE
+       -------------------------------------------------------- */
 
     function showMessage(message, type = "error") {
 
         if (!messageBox) return;
 
         messageBox.textContent = message;
-
-        messageBox.className = "message " + type;
-
+        messageBox.className = `message ${type}`;
+        messageBox.style.display = "block";
     }
 
 
@@ -116,17 +78,14 @@ AUDITOR
         if (!messageBox) return;
 
         messageBox.textContent = "";
-
         messageBox.className = "message";
-
+        messageBox.style.display = "none";
     }
 
 
-    /*
-    ============================================================
-    BUTTON STATE
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       LOADING STATE
+       -------------------------------------------------------- */
 
     function setLoading(loading) {
 
@@ -137,49 +96,44 @@ AUDITOR
         if (loading) {
 
             loginButton.innerHTML =
-                '<span class="loading-spinner"></span>Signing in...';
+                '<span class="loading-spinner"></span> Signing in...';
 
         } else {
 
             loginButton.textContent = "Sign In";
 
         }
-
     }
 
 
-    /*
-    ============================================================
-    PASSWORD VISIBILITY
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       PASSWORD SHOW / HIDE
+       -------------------------------------------------------- */
 
-    if (togglePassword) {
+    if (togglePassword && passwordInput) {
 
-        togglePassword.addEventListener(
-            "click",
-            function () {
+        togglePassword.addEventListener("click", () => {
 
-                const isPassword =
-                    passwordInput.type === "password";
+            if (passwordInput.type === "password") {
 
-                passwordInput.type =
-                    isPassword ? "text" : "password";
+                passwordInput.type = "text";
+                togglePassword.textContent = "Hide";
 
-                togglePassword.textContent =
-                    isPassword ? "Hide" : "Show";
+            } else {
+
+                passwordInput.type = "password";
+                togglePassword.textContent = "Show";
 
             }
-        );
+
+        });
 
     }
 
 
-    /*
-    ============================================================
-    GET STAFF PROFILE
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       GET STAFF PROFILE
+       -------------------------------------------------------- */
 
     async function getStaffProfile(userId) {
 
@@ -199,6 +153,7 @@ AUDITOR
             .eq("auth_user_id", userId)
             .maybeSingle();
 
+
         if (error) {
 
             console.error(
@@ -209,168 +164,139 @@ AUDITOR
             throw new Error(
                 "Unable to retrieve your staff profile."
             );
-
         }
+
 
         if (!data) {
 
             throw new Error(
-                "Your account is authenticated, but no Lashawn staff profile was found."
+                "No staff profile is linked to this account."
             );
-
         }
 
-        return data;
 
+        return data;
     }
 
 
-    /*
-    ============================================================
-    VERIFY STAFF ACCOUNT
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       VERIFY STAFF
+       -------------------------------------------------------- */
 
     async function verifyStaff(userId) {
 
         const staff = await getStaffProfile(userId);
+
 
         if (!staff.is_active) {
 
             await db.auth.signOut();
 
             throw new Error(
-                "Your Lashawn Academy staff account is inactive. Please contact an administrator."
+                "Your staff account is inactive. Please contact the administrator."
             );
-
         }
+
 
         return staff;
-
     }
 
 
-    /*
-    ============================================================
-    SAVE SESSION PROFILE
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       SAVE STAFF SESSION
+       -------------------------------------------------------- */
 
-    function saveStaffProfile(staff) {
+    function saveStaff(staff) {
 
-        try {
-
-            sessionStorage.setItem(
-                "lashawn_staff",
-                JSON.stringify(staff)
-            );
-
-        } catch (error) {
-
-            console.warn(
-                "Could not save staff profile:",
-                error
-            );
-
-        }
-
+        sessionStorage.setItem(
+            "lashawn_staff",
+            JSON.stringify(staff)
+        );
     }
 
 
-    /*
-    ============================================================
-    LOGIN
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       REMOVE STAFF SESSION
+       -------------------------------------------------------- */
+
+    function clearStaff() {
+
+        sessionStorage.removeItem(
+            "lashawn_staff"
+        );
+    }
+
+
+    /* --------------------------------------------------------
+       LOGIN
+       -------------------------------------------------------- */
 
     async function login(email, password) {
 
         clearMessage();
-
         setLoading(true);
 
         try {
 
-            /*
-            --------------------------------------------
-            Supabase Authentication
-            --------------------------------------------
-            */
+            /* Authenticate with Supabase */
 
             const {
-                data: authData,
-                error: authError
+                data,
+                error
             } = await db.auth.signInWithPassword({
-                email: email,
-                password: password
+                email,
+                password
             });
 
 
-            if (authError) {
+            if (error) {
 
                 console.error(
-                    "Authentication error:",
-                    authError
+                    "Supabase login error:",
+                    error
                 );
 
                 throw new Error(
                     "Invalid email or password."
                 );
-
             }
 
 
-            if (!authData || !authData.user) {
+            if (!data || !data.user) {
 
                 throw new Error(
-                    "Login failed. No authenticated user was returned."
+                    "Login failed. Please try again."
                 );
-
             }
 
 
-            /*
-            --------------------------------------------
-            Verify staff profile
-            --------------------------------------------
-            */
+            /* Verify staff account */
 
             const staff = await verifyStaff(
-                authData.user.id
+                data.user.id
             );
 
 
-            /*
-            --------------------------------------------
-            Save profile
-            --------------------------------------------
-            */
+            /* Save staff profile */
 
-            saveStaffProfile(staff);
+            saveStaff(staff);
 
 
-            /*
-            --------------------------------------------
-            Successful login
-            --------------------------------------------
-            */
+            /* Display success */
 
             const roleName =
-                ROLE_LABELS[staff.role] || staff.role;
+                ROLE_NAMES[staff.role] || staff.role;
 
 
             showMessage(
-                `Welcome ${staff.first_name}. Signing you in as ${roleName}...`,
+                `Welcome ${staff.first_name}. Signing in as ${roleName}...`,
                 "success"
             );
 
 
-            /*
-            Give the browser a moment to save
-            the Supabase session.
-            */
+            /* Redirect */
 
-            setTimeout(function () {
+            setTimeout(() => {
 
                 window.location.href =
                     DASHBOARD_URL;
@@ -385,35 +311,44 @@ AUDITOR
                 error
             );
 
+            try {
+                await db.auth.signOut();
+            } catch (signOutError) {
+                console.error(
+                    "Sign-out error:",
+                    signOutError
+                );
+            }
+
+            clearStaff();
+
             showMessage(
                 error.message ||
-                "Unable to sign in. Please try again.",
+                "Unable to sign in.",
                 "error"
             );
 
             setLoading(false);
-
         }
-
     }
 
 
-    /*
-    ============================================================
-    LOGIN FORM
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       LOGIN FORM
+       -------------------------------------------------------- */
 
     if (loginForm) {
 
         loginForm.addEventListener(
             "submit",
-            async function (event) {
+            async (event) => {
 
                 event.preventDefault();
 
                 const email =
-                    emailInput.value.trim().toLowerCase();
+                    emailInput.value
+                        .trim()
+                        .toLowerCase();
 
                 const password =
                     passwordInput.value;
@@ -427,7 +362,6 @@ AUDITOR
                     );
 
                     emailInput.focus();
-
                     return;
                 }
 
@@ -440,7 +374,6 @@ AUDITOR
                     );
 
                     passwordInput.focus();
-
                     return;
                 }
 
@@ -449,206 +382,111 @@ AUDITOR
                     email,
                     password
                 );
-
             }
         );
 
     }
 
 
-    /*
-    ============================================================
-    CHECK EXISTING SESSION
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       EXISTING SESSION
+       -------------------------------------------------------- */
 
     async function checkExistingSession() {
 
         try {
 
-            const {
-                data,
-                error
-            } = await db.auth.getSession();
+            const session =
+                await window.getSession();
 
 
-            if (error) {
-
-                console.error(
-                    "Session check error:",
-                    error
-                );
-
+            if (!session) {
                 return;
-
             }
-
-
-            if (!data || !data.session) {
-
-                return;
-
-            }
-
-
-            /*
-            User already has an authenticated
-            Supabase session.
-            */
-
-            const user =
-                data.session.user;
 
 
             const staff =
-                await verifyStaff(user.id);
+                await verifyStaff(
+                    session.user.id
+                );
 
 
-            saveStaffProfile(staff);
+            saveStaff(staff);
 
 
             /*
-            Already logged in.
-            Go directly to dashboard.
-            */
+             * User is already logged in.
+             * Go to dashboard.
+             */
 
             window.location.href =
                 DASHBOARD_URL;
 
+
         } catch (error) {
 
             console.warn(
-                "Existing session check failed:",
+                "Existing session is not valid:",
                 error.message
             );
 
-            /*
-            If the account is no longer valid,
-            make sure the session is removed.
-            */
+            clearStaff();
 
             try {
-
                 await db.auth.signOut();
-
             } catch (signOutError) {
-
                 console.error(
                     signOutError
                 );
-
             }
-
         }
-
     }
 
 
-    /*
-    ============================================================
-    AUTH STATE LISTENER
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       AUTH STATE
+       -------------------------------------------------------- */
 
     db.auth.onAuthStateChange(
-        function (event, session) {
+        (event, session) => {
 
             console.log(
-                "Auth event:",
+                "Lashawn authentication event:",
                 event
             );
-
-            /*
-            We don't redirect directly here because
-            the login() function handles verification
-            of the staff record first.
-            */
 
         }
     );
 
 
-    /*
-    ============================================================
-    LOGOUT FUNCTION
-    ============================================================
-    */
-
-    window.LashawnLogout = async function () {
-
-        try {
-
-            await db.auth.signOut();
-
-            sessionStorage.removeItem(
-                "lashawn_staff"
-            );
-
-            window.location.href =
-                "login.html";
-
-        } catch (error) {
-
-            console.error(
-                "Logout error:",
-                error
-            );
-
-            /*
-            Even if Supabase reports an error,
-            clear the local session.
-            */
-
-            sessionStorage.removeItem(
-                "lashawn_staff"
-            );
-
-            window.location.href =
-                "login.html";
-
-        }
-
-    };
-
-
-    /*
-    ============================================================
-    GET CURRENT STAFF
-    ============================================================
-    */
+    /* --------------------------------------------------------
+       GLOBAL STAFF HELPERS
+       -------------------------------------------------------- */
 
     window.getLashawnStaff = function () {
 
         try {
 
-            const stored =
+            const staff =
                 sessionStorage.getItem(
                     "lashawn_staff"
                 );
 
-            if (!stored) return null;
-
-            return JSON.parse(stored);
+            return staff
+                ? JSON.parse(staff)
+                : null;
 
         } catch (error) {
 
             console.error(
-                "Could not read staff session:",
+                "Staff session error:",
                 error
             );
 
             return null;
-
         }
-
     };
 
-
-    /*
-    ============================================================
-    ROLE CHECK
-    ============================================================
-    */
 
     window.hasLashawnRole = function (
         allowedRoles
@@ -657,27 +495,48 @@ AUDITOR
         const staff =
             window.getLashawnStaff();
 
-        if (!staff) return false;
+
+        if (!staff) {
+            return false;
+        }
+
 
         if (!Array.isArray(allowedRoles)) {
-
             allowedRoles = [allowedRoles];
-
         }
+
 
         return allowedRoles.includes(
             staff.role
         );
-
     };
 
 
-    /*
-    ============================================================
-    INITIALIZE
-    ============================================================
-    */
+    window.lashawnLogout = async function () {
+
+        clearStaff();
+
+        try {
+
+            await db.auth.signOut();
+
+        } catch (error) {
+
+            console.error(
+                "Logout error:",
+                error
+            );
+        }
+
+        window.location.href =
+            "login.html";
+    };
+
+
+    /* --------------------------------------------------------
+       INITIALIZE
+       -------------------------------------------------------- */
 
     checkExistingSession();
 
-})();
+});
