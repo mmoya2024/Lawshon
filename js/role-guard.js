@@ -1,140 +1,35 @@
-// ============================================================
-// LASHAWN ACADEMY
-// OFFICE ADMIN ROLE GUARD
-// ============================================================
-
+// LASHAWN ACADEMY - OFFICE ADMIN ROLE GUARD
 (function () {
-    'use strict';
+  'use strict';
+  const DB = window.LashawnDB;
 
-    const DB = window.LashawnDB;
+  window.requireAdminAccess = async function () {
+    if (!DB) { window.location.replace('login.html'); return false; }
+    try {
+      const { data: { session }, error } = await DB.auth.getSession();
+      if (error || !session || !session.user) { window.location.replace('login.html'); return false; }
+      const u = session.user, a = u.app_metadata || {}, m = u.user_metadata || {};
+      const allowed =
+        a.role === 'admin' || a.role === 'staff' || m.role === 'admin' || m.role === 'staff' ||
+        a.account_type === 'admin' || a.account_type === 'staff' ||
+        m.account_type === 'admin' || m.account_type === 'staff' ||
+        m.office_role === 'Office Admin';
+      if (!allowed) {
+        await DB.auth.signOut();
+        alert('You do not have Office Admin access.');
+        window.location.replace('login.html');
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error('Office Admin authentication error:', e);
+      window.location.replace('login.html');
+      return false;
+    }
+  };
 
-    // ---------------------------------------------------------
-    // Require authenticated Office Admin
-    // ---------------------------------------------------------
-    window.requireAdminAccess = async function () {
-
-        if (!DB) {
-            console.error('Lashawn Supabase is not configured.');
-            window.location.replace('login.html');
-            return false;
-        }
-
-        try {
-
-            const {
-                data: { session },
-                error: sessionError
-            } = await DB.auth.getSession();
-
-            if (sessionError) {
-                console.error('Session error:', sessionError);
-                window.location.replace('login.html');
-                return false;
-            }
-
-            if (!session || !session.user) {
-                console.warn('No authenticated user.');
-                window.location.replace('login.html');
-                return false;
-            }
-
-            const user = session.user;
-
-            // -------------------------------------------------
-            // Read roles from Supabase Auth metadata
-            // -------------------------------------------------
-
-            const appMetadata = user.app_metadata || {};
-            const userMetadata = user.user_metadata || {};
-
-            const role =
-                appMetadata.role ||
-                userMetadata.role ||
-                '';
-
-            const accountType =
-                appMetadata.account_type ||
-                userMetadata.account_type ||
-                '';
-
-            const officeRole =
-                userMetadata.office_role ||
-                '';
-
-            console.log('Logged-in user:', user.email);
-            console.log('Role:', role);
-            console.log('Account type:', accountType);
-            console.log('Office role:', officeRole);
-
-            // -------------------------------------------------
-            // Allowed Office Admin roles
-            // -------------------------------------------------
-
-            const allowed =
-                role === 'admin' ||
-                role === 'staff' ||
-                accountType === 'admin' ||
-                accountType === 'staff' ||
-                officeRole === 'Office Admin';
-
-            if (!allowed) {
-
-                console.error(
-                    'User authenticated but does not have admin/staff access.'
-                );
-
-                await DB.auth.signOut();
-
-                alert('You do not have Office Admin access.');
-
-                window.location.replace('login.html');
-
-                return false;
-            }
-
-            // -------------------------------------------------
-            // Successfully authenticated
-            // -------------------------------------------------
-
-            console.log('Office Admin access granted.');
-
-            return true;
-
-        } catch (error) {
-
-            console.error(
-                'Office Admin authentication error:',
-                error
-            );
-
-            window.location.replace('login.html');
-
-            return false;
-        }
-    };
-
-
-    // ---------------------------------------------------------
-    // Logout helper
-    // ---------------------------------------------------------
-
-    window.logoutAdmin = async function () {
-
-        try {
-
-            if (DB) {
-                await DB.auth.signOut();
-            }
-
-        } catch (error) {
-
-            console.error('Logout error:', error);
-
-        } finally {
-
-            window.location.replace('login.html');
-
-        }
-    };
-
+  window.logoutAdmin = async function () {
+    try { if (DB) await DB.auth.signOut(); } catch (e) { console.error(e); }
+    window.location.replace('login.html');
+  };
 })();
