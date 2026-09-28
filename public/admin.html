@@ -3,4063 +3,483 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Lashawn Academy | Office Admin</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-:root{
-    --navy:#071a33;
-    --navy2:#0d2748;
-    --green:#16c784;
-    --green-dark:#087443;
-    --bg:#f4f7fb;
-    --white:#ffffff;
-    --text:#172033;
-    --muted:#68758a;
-    --border:#dce3ed;
-    --danger:#d92d20;
-    --warning:#9a6700;
-}
-
-*{
-    box-sizing:border-box;
-}
-
-body{
-    margin:0;
-    font-family:Inter,Arial,Helvetica,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-}
-
-button,
-input,
-select,
-textarea{
-    font:inherit;
-}
-
-.app{
-    min-height:100vh;
-    display:flex;
-}
-
-/* ================= SIDEBAR ================= */
-
-.sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    bottom:0;
-    width:245px;
-    background:var(--navy);
-    color:#fff;
-    padding:20px 14px;
-    z-index:20;
-}
-
-.brand{
-    padding:10px 12px 24px;
-    font-size:20px;
-    font-weight:900;
-    letter-spacing:.3px;
-}
-
-.brand small{
-    display:block;
-    margin-top:5px;
-    color:#9fb1c8;
-    font-size:11px;
-    font-weight:600;
-}
-
-.nav{
-    display:grid;
-    gap:6px;
-}
-
-.nav button{
-    border:0;
-    background:transparent;
-    color:#c8d4e4;
-    text-align:left;
-    padding:12px;
-    border-radius:9px;
-    cursor:pointer;
-    font-size:14px;
-}
-
-.nav button:hover{
-    background:var(--navy2);
-    color:#fff;
-}
-
-.nav button.active{
-    background:var(--navy2);
-    color:#fff;
-    border-left:3px solid var(--green);
-}
-
-.userbox{
-    position:absolute;
-    left:14px;
-    right:14px;
-    bottom:18px;
-    border-top:1px solid #27415f;
-    padding:15px 8px;
-    color:#b8c7d9;
-    font-size:12px;
-}
-
-.user-name{
-    color:#fff;
-    font-weight:800;
-    margin-bottom:3px;
-}
-
-.user-email{
-    word-break:break-word;
-    margin-bottom:10px;
-}
-
-/* ================= MAIN ================= */
-
-.main{
-    width:calc(100% - 245px);
-    margin-left:245px;
-    padding:28px;
-}
-
-.topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:15px;
-    margin-bottom:24px;
-}
-
-.topbar h1{
-    margin:0;
-    font-size:26px;
-}
-
-.db-status{
-    color:var(--muted);
-    font-size:12px;
-    margin-top:6px;
-}
-
-.db-status.ok{
-    color:var(--green-dark);
-}
-
-.db-status.bad{
-    color:var(--danger);
-}
-
-/* ================= PANELS ================= */
-
-.panel{
-    display:none;
-}
-
-.panel.active{
-    display:block;
-}
-
-.lede{
-    color:var(--muted);
-    margin-top:-12px;
-    margin-bottom:20px;
-}
-
-/* ================= CARDS ================= */
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:15px;
-}
-
-.card{
-    background:var(--white);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:18px;
-    margin-bottom:18px;
-    box-shadow:0 2px 8px rgba(16,42,67,.04);
-}
-
-.card h2{
-    margin:0 0 15px;
-    font-size:17px;
-}
-
-.stat .label{
-    color:var(--muted);
-    font-size:12px;
-}
-
-.stat .value{
-    font-size:27px;
-    font-weight:800;
-    margin-top:8px;
-}
-
-/* ================= FORMS ================= */
-
-.form-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:14px;
-}
-
-.form-group{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-}
-
-.form-group.full{
-    grid-column:1/-1;
-}
-
-label{
-    font-size:12px;
-    font-weight:700;
-    color:#44526a;
-}
-
-input,
-select,
-textarea{
-    width:100%;
-    padding:10px 11px;
-    border:1px solid var(--border);
-    border-radius:8px;
-    background:#fff;
-    color:var(--text);
-    outline:none;
-    font-size:13px;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-    border-color:#79a8d7;
-    box-shadow:0 0 0 2px rgba(22,199,132,.08);
-}
-
-input[readonly]{
-    background:#f5f7fa;
-}
-
-/* ================= BUTTONS ================= */
-
-.actions{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:17px;
-}
-
-.btn{
-    border:0;
-    background:var(--green);
-    color:#062719;
-    padding:10px 15px;
-    border-radius:8px;
-    font-weight:800;
-    cursor:pointer;
-}
-
-.btn:hover{
-    opacity:.92;
-}
-
-.btn:disabled{
-    opacity:.55;
-    cursor:not-allowed;
-}
-
-.btn.outline{
-    background:#fff;
-    border:1px solid var(--border);
-    color:var(--text);
-}
-
-.btn.danger{
-    background:#fff0ef;
-    border:1px solid #ffd0cc;
-    color:var(--danger);
-}
-
-/* ================= TABLES ================= */
-
-.table-wrap{
-    overflow:auto;
-}
-
-.table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:13px;
-}
-
-.table th,
-.table td{
-    padding:11px 10px;
-    border-bottom:1px solid #edf0f5;
-    text-align:left;
-    white-space:nowrap;
-}
-
-.table th{
-    background:#fafbfd;
-    color:var(--muted);
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:.3px;
-}
-
-.table tbody tr:hover{
-    background:#fafcfe;
-}
-
-/* ================= PILLS ================= */
-
-.pill{
-    display:inline-block;
-    padding:4px 8px;
-    border-radius:999px;
-    font-size:10px;
-    font-weight:800;
-    background:#edf2f7;
-}
-
-.pill.green{
-    background:#e5f8ef;
-    color:#087443;
-}
-
-.pill.yellow{
-    background:#fff7dc;
-    color:#8a6100;
-}
-
-.pill.red{
-    background:#ffeded;
-    color:#a32118;
-}
-
-/* ================= NOTICE ================= */
-
-.notice{
-    padding:12px;
-    border-radius:8px;
-    font-size:13px;
-    margin-bottom:15px;
-}
-
-.notice.info{
-    background:#eef6ff;
-    color:#24547d;
-}
-
-.notice.err{
-    background:#fff0ef;
-    color:#9d251b;
-}
-
-.notice.success{
-    background:#e7f8ef;
-    color:#087443;
-}
-
-.empty{
-    text-align:center;
-    color:var(--muted);
-    padding:30px;
-}
-
-.hint{
-    color:var(--muted);
-    font-size:11px;
-    margin-top:8px;
-}
-
-.search{
-    max-width:380px;
-    margin-bottom:14px;
-}
-
-/* ================= MODAL ================= */
-
-.modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(7,26,51,.55);
-    z-index:100;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-}
-
-.modal.open{
-    display:flex;
-}
-
-.modal-box{
-    width:min(680px,100%);
-    max-height:90vh;
-    overflow:auto;
-    background:#fff;
-    border-radius:14px;
-    padding:24px;
-}
-
-.receipt{
-    font-family:Arial,Helvetica,sans-serif;
-}
-
-.receipt h2{
-    text-align:center;
-    margin:0;
-}
-
-.receipt hr{
-    border:0;
-    border-top:1px dashed #999;
-    margin:15px 0;
-}
-
-.receipt-row{
-    display:flex;
-    justify-content:space-between;
-    gap:20px;
-    padding:5px 0;
-}
-
-/* ================= TOAST ================= */
-
-#toast{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    z-index:200;
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media(max-width:1000px){
-
-    .grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .form-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-}
-
-@media(max-width:700px){
-
-    .app{
-        display:block;
-    }
-
-    .sidebar{
-        position:static;
-        width:100%;
-    }
-
-    .main{
-        width:100%;
-        margin-left:0;
-        padding:15px;
-    }
-
-    .userbox{
-        position:static;
-        margin-top:20px;
-    }
-
-    .grid,
-    .form-grid{
-        grid-template-columns:1fr;
-    }
-
-    .form-group.full{
-        grid-column:auto;
-    }
-
-    .topbar{
-        flex-direction:column;
-    }
-}
+:root{--navy:#071a33;--navy2:#0d2748;--green:#16c784;--green-dark:#087443;--bg:#f4f7fb;--text:#172033;--muted:#68758a;--border:#dce3ed;--danger:#d92d20}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:245px;background:var(--navy);color:#fff;padding:20px 14px;z-index:20}
+.brand{padding:10px 12px 24px;font-size:20px;font-weight:900}.brand small{display:block;margin-top:5px;color:#9fb1c8;font-size:11px}
+.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#c8d4e4;text-align:left;padding:12px;border-radius:9px;cursor:pointer;font-size:14px}
+.nav button:hover,.nav button.active{background:var(--navy2);color:#fff}.nav button.active{border-left:3px solid var(--green)}
+.userbox{position:absolute;left:14px;right:14px;bottom:18px;border-top:1px solid #27415f;padding:15px 8px;color:#b8c7d9;font-size:12px}
+.user-name{color:#fff;font-weight:800;margin-bottom:3px}.user-email{word-break:break-word;margin-bottom:10px}
+.main{margin-left:245px;padding:28px}.topbar h1{margin:0;font-size:26px}
+.db-status{color:var(--muted);font-size:12px;margin:6px 0 24px}.db-status.ok{color:var(--green-dark)}.db-status.bad{color:var(--danger)}
+.panel{display:none}.panel.active{display:block}.lede{color:var(--muted);margin-top:-12px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px}
+.card h2{margin:0 0 15px;font-size:17px}.stat .label{color:var(--muted);font-size:12px}.stat .value{font-size:27px;font-weight:800;margin-top:8px}
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.form-group{display:flex;flex-direction:column;gap:6px}.form-group.full{grid-column:1/-1}
+label{font-size:12px;font-weight:700;color:#44526a}
+input,select,textarea{width:100%;padding:10px 11px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font-size:13px}
+input[readonly]{background:#f5f7fa}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}
+.btn{border:0;background:var(--green);color:#062719;padding:10px 15px;border-radius:8px;font-weight:800;cursor:pointer}
+.btn:disabled{opacity:.55;cursor:not-allowed}.btn.outline{background:#fff;border:1px solid var(--border);color:var(--text)}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:13px}
+.table th,.table td{padding:11px 10px;border-bottom:1px solid #edf0f5;text-align:left;white-space:nowrap}
+.table th{background:#fafbfd;color:var(--muted);font-size:11px;text-transform:uppercase}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;background:#edf2f7}
+.pill.green{background:#e5f8ef;color:#087443}.pill.yellow{background:#fff7dc;color:#8a6100}.pill.red{background:#ffeded;color:#a32118}
+.notice{padding:12px;border-radius:8px;font-size:13px;margin-bottom:15px}
+.notice.info{background:#eef6ff;color:#24547d}.notice.err{background:#fff0ef;color:#9d251b}.notice.success{background:#e7f8ef;color:#087443}
+.empty{text-align:center;color:var(--muted);padding:30px}.hint{color:var(--muted);font-size:11px;margin-top:8px}.search{max-width:380px;margin-bottom:14px}
+.modal{display:none;position:fixed;inset:0;background:rgba(7,26,51,.55);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}.modal-box{width:min(680px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:14px;padding:24px}
+.receipt h2{text-align:center;margin:0}.receipt hr{border:0;border-top:1px dashed #999;margin:15px 0}
+.receipt-row{display:flex;justify-content:space-between;gap:20px;padding:5px 0}
+#toast{position:fixed;right:20px;bottom:20px;z-index:200}
+@media(max-width:1000px){.grid,.form-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.sidebar{position:static;width:100%}.main{margin-left:0;padding:15px}.userbox{position:static;margin-top:20px}.grid,.form-grid{grid-template-columns:1fr}.form-group.full{grid-column:auto}}
+@media print{.sidebar,.main{display:none}.modal{position:static;background:none}.modal .actions{display:none}}
 </style>
 </head>
-
 <body>
-
-<div class="app">
-
-<!-- ================= SIDEBAR ================= -->
-
 <aside class="sidebar">
-
-    <div class="brand">
-        LASHAWN ACADEMY
-        <small>OFFICE ADMIN</small>
-    </div>
-
-    <nav class="nav">
-
-        <button class="active" data-panel="overview">
-            Overview
-        </button>
-
-        <button data-panel="enrolment">
-            New Enrolment
-        </button>
-
-        <button data-panel="students">
-            Students
-        </button>
-
-        <button data-panel="fees">
-            Fees & Balances
-        </button>
-
-        <button data-panel="payments">
-            Payments
-        </button>
-
-        <button data-panel="services">
-            Services & Pricing
-        </button>
-
-    </nav>
-
-    <div class="userbox">
-
-        <div class="user-name" id="adminName">
-            Office Admin
-        </div>
-
-        <div class="user-email" id="adminEmail"></div>
-
-        <button
-            class="btn outline"
-            id="logoutBtn"
-            style="width:100%;"
-        >
-            Logout
-        </button>
-
-    </div>
-
+  <div class="brand">LASHAWN ACADEMY<small>OFFICE ADMIN</small></div>
+  <nav class="nav">
+    <button class="active" data-panel="overview">Overview</button>
+    <button data-panel="enrolment">New Enrolment</button>
+    <button data-panel="students">Students</button>
+    <button data-panel="fees">Fees &amp; Balances</button>
+    <button data-panel="payments">Payments</button>
+    <button data-panel="services">Services &amp; Pricing</button>
+  </nav>
+  <div class="userbox">
+    <div class="user-name" id="adminName">Office Admin</div>
+    <div class="user-email" id="adminEmail"></div>
+    <button class="btn outline" id="logoutBtn" style="width:100%">Logout</button>
+  </div>
 </aside>
 
-
-<!-- ================= MAIN ================= -->
-
 <main class="main">
+  <div class="topbar"><h1 id="pageTitle">Overview</h1></div>
+  <div id="dbStatus" class="db-status">Connecting...</div>
 
-    <div class="topbar">
-
-        <div>
-
-            <h1 id="pageTitle">
-                Office Admin Overview
-            </h1>
-
-            <div
-                id="dbStatus"
-                class="db-status"
-            >
-                Connecting...
-            </div>
-
-        </div>
-
+  <section class="panel active" id="panel-overview">
+    <div class="grid">
+      <div class="card stat"><div class="label">Students</div><div class="value" id="statStudents">—</div></div>
+      <div class="card stat"><div class="label">Enrolments</div><div class="value" id="statEnrolments">—</div></div>
+      <div class="card stat"><div class="label">Confirmed Payments</div><div class="value" id="statPayments">—</div></div>
+      <div class="card stat"><div class="label">Active Fee Structures</div><div class="value" id="statFees">—</div></div>
     </div>
+    <div class="card"><h2>Status</h2><div id="recentActivity">Loading...</div></div>
+  </section>
 
-
-    <!-- ======================================================
-         OVERVIEW
-    ======================================================= -->
-
-    <section
-        class="panel active"
-        id="panel-overview"
-    >
-
-        <div class="grid">
-
-            <div class="card stat">
-                <div class="label">
-                    Students
-                </div>
-
-                <div
-                    class="value"
-                    id="statStudents"
-                >
-                    —
-                </div>
-            </div>
-
-
-            <div class="card stat">
-
-                <div class="label">
-                    Enrolments
-                </div>
-
-                <div
-                    class="value"
-                    id="statEnrolments"
-                >
-                    —
-                </div>
-
-            </div>
-
-
-            <div class="card stat">
-
-                <div class="label">
-                    Confirmed Payments
-                </div>
-
-                <div
-                    class="value"
-                    id="statPayments"
-                >
-                    —
-                </div>
-
-            </div>
-
-
-            <div class="card stat">
-
-                <div class="label">
-                    Active Fee Structures
-                </div>
-
-                <div
-                    class="value"
-                    id="statFees"
-                >
-                    —
-                </div>
-
-            </div>
-
+  <section class="panel" id="panel-enrolment">
+    <p class="lede">Register a student, create the enrolment and invoice. Prices come from Supabase.</p>
+    <div id="enrolNotice"></div>
+    <form id="enrolForm">
+      <div class="card"><h2>Student Details</h2>
+        <div class="form-grid">
+          <div class="form-group"><label>First Name *</label><input id="firstName" required></div>
+          <div class="form-group"><label>Middle Name</label><input id="middleName"></div>
+          <div class="form-group"><label>Last Name *</label><input id="lastName" required></div>
+          <div class="form-group"><label>Phone *</label><input id="phone" required></div>
+          <div class="form-group"><label>Email</label><input id="email" type="email"></div>
+          <div class="form-group"><label>National ID</label><input id="idNumber"></div>
+          <div class="form-group"><label>Date of Birth</label><input id="dob" type="date"></div>
+          <div class="form-group"><label>Gender</label>
+            <select id="gender"><option value="">Select</option><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select>
+          </div>
         </div>
-
-
-        <div class="card">
-
-            <h2>
-                Recent Activity
-            </h2>
-
-            <div id="recentActivity">
-                Loading...
-            </div>
-
+      </div>
+      <div class="card"><h2>Training / Service</h2>
+        <div class="form-grid">
+          <div class="form-group"><label>Programme *</label>
+            <select id="programme" required><option value="">Select Programme</option><option value="DRIVING">Driving</option><option value="COMPUTER">Computer</option><option value="PRINTING_DIGITAL">Printing / Digital</option></select>
+          </div>
+          <div class="form-group" id="drivingGroup"><label>Driving Class</label><select id="drivingClass"><option value="">Select Class</option></select></div>
+          <div class="form-group" id="computerGroup"><label>Computer Course</label><select id="computerCourse"><option value="">Select Course</option></select></div>
+          <div class="form-group"><label>Fee Option *</label><select id="feeOption" required><option value="">Select Programme First</option></select></div>
+          <div class="form-group"><label>Unit Fee</label><input id="unitFee" value="KES 0.00" readonly></div>
+          <div class="form-group"><label>Quantity</label><input id="quantity" type="number" min="1" value="1"></div>
+          <div class="form-group"><label>Total Fee</label><input id="totalFee" value="KES 0.00" readonly></div>
+          <div class="form-group"><label>Initial Payment</label><input id="amountPaid" type="number" min="0" step="0.01" value="0"></div>
+          <div class="form-group"><label>Balance</label><input id="balance" value="KES 0.00" readonly></div>
+          <div class="form-group"><label>Payment Method</label>
+            <select id="paymentMethod"><option value="CASH">Cash</option><option value="MPESA">M-Pesa</option><option value="BANK">Bank Transfer</option><option value="CARD">Card</option><option value="CHEQUE">Cheque</option><option value="OTHER">Other</option></select>
+          </div>
+          <div class="form-group"><label>Payment Reference</label><input id="paymentReference" placeholder="M-Pesa code / receipt / cheque no."></div>
+          <div class="form-group"><label>Start Date *</label><input id="startDate" type="date" required></div>
+          <div class="form-group full"><label>Notes</label><textarea id="notes" rows="3"></textarea></div>
         </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         NEW ENROLMENT
-    ======================================================= -->
-
-    <section
-        class="panel"
-        id="panel-enrolment"
-    >
-
-        <h1>
-            New Enrolment
-        </h1>
-
-        <p class="lede">
-            Register a student and create the enrolment and invoice.
-            All prices are loaded from Supabase.
-        </p>
-
-        <div id="enrolNotice"></div>
-
-
-        <form id="enrolForm">
-
-
-            <!-- STUDENT -->
-
-            <div class="card">
-
-                <h2>
-                    Student Details
-                </h2>
-
-                <div class="form-grid">
-
-                    <div class="form-group">
-                        <label>
-                            First Name *
-                        </label>
-
-                        <input
-                            id="firstName"
-                            required
-                        >
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Middle Name
-                        </label>
-
-                        <input id="middleName">
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Last Name *
-                        </label>
-
-                        <input
-                            id="lastName"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Phone *
-                        </label>
-
-                        <input
-                            id="phone"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Email
-                        </label>
-
-                        <input
-                            id="email"
-                            type="email"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            National ID / Passport
-                        </label>
-
-                        <input id="idNumber">
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Date of Birth
-                        </label>
-
-                        <input
-                            id="dob"
-                            type="date"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Gender
-                        </label>
-
-                        <select id="gender">
-
-                            <option value="">
-                                Select
-                            </option>
-
-                            <option value="MALE">
-                                Male
-                            </option>
-
-                            <option value="FEMALE">
-                                Female
-                            </option>
-
-                            <option value="OTHER">
-                                Other
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- PROGRAMME -->
-
-            <div class="card">
-
-                <h2>
-                    Training / Service
-                </h2>
-
-                <div class="form-grid">
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Programme *
-                        </label>
-
-                        <select
-                            id="programme"
-                            required
-                        >
-
-                            <option value="">
-                                Select Programme
-                            </option>
-
-                            <option value="DRIVING">
-                                Driving
-                            </option>
-
-                            <option value="COMPUTER">
-                                Computer
-                            </option>
-
-                            <option value="PRINTING_DIGITAL">
-                                Printing / Digital
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div
-                        class="form-group"
-                        id="drivingGroup"
-                    >
-
-                        <label>
-                            Driving Class
-                        </label>
-
-                        <select id="drivingClass">
-
-                            <option value="">
-                                Select Class
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div
-                        class="form-group"
-                        id="computerGroup"
-                    >
-
-                        <label>
-                            Computer Course
-                        </label>
-
-                        <select id="computerCourse">
-
-                            <option value="">
-                                Select Course
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Fee Option *
-                        </label>
-
-                        <select
-                            id="feeOption"
-                            required
-                        >
-
-                            <option value="">
-                                Select Programme First
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Unit Fee
-                        </label>
-
-                        <input
-                            id="unitFee"
-                            value="0"
-                            readonly
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Quantity
-                        </label>
-
-                        <input
-                            id="quantity"
-                            type="number"
-                            min="1"
-                            value="1"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Total Fee
-                        </label>
-
-                        <input
-                            id="totalFee"
-                            value="0"
-                            readonly
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Initial Payment
-                        </label>
-
-                        <input
-                            id="amountPaid"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value="0"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Balance
-                        </label>
-
-                        <input
-                            id="balance"
-                            value="0"
-                            readonly
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Payment Method
-                        </label>
-
-                        <select id="paymentMethod">
-
-                            <option value="CASH">
-                                Cash
-                            </option>
-
-                            <option value="MPESA">
-                                M-Pesa
-                            </option>
-
-                            <option value="BANK">
-                                Bank Transfer
-                            </option>
-
-                            <option value="CARD">
-                                Card
-                            </option>
-
-                            <option value="CHEQUE">
-                                Cheque
-                            </option>
-
-                            <option value="OTHER">
-                                Other
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Payment Reference
-                        </label>
-
-                        <input
-                            id="paymentReference"
-                            placeholder="M-Pesa code / receipt / cheque no."
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>
-                            Start Date *
-                        </label>
-
-                        <input
-                            id="startDate"
-                            type="date"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="form-group full">
-
-                        <label>
-                            Notes
-                        </label>
-
-                        <textarea
-                            id="notes"
-                            rows="3"
-                        ></textarea>
-
-                    </div>
-
-                </div>
-
-
-                <div
-                    id="feeDescription"
-                    class="hint"
-                ></div>
-
-
-                <div class="actions">
-
-                    <button
-                        class="btn"
-                        type="submit"
-                        id="saveBtn"
-                    >
-                        Save Enrolment
-                    </button>
-
-                    <button
-                        class="btn outline"
-                        type="button"
-                        id="clearBtn"
-                    >
-                        Clear
-                    </button>
-
-                </div>
-
-            </div>
-
-        </form>
-
-    </section>
-
-
-    <!-- ======================================================
-         STUDENTS
-    ======================================================= -->
-
-    <section
-        class="panel"
-        id="panel-students"
-    >
-
-        <h1>
-            Students
-        </h1>
-
-        <p class="lede">
-            Registered students and their latest enrolment.
-        </p>
-
-        <input
-            class="search"
-            id="studentSearch"
-            placeholder="Search name, student number or phone"
-        >
-
-
-        <div class="card">
-
-            <div class="table-wrap">
-
-                <table class="table">
-
-                    <thead>
-
-                        <tr>
-                            <th>Student No.</th>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Programme</th>
-                            <th>Enrolment</th>
-                            <th>Start</th>
-                            <th>Status</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="studentsTable"></tbody>
-
-                </table>
-
-            </div>
-
+        <div id="feeDescription" class="hint"></div>
+        <div class="actions">
+          <button class="btn" type="submit" id="saveBtn">Save Enrolment</button>
+          <button class="btn outline" type="button" id="clearBtn">Clear</button>
         </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         FEES
-    ======================================================= -->
-
-    <section
-        class="panel"
-        id="panel-fees"
-    >
-
-        <h1>
-            Fees & Balances
-        </h1>
-
-        <p class="lede">
-            Balances are calculated from invoices and payments.
-        </p>
-
-
-        <div class="card">
-
-            <div class="table-wrap">
-
-                <table class="table">
-
-                    <thead>
-
-                        <tr>
-                            <th>Student</th>
-                            <th>Enrolment</th>
-                            <th>Programme</th>
-                            <th>Total</th>
-                            <th>Paid</th>
-                            <th>Balance</th>
-                            <th>Status</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="feesTable"></tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         PAYMENTS
-    ======================================================= -->
-
-    <section
-        class="panel"
-        id="panel-payments"
-    >
-
-        <h1>
-            Payments
-        </h1>
-
-        <p class="lede">
-            Confirmed payments recorded by the office.
-        </p>
-
-
-        <div class="card">
-
-            <div class="table-wrap">
-
-                <table class="table">
-
-                    <thead>
-
-                        <tr>
-                            <th>Payment No.</th>
-                            <th>Date</th>
-                            <th>Student</th>
-                            <th>Method</th>
-                            <th>Reference</th>
-                            <th>Amount</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="paymentsTable"></tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ======================================================
-         SERVICES & PRICING
-    ======================================================= -->
-
-    <section
-        class="panel"
-        id="panel-services"
-    >
-
-        <h1>
-            Services & Pricing
-        </h1>
-
-        <p class="lede">
-            Prices shown here are read directly from Supabase.
-            No prices are hard-coded in this page.
-        </p>
-
-
-        <div class="card">
-
-            <h2>
-                Driving Classes
-            </h2>
-
-            <div class="table-wrap">
-
-                <table class="table">
-
-                    <thead>
-
-                        <tr>
-                            <th>Code</th>
-                            <th>Class</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="drivingServices"></tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h2>
-                Computer Courses
-            </h2>
-
-            <div class="table-wrap">
-
-                <table class="table">
-
-                    <thead>
-
-                        <tr>
-                            <th>Code</th>
-                            <th>Course</th>
-                            <th>Duration</th>
-                            <th>Database Fee</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="computerServices"></tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h2>
-                Fee Structures / Printing & Digital
-            </h2>
-
-            <div class="table-wrap">
-
-                <table class="table">
-
-                    <thead>
-
-                        <tr>
-                            <th>Programme</th>
-                            <th>Option</th>
-                            <th>Description</th>
-                            <th>Unit</th>
-                            <th>Quantity Based</th>
-                            <th>Amount</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="feeServices"></tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </section>
-
+      </div>
+    </form>
+  </section>
+
+  <section class="panel" id="panel-students">
+    <p class="lede">Registered students and their latest training status.</p>
+    <input class="search" id="studentSearch" placeholder="Search name, student number or phone">
+    <div class="card"><div class="table-wrap"><table class="table">
+      <thead><tr><th>Student No.</th><th>Name</th><th>Phone</th><th>Programme</th><th>Start</th><th>Days Left</th><th>Alert</th><th>Status</th></tr></thead>
+      <tbody id="studentsTable"></tbody>
+    </table></div></div>
+  </section>
+
+  <section class="panel" id="panel-fees">
+    <p class="lede">Invoices with totals, payments and balances.</p>
+    <div class="card"><div class="table-wrap"><table class="table">
+      <thead><tr><th>Invoice</th><th>Student</th><th>Enrolment</th><th>Programme</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead>
+      <tbody id="feesTable"></tbody>
+    </table></div></div>
+  </section>
+
+  <section class="panel" id="panel-payments">
+    <p class="lede">Confirmed payments recorded by the office.</p>
+    <div class="card"><div class="table-wrap"><table class="table">
+      <thead><tr><th>Payment No.</th><th>Date</th><th>Student</th><th>Method</th><th>Reference</th><th>Amount</th></tr></thead>
+      <tbody id="paymentsTable"></tbody>
+    </table></div></div>
+  </section>
+
+  <section class="panel" id="panel-services">
+    <p class="lede">All prices are read from Supabase.</p>
+    <div class="card"><h2>Driving Classes</h2><div class="table-wrap"><table class="table">
+      <thead><tr><th>Code</th><th>Class</th><th>Weeks</th><th>Min Age</th></tr></thead><tbody id="drivingServices"></tbody></table></div></div>
+    <div class="card"><h2>Computer Courses</h2><div class="table-wrap"><table class="table">
+      <thead><tr><th>Code</th><th>Course</th><th>Duration</th><th>Fee</th></tr></thead><tbody id="computerServices"></tbody></table></div></div>
+    <div class="card"><h2>Fee Structures</h2><div class="table-wrap"><table class="table">
+      <thead><tr><th>Programme</th><th>Option</th><th>Description</th><th>Unit</th><th>Qty Based</th><th>Amount</th></tr></thead><tbody id="feeServices"></tbody></table></div></div>
+  </section>
 </main>
 
-</div>
-
-
-<!-- ==========================================================
-     RECEIPT MODAL
-=========================================================== -->
-
-<div
-    class="modal"
-    id="receiptModal"
->
-
-    <div class="modal-box">
-
-        <div
-            class="receipt"
-            id="receiptContent"
-        ></div>
-
-        <div class="actions">
-
-            <button
-                class="btn"
-                onclick="window.print()"
-            >
-                Print
-            </button>
-
-            <button
-                class="btn outline"
-                id="closeReceipt"
-            >
-                Close
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
+<div class="modal" id="receiptModal"><div class="modal-box">
+  <div class="receipt" id="receiptContent"></div>
+  <div class="actions"><button class="btn" onclick="window.print()">Print</button><button class="btn outline" id="closeReceipt">Close</button></div>
+</div></div>
 <div id="toast"></div>
 
-
 <script>
+const SUPABASE_URL = "https://qjfinbftcserrjiedduf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
+const DB = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-/* ==========================================================
-   SUPABASE
-========================================================== */
+/* Table / view names in one place */
+const T = {
+  students:"students", enrolments:"enrolments", invoices:"invoices", payments:"payments",
+  fees:"fee_structures", driving:"driving_classes", computer:"computer_courses",
+  status:"academy_student_training_status"
+};
 
-const SUPABASE_URL =
-    "https://qjfinbftcserrjiedduf.supabase.co";
+let DRIVING=[], COMPUTER=[], FEES=[], STUDENT_ROWS=[];
+let CALC={unit:0,qty:1,total:0,paid:0,balance:0};
 
-const SUPABASE_KEY =
-    "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
+const $ = id => document.getElementById(id);
+const money = v => "KES " + Number(v||0).toLocaleString("en-KE",{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc = v => String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const fmtDate = v => v ? new Date(v).toLocaleDateString("en-KE") : "—";
+const fullName = s => [s?.first_name,s?.middle_name,s?.last_name].filter(Boolean).join(" ");
+const today = () => new Date().toISOString().slice(0,10);
+const empty = (cols,msg) => `<tr><td colspan="${cols}" class="empty">${msg}</td></tr>`;
 
-let DB = null;
-
-if (
-    typeof window.supabase !== "undefined"
-) {
-
-    DB = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
+function toast(msg,ok=true){
+  $("toast").innerHTML=`<div style="background:${ok?"#0d2748":"#9d251b"};color:#fff;padding:12px 16px;border-radius:8px">${esc(msg)}</div>`;
+  setTimeout(()=>$("toast").innerHTML="",3500);
 }
-
-
-/* ==========================================================
-   STATE
-========================================================== */
-
-let CURRENT_USER = null;
-
-let DRIVING = [];
-let COMPUTER = [];
-let FEES = [];
-
-let STUDENTS = [];
-let ENROLS = [];
-
-
-/* ==========================================================
-   HELPERS
-========================================================== */
-
-const $ = id =>
-    document.getElementById(id);
-
-
-function money(value){
-
-    return `KES ${Number(value || 0).toLocaleString(
-        "en-KE",
-        {
-            minimumFractionDigits:2,
-            maximumFractionDigits:2
-        }
-    )}`;
-
+function showNotice(msg,type="info"){
+  $("enrolNotice").innerHTML = msg ? `<div class="notice ${type}">${esc(msg)}</div>` : "";
 }
+function setStatus(text,cls){ $("dbStatus").textContent=text; $("dbStatus").className="db-status "+(cls||""); }
 
-
-function esc(value){
-
-    return String(value ?? "")
-        .replace(
-            /[&<>"']/g,
-            char => ({
-                "&":"&amp;",
-                "<":"&lt;",
-                ">":"&gt;",
-                '"':"&quot;",
-                "'":"&#039;"
-            }[char])
-        );
-
+/* ---------- Auth ---------- */
+function isStaff(u){
+  const a=u?.app_metadata||{}, m=u?.user_metadata||{};
+  const role=a.role||m.role||"", type=a.account_type||m.account_type||"";
+  return ["admin","staff"].includes(role) || ["admin","staff"].includes(type) || m.office_role==="Office Admin";
 }
-
-
-function fmtDate(value){
-
-    if(!value){
-        return "—";
-    }
-
-    return new Date(value)
-        .toLocaleDateString("en-KE");
-
-}
-
-
-function toast(message, success=true){
-
-    const color =
-        success
-        ? "#0d2748"
-        : "#9d251b";
-
-    $("toast").innerHTML = `
-        <div style="
-            background:${color};
-            color:#fff;
-            padding:12px 16px;
-            border-radius:8px;
-            box-shadow:0 5px 20px rgba(0,0,0,.15);
-        ">
-            ${esc(message)}
-        </div>
-    `;
-
-    setTimeout(() => {
-
-        $("toast").innerHTML = "";
-
-    },3500);
-
-}
-
-
-function showNotice(
-    message,
-    type="info"
-){
-
-    $("enrolNotice").innerHTML =
-        message
-        ? `
-            <div class="notice ${type}">
-                ${esc(message)}
-            </div>
-          `
-        : "";
-
-}
-
-
-/* ==========================================================
-   AUTHORIZATION
-========================================================== */
-
-function isStaff(user){
-
-    const app =
-        user?.app_metadata || {};
-
-    const meta =
-        user?.user_metadata || {};
-
-    const role =
-        app.role ||
-        meta.role ||
-        "";
-
-    const accountType =
-        app.account_type ||
-        meta.account_type ||
-        "";
-
-    const officeRole =
-        meta.office_role ||
-        "";
-
-    return (
-        role === "admin" ||
-        role === "staff" ||
-        accountType === "admin" ||
-        accountType === "staff" ||
-        officeRole === "Office Admin"
-    );
-
-}
-
-
 async function guard(){
-
-    if(!DB){
-
-        $("dbStatus").textContent =
-            "● Supabase unavailable";
-
-        $("dbStatus").className =
-            "db-status bad";
-
-        return false;
-
-    }
-
-
-    const {
-        data:{
-            session
-        },
-        error
-    } =
-        await DB.auth.getSession();
-
-
-    if(error){
-
-        $("dbStatus").textContent =
-            "● Authentication error";
-
-        $("dbStatus").className =
-            "db-status bad";
-
-        return false;
-
-    }
-
-
-    if(!session){
-
-        location.href =
-            "login.html";
-
-        return false;
-
-    }
-
-
-    CURRENT_USER =
-        session.user;
-
-
-    if(!isStaff(CURRENT_USER)){
-
-        $("dbStatus").textContent =
-            "● Office Admin access required";
-
-        $("dbStatus").className =
-            "db-status bad";
-
-        return false;
-
-    }
-
-
-    $("adminEmail").textContent =
-        CURRENT_USER.email || "";
-
-    $("adminName").textContent =
-        CURRENT_USER.user_metadata?.full_name ||
-        CURRENT_USER.user_metadata?.office_role ||
-        "Office Admin";
-
-
-    $("dbStatus").textContent =
-        "● Connected";
-
-    $("dbStatus").className =
-        "db-status ok";
-
-
-    return true;
-
+  if(!DB){ setStatus("● Supabase unavailable","bad"); return false; }
+  const {data:{session},error} = await DB.auth.getSession();
+  if(error){ setStatus("● Authentication error","bad"); return false; }
+  if(!session){ location.href="login.html"; return false; }
+  const u=session.user;
+  if(!isStaff(u)){ setStatus("● Office Admin access required","bad"); return false; }
+  $("adminEmail").textContent=u.email||"";
+  $("adminName").textContent=u.user_metadata?.full_name||u.user_metadata?.office_role||"Office Admin";
+  setStatus("● Connected","ok");
+  return true;
 }
 
-
-/* ==========================================================
-   LOAD REFERENCE DATA
-========================================================== */
-
+/* ---------- Reference data ---------- */
 async function loadReference(){
-
-    const [
-
-        drivingResult,
-
-        computerResult,
-
-        feeResult
-
-    ] = await Promise.all([
-
-
-        /*
-         * IMPORTANT FIX
-         *
-         * driving_classes DOES NOT have
-         * duration_weeks.
-         *
-         * Therefore only select:
-         * id
-         * class_code
-         * class_name
-         */
-
-        DB
-            .from("driving_classes")
-            .select(
-                "id,class_code,class_name"
-            )
-            .order("class_code"),
-
-
-        DB
-            .from("computer_courses")
-            .select(
-                "id,course_code,course_name,duration_weeks,fee"
-            )
-            .eq("is_active",true)
-            .order("course_name"),
-
-
-        DB
-            .from("fee_structures")
-            .select(
-                "id,name,programme,driving_class_id,computer_course_id,amount,description,is_active,option_code,unit,quantity_based"
-            )
-            .eq("is_active",true)
-            .order("programme")
-            .order("name")
-
-    ]);
-
-
-    if(drivingResult.error){
-
-        throw new Error(
-            "Driving classes: " +
-            drivingResult.error.message
-        );
-
-    }
-
-
-    if(computerResult.error){
-
-        throw new Error(
-            "Computer courses: " +
-            computerResult.error.message
-        );
-
-    }
-
-
-    if(feeResult.error){
-
-        throw new Error(
-            "Fee structures: " +
-            feeResult.error.message
-        );
-
-    }
-
-
-    DRIVING =
-        drivingResult.data || [];
-
-
-    COMPUTER =
-        computerResult.data || [];
-
-
-    FEES =
-        feeResult.data || [];
-
-
-    populateDrivingClasses();
-
-    populateComputerCourses();
-
-    renderServices();
-
+  const [d,c,f] = await Promise.all([
+    DB.from(T.driving).select("id,class_code,class_name,training_weeks,minimum_age").order("class_code"),
+    DB.from(T.computer).select("id,course_code,course_name,duration_weeks,fee").eq("is_active",true).order("course_name"),
+    DB.from(T.fees).select("id,name,programme,driving_class_id,computer_course_id,amount,description,option_code,unit,quantity_based")
+      .eq("is_active",true).order("programme").order("name")
+  ]);
+  if(d.error) throw new Error("Driving classes: "+d.error.message);
+  if(c.error) throw new Error("Computer courses: "+c.error.message);
+  if(f.error) throw new Error("Fee structures: "+f.error.message);
+  DRIVING=d.data||[]; COMPUTER=c.data||[]; FEES=f.data||[];
+  $("drivingClass").innerHTML='<option value="">Select Class</option>'+DRIVING.map(i=>`<option value="${esc(i.id)}">${esc(i.class_code)} — ${esc(i.class_name)}</option>`).join("");
+  $("computerCourse").innerHTML='<option value="">Select Course</option>'+COMPUTER.map(i=>`<option value="${esc(i.id)}">${esc(i.course_code)} — ${esc(i.course_name)}</option>`).join("");
+  renderServices();
 }
 
-
-/* ==========================================================
-   POPULATE DRIVING CLASSES
-========================================================== */
-
-function populateDrivingClasses(){
-
-    $("drivingClass").innerHTML = `
-
-        <option value="">
-            Select Class
-        </option>
-
-        ${
-            DRIVING.map(item => `
-
-                <option value="${esc(item.id)}">
-
-                    ${esc(item.class_code)}
-                    —
-                    ${esc(item.class_name)}
-
-                </option>
-
-            `).join("")
-        }
-
-    `;
-
-}
-
-
-/* ==========================================================
-   POPULATE COMPUTER COURSES
-========================================================== */
-
-function populateComputerCourses(){
-
-    $("computerCourse").innerHTML = `
-
-        <option value="">
-            Select Course
-        </option>
-
-        ${
-            COMPUTER.map(item => `
-
-                <option value="${esc(item.id)}">
-
-                    ${esc(item.course_code)}
-                    —
-                    ${esc(item.course_name)}
-
-                </option>
-
-            `).join("")
-        }
-
-    `;
-
-}
-
-
-/* ==========================================================
-   PROGRAMME CHANGE
-========================================================== */
-
+/* ---------- Enrolment form ---------- */
 function programmeChanged(){
-
-    const programme =
-        $("programme").value;
-
-
-    $("drivingGroup").style.display =
-        programme === "DRIVING"
-        ? "flex"
-        : "none";
-
-
-    $("computerGroup").style.display =
-        programme === "COMPUTER"
-        ? "flex"
-        : "none";
-
-
-    refreshFeeOptions();
-
+  const p=$("programme").value;
+  $("drivingGroup").style.display = p==="DRIVING" ? "flex":"none";
+  $("computerGroup").style.display = p==="COMPUTER" ? "flex":"none";
+  refreshFeeOptions();
 }
-
-
-/* ==========================================================
-   FEE OPTIONS
-========================================================== */
-
 function refreshFeeOptions(){
-
-    const programme =
-        $("programme").value;
-
-    const drivingClass =
-        $("drivingClass").value;
-
-    const computerCourse =
-        $("computerCourse").value;
-
-
-    let rows =
-        FEES.filter(
-            fee =>
-                fee.programme === programme
-        );
-
-
-    if(
-        programme === "DRIVING" &&
-        drivingClass
-    ){
-
-        rows =
-            rows.filter(
-                fee =>
-                    !fee.driving_class_id ||
-                    fee.driving_class_id === drivingClass
-            );
-
-    }
-
-
-    if(
-        programme === "COMPUTER" &&
-        computerCourse
-    ){
-
-        rows =
-            rows.filter(
-                fee =>
-                    !fee.computer_course_id ||
-                    fee.computer_course_id === computerCourse
-            );
-
-    }
-
-
-    $("feeOption").innerHTML = `
-
-        <option value="">
-            Select Fee Option
-        </option>
-
-        ${
-            rows.map(fee => `
-
-                <option value="${esc(fee.id)}">
-
-                    ${esc(fee.name)}
-                    —
-                    ${money(fee.amount)}
-                    ${
-                        fee.unit
-                        ? " / " + esc(fee.unit)
-                        : ""
-                    }
-
-                </option>
-
-            `).join("")
-        }
-
-    `;
-
-
-    updateFee();
-
+  const p=$("programme").value, dc=$("drivingClass").value, cc=$("computerCourse").value;
+  let rows=FEES.filter(f=>f.programme===p);
+  if(p==="DRIVING" && dc) rows=rows.filter(f=>!f.driving_class_id||f.driving_class_id===dc);
+  if(p==="COMPUTER" && cc) rows=rows.filter(f=>!f.computer_course_id||f.computer_course_id===cc);
+  $("feeOption").innerHTML='<option value="">Select Fee Option</option>'+rows.map(f=>
+    `<option value="${esc(f.id)}">${esc(f.name)} — ${money(f.amount)}${f.unit?" / "+esc(f.unit):""}</option>`).join("");
+  updateFee();
 }
-
-
-/* ==========================================================
-   CALCULATE FEE
-========================================================== */
-
 function updateFee(){
-
-    const fee =
-        FEES.find(
-            item =>
-                item.id ===
-                $("feeOption").value
-        );
-
-
-    const quantity =
-        $("quantity");
-
-
-    if(!fee){
-
-        $("unitFee").value =
-            "KES 0.00";
-
-        $("totalFee").value =
-            "KES 0.00";
-
-        $("balance").value =
-            "KES 0.00";
-
-        $("feeDescription").textContent =
-            "";
-
-        quantity.disabled =
-            true;
-
-        return;
-
-    }
-
-
-    let qty =
-        Number(
-            quantity.value || 1
-        );
-
-
-    if(
-        fee.quantity_based
-    ){
-
-        qty =
-            Math.max(
-                1,
-                qty
-            );
-
-        quantity.disabled =
-            false;
-
-    }else{
-
-        qty = 1;
-
-        quantity.value = 1;
-
-        quantity.disabled =
-            true;
-
-    }
-
-
-    const total =
-        Number(fee.amount || 0) *
-        qty;
-
-
-    const paid =
-        Math.max(
-            0,
-            Number(
-                $("amountPaid").value || 0
-            )
-        );
-
-
-    const balance =
-        Math.max(
-            0,
-            total - paid
-        );
-
-
-    $("unitFee").value =
-        money(fee.amount);
-
-
-    $("totalFee").value =
-        money(total);
-
-
-    $("balance").value =
-        money(balance);
-
-
-    $("amountPaid").max =
-        total;
-
-
-    $("feeDescription").textContent =
-        fee.description || "";
-
+  const fee=FEES.find(f=>f.id===$("feeOption").value), q=$("quantity");
+  if(!fee){
+    CALC={unit:0,qty:1,total:0,paid:0,balance:0};
+    q.disabled=true; $("feeDescription").textContent="";
+  }else{
+    let qty=1;
+    if(fee.quantity_based){ qty=Math.max(1,Number(q.value||1)); q.disabled=false; }
+    else { q.value=1; q.disabled=true; }
+    const unit=Number(fee.amount||0), total=unit*qty;
+    const paid=Math.min(total,Math.max(0,Number($("amountPaid").value||0)));
+    CALC={unit,qty,total,paid,balance:total-paid};
+    $("feeDescription").textContent=fee.description||"";
+  }
+  $("unitFee").value=money(CALC.unit);
+  $("totalFee").value=money(CALC.total);
+  $("balance").value=money(CALC.balance);
+}
+function resetForm(){
+  $("enrolForm").reset(); $("startDate").value=today(); programmeChanged();
 }
 
-
-/* ==========================================================
-   SAVE ENROLMENT
-========================================================== */
-
-async function saveEnrolment(event){
-
-    event.preventDefault();
-
-
-    showNotice("");
-
-
-    const programme =
-        $("programme").value;
-
-
-    const fee =
-        FEES.find(
-            item =>
-                item.id ===
-                $("feeOption").value
-        );
-
-
-    if(!programme || !fee){
-
-        showNotice(
-            "Select a programme and fee option.",
-            "err"
-        );
-
-        return;
-
-    }
-
-
-    const total =
-        Number(
-            $("totalFee")
-                .value
-                .replace(/[^\d.-]/g,"")
-        ) || 0;
-
-
-    const paid =
-        Math.max(
-            0,
-            Number(
-                $("amountPaid").value || 0
-            )
-        );
-
-
-    if(paid > total){
-
-        showNotice(
-            "Initial payment cannot exceed the total fee.",
-            "err"
-        );
-
-        return;
-
-    }
-
-
-    $("saveBtn").disabled =
-        true;
-
-    $("saveBtn").textContent =
-        "Saving...";
-
-
-    try{
-
-
-        /*
-         * Register student + enrolment
-         */
-
-        const {
-            data,
-            error
-        } =
-            await DB.rpc(
-                "register_student",
-                {
-
-                    p_first_name:
-                        $("firstName")
-                        .value
-                        .trim(),
-
-                    p_last_name:
-                        $("lastName")
-                        .value
-                        .trim(),
-
-                    p_phone:
-                        $("phone")
-                        .value
-                        .trim(),
-
-                    p_email:
-                        $("email")
-                        .value
-                        .trim() ||
-                        null,
-
-                    p_id_number:
-                        $("idNumber")
-                        .value
-                        .trim() ||
-                        null,
-
-                    p_programme:
-                        programme,
-
-                    p_driving_class_id:
-                        programme === "DRIVING"
-                        ? (
-                            $("drivingClass").value ||
-                            null
-                        )
-                        : null,
-
-                    p_computer_course_id:
-                        programme === "COMPUTER"
-                        ? (
-                            $("computerCourse").value ||
-                            null
-                        )
-                        : null,
-
-                    p_branch_id:
-                        null,
-
-                    p_start_date:
-                        $("startDate").value,
-
-                    p_notes:
-                        $("notes")
-                        .value
-                        .trim() ||
-                        null
-
-                }
-            );
-
-
-        if(error){
-
-            throw error;
-
-        }
-
-
-        const result =
-            Array.isArray(data)
-            ? data[0]
-            : data;
-
-
-        const studentId =
-            result?.student_id;
-
-
-        const enrolmentId =
-            result?.enrolment_id;
-
-
-        /*
-         * Do NOT guess the enrolment by
-         * selecting the latest record.
-         *
-         * The RPC must return both IDs.
-         */
-
-        if(
-            !studentId ||
-            !enrolmentId
-        ){
-
-            throw new Error(
-                "register_student did not return student_id and enrolment_id. Please update the register_student RPC to return both IDs."
-            );
-
-        }
-
-
-        /*
-         * Create invoice
-         */
-
-        const {
-            data:invoice,
-            error:invoiceError
-        } =
-            await DB
-                .from("invoices")
-                .insert({
-
-                    enrolment_id:
-                        enrolmentId,
-
-                    total_amount:
-                        total,
-
-                    amount_paid:
-                        paid,
-
-                    balance:
-                        Math.max(
-                            0,
-                            total - paid
-                        ),
-
-                    status:
-                        paid >= total
-                        ? "PAID"
-                        : paid > 0
-                        ? "PARTIAL"
-                        : "PENDING"
-
-                })
-                .select("id")
-                .single();
-
-
-        if(invoiceError){
-
-            throw invoiceError;
-
-        }
-
-
-        /*
-         * Record initial payment
-         */
-
-        let payment = null;
-
-
-        if(paid > 0){
-
-            const {
-                data:paymentData,
-                error:paymentError
-            } =
-                await DB
-                    .from("payments")
-                    .insert({
-
-                        student_id:
-                            studentId,
-
-                        enrolment_id:
-                            enrolmentId,
-
-                        invoice_id:
-                            invoice?.id ||
-                            null,
-
-                        amount:
-                            paid,
-
-                        payment_method:
-                            $("paymentMethod")
-                            .value,
-
-                        transaction_reference:
-                            $("paymentReference")
-                            .value
-                            .trim() ||
-                            null,
-
-                        status:
-                            "CONFIRMED",
-
-                        notes:
-                            "Initial enrolment payment"
-
-                    })
-                    .select(
-                        "id,payment_number,payment_date"
-                    )
-                    .single();
-
-
-            if(paymentError){
-
-                throw paymentError;
-
-            }
-
-
-            payment =
-                paymentData;
-
-        }
-
-
-        /*
-         * Load generated student/enrolment numbers
-         */
-
-        const [
-            studentResult,
-            enrolmentResult
-        ] =
-            await Promise.all([
-
-                DB
-                    .from("students")
-                    .select(
-                        "student_number,first_name,middle_name,last_name"
-                    )
-                    .eq(
-                        "id",
-                        studentId
-                    )
-                    .single(),
-
-                DB
-                    .from("enrolments")
-                    .select(
-                        "enrolment_number,programme"
-                    )
-                    .eq(
-                        "id",
-                        enrolmentId
-                    )
-                    .single()
-
-            ]);
-
-
-        const student =
-            studentResult.data;
-
-
-        const enrolment =
-            enrolmentResult.data;
-
-
-        showNotice(
-            `Enrolment saved successfully. Student No: ${
-                student?.student_number || "—"
-            } | Enrolment No: ${
-                enrolment?.enrolment_number || "—"
-            }`,
-            "success"
-        );
-
-
-        if(payment){
-
-            showReceipt({
-
-                payment,
-
-                student,
-
-                enrolment,
-
-                paid,
-
-                method:
-                    $("paymentMethod").value,
-
-                reference:
-                    $("paymentReference")
-                    .value
-                    .trim()
-
-            });
-
-        }
-
-
-        $("enrolForm").reset();
-
-
-        $("startDate").value =
-            new Date()
-                .toISOString()
-                .slice(0,10);
-
-
-        programmeChanged();
-
-
-        await loadOverview();
-
-
-    }catch(error){
-
-        console.error(
-            "Enrolment error:",
-            error
-        );
-
-
-        showNotice(
-            error.message ||
-            "Could not save enrolment.",
-            "err"
-        );
-
-
-    }finally{
-
-        $("saveBtn").disabled =
-            false;
-
-        $("saveBtn").textContent =
-            "Save Enrolment";
-
-    }
-
-}
-
-
-/* ==========================================================
-   OVERVIEW
-========================================================== */
-
-async function loadOverview(){
-
-    const [
-
-        students,
-
-        enrolments,
-
-        payments,
-
-        fees
-
-    ] =
-        await Promise.all([
-
-            DB
-                .from("students")
-                .select(
-                    "id",
-                    {
-                        count:"exact",
-                        head:true
-                    }
-                ),
-
-            DB
-                .from("enrolments")
-                .select(
-                    "id",
-                    {
-                        count:"exact",
-                        head:true
-                    }
-                ),
-
-            DB
-                .from("payments")
-                .select("amount")
-                .eq(
-                    "status",
-                    "CONFIRMED"
-                )
-                .limit(10000),
-
-            DB
-                .from("fee_structures")
-                .select(
-                    "id",
-                    {
-                        count:"exact",
-                        head:true
-                    }
-                )
-                .eq(
-                    "is_active",
-                    true
-                )
-
-        ]);
-
-
-    if(students.error)
-        throw students.error;
-
-    if(enrolments.error)
-        throw enrolments.error;
-
-    if(payments.error)
-        throw payments.error;
-
-    if(fees.error)
-        throw fees.error;
-
-
-    $("statStudents").textContent =
-        students.count ?? 0;
-
-
-    $("statEnrolments").textContent =
-        enrolments.count ?? 0;
-
-
-    $("statFees").textContent =
-        fees.count ?? 0;
-
-
-    const paymentTotal =
-        (payments.data || [])
-            .reduce(
-                (sum,row) =>
-                    sum +
-                    Number(
-                        row.amount || 0
-                    ),
-                0
-            );
-
-
-    $("statPayments").textContent =
-        money(paymentTotal);
-
-
-    $("recentActivity").innerHTML = `
-
-        <div class="notice info">
-
-            Office Admin is connected to Supabase.
-            Reference data and current office records are available.
-
-        </div>
-
-    `;
-
-}
-
-
-/* ==========================================================
-   STUDENTS
-========================================================== */
-
-async function loadStudents(){
-
-    const {
-        data,
-        error
-    } =
-        await DB
-            .from("students")
-            .select(
-                "id,student_number,first_name,middle_name,last_name,phone,registration_date"
-            )
-            .order(
-                "created_at",
-                {
-                    ascending:false
-                }
-            )
-            .limit(500);
-
-
-    if(error){
-
-        throw error;
-
-    }
-
-
-    STUDENTS =
-        data || [];
-
-
-    const {
-        data:enrolments,
-        error:enrolmentError
-    } =
-        await DB
-            .from("enrolments")
-            .select(
-                "id,enrolment_number,student_id,programme,driving_class_id,start_date,status"
-            )
-            .order(
-                "created_at",
-                {
-                    ascending:false
-                }
-            )
-            .limit(1000);
-
-
-    if(enrolmentError){
-
-        throw enrolmentError;
-
-    }
-
-
-    ENROLS =
-        enrolments || [];
-
-
-    renderStudents();
-
-}
-
-
-function renderStudents(){
-
-    const query =
-        $("studentSearch")
-            .value
-            .toLowerCase()
-            .trim();
-
-
-    const rows =
-        STUDENTS.filter(
-            student => {
-
-                if(!query){
-
-                    return true;
-
-                }
-
-
-                const text = [
-
-                    student.student_number,
-
-                    student.first_name,
-
-                    student.middle_name,
-
-                    student.last_name,
-
-                    student.phone
-
-                ]
-                    .filter(Boolean)
-                    .join(" ")
-                    .toLowerCase();
-
-
-                return text.includes(query);
-
-            }
-        );
-
-
-    const latest = {};
-
-
-    ENROLS.forEach(
-        enrolment => {
-
-            if(
-                !latest[
-                    enrolment.student_id
-                ]
-            ){
-
-                latest[
-                    enrolment.student_id
-                ] =
-                    enrolment;
-
-            }
-
-        }
-    );
-
-
-    $("studentsTable").innerHTML =
-
-        rows.length
-
-        ?
-
-        rows.map(
-            student => {
-
-                const enrolment =
-                    latest[
-                        student.id
-                    ];
-
-
-                const drivingClass =
-                    DRIVING.find(
-                        item =>
-                            item.id ===
-                            enrolment?.driving_class_id
-                    );
-
-
-                const programme =
-                    enrolment
-
-                    ?
-
-                    enrolment.programme +
-                    (
-                        drivingClass
-                        ? " · " +
-                          drivingClass.class_code
-                        : ""
-                    )
-
-                    :
-
-                    "—";
-
-
-                const name =
-                    [
-                        student.first_name,
-                        student.middle_name,
-                        student.last_name
-                    ]
-                    .filter(Boolean)
-                    .join(" ");
-
-
-                return `
-
-                    <tr>
-
-                        <td>
-                            ${esc(
-                                student.student_number
-                            )}
-                        </td>
-
-                        <td>
-                            ${esc(name)}
-                        </td>
-
-                        <td>
-                            ${esc(
-                                student.phone
-                            )}
-                        </td>
-
-                        <td>
-                            ${esc(programme)}
-                        </td>
-
-                        <td>
-                            ${esc(
-                                enrolment?.enrolment_number ||
-                                "—"
-                            )}
-                        </td>
-
-                        <td>
-                            ${fmtDate(
-                                enrolment?.start_date
-                            )}
-                        </td>
-
-                        <td>
-
-                            <span class="pill ${
-                                enrolment?.status ===
-                                "ACTIVE"
-                                ? "green"
-                                : ""
-                            }">
-
-                                ${esc(
-                                    enrolment?.status ||
-                                    "—"
-                                )}
-
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                `;
-
-            }
-        ).join("")
-
-        :
-
-        `
-
-            <tr>
-
-                <td
-                    colspan="7"
-                    class="empty"
-                >
-                    No students found.
-                </td>
-
-            </tr>
-
-        `;
-
-}
-
-
-/* ==========================================================
-   FEES
-========================================================== */
-
-async function loadFees(){
-
-    const [
-
-        invoiceResult,
-
-        enrolmentResult,
-
-        studentResult
-
-    ] =
-        await Promise.all([
-
-            DB
-                .from("invoices")
-                .select(
-                    "id,enrolment_id,total_amount,amount_paid,balance,status,created_at"
-                )
-                .order(
-                    "created_at",
-                    {
-                        ascending:false
-                    }
-                )
-                .limit(1000),
-
-            DB
-                .from("enrolments")
-                .select(
-                    "id,enrolment_number,student_id,programme"
-                )
-                .limit(1000),
-
-            DB
-                .from("students")
-                .select(
-                    "id,student_number,first_name,last_name"
-                )
-                .limit(1000)
-
-        ]);
-
-
-    if(invoiceResult.error)
-        throw invoiceResult.error;
-
-    if(enrolmentResult.error)
-        throw enrolmentResult.error;
-
-    if(studentResult.error)
-        throw studentResult.error;
-
-
-    const enrolmentMap =
-        Object.fromEntries(
-            (enrolmentResult.data || [])
-                .map(
-                    item =>
-                        [
-                            item.id,
-                            item
-                        ]
-                )
-        );
-
-
-    const studentMap =
-        Object.fromEntries(
-            (studentResult.data || [])
-                .map(
-                    item =>
-                        [
-                            item.id,
-                            item
-                        ]
-                )
-        );
-
-
-    $("feesTable").innerHTML =
-
-        (invoiceResult.data || [])
-            .map(invoice => {
-
-                const enrolment =
-                    enrolmentMap[
-                        invoice.enrolment_id
-                    ];
-
-
-                const student =
-                    studentMap[
-                        enrolment?.student_id
-                    ];
-
-
-                const total =
-                    Number(
-                        invoice.total_amount ||
-                        0
-                    );
-
-
-                const paid =
-                    Number(
-                        invoice.amount_paid ||
-                        0
-                    );
-
-
-                const balance =
-                    Number(
-                        invoice.balance ||
-                        0
-                    );
-
-
-                let status =
-                    "PENDING";
-
-                let className =
-                    "red";
-
-
-                if(balance <= 0){
-
-                    status =
-                        "PAID";
-
-                    className =
-                        "green";
-
-                }else if(paid > 0){
-
-                    status =
-                        "PARTIAL";
-
-                    className =
-                        "yellow";
-
-                }
-
-
-                return `
-
-                    <tr>
-
-                        <td>
-
-                            ${esc(
-                                student?.student_number ||
-                                "—"
-                            )}
-
-                            ·
-
-                            ${esc(
-                                [
-                                    student?.first_name,
-                                    student?.last_name
-                                ]
-                                .filter(Boolean)
-                                .join(" ")
-                            )}
-
-                        </td>
-
-                        <td>
-                            ${esc(
-                                enrolment?.enrolment_number ||
-                                "—"
-                            )}
-                        </td>
-
-                        <td>
-                            ${esc(
-                                enrolment?.programme ||
-                                "—"
-                            )}
-                        </td>
-
-                        <td>
-                            ${money(total)}
-                        </td>
-
-                        <td>
-                            ${money(paid)}
-                        </td>
-
-                        <td>
-                            ${money(balance)}
-                        </td>
-
-                        <td>
-
-                            <span
-                                class="pill ${className}"
-                            >
-                                ${status}
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                `;
-
-            })
-            .join("")
-
-        ||
-
-        `
-
-            <tr>
-
-                <td
-                    colspan="7"
-                    class="empty"
-                >
-                    No invoices found.
-                </td>
-
-            </tr>
-
-        `;
-
-}
-
-
-/* ==========================================================
-   PAYMENTS
-========================================================== */
-
-async function loadPayments(){
-
-    const {
-        data,
-        error
-    } =
-        await DB
-            .from("payments")
-            .select(
-                "payment_number,payment_date,amount,payment_method,transaction_reference,student_id"
-            )
-            .eq(
-                "status",
-                "CONFIRMED"
-            )
-            .order(
-                "payment_date",
-                {
-                    ascending:false
-                }
-            )
-            .limit(1000);
-
-
-    if(error){
-
-        throw error;
-
-    }
-
-
-    const studentIds =
-        [
-            ...new Set(
-                (data || [])
-                    .map(
-                        row =>
-                            row.student_id
-                    )
-                    .filter(Boolean)
-            )
-        ];
-
-
-    let students = [];
-
-
-    if(studentIds.length){
-
-        const result =
-            await DB
-                .from("students")
-                .select(
-                    "id,student_number,first_name,last_name"
-                )
-                .in(
-                    "id",
-                    studentIds
-                );
-
-
-        if(result.error){
-
-            throw result.error;
-
-        }
-
-
-        students =
-            result.data || [];
-
-    }
-
-
-    const studentMap =
-        Object.fromEntries(
-            students.map(
-                student =>
-                    [
-                        student.id,
-                        student
-                    ]
-            )
-        );
-
-
-    $("paymentsTable").innerHTML =
-
-        (data || [])
-            .map(payment => {
-
-                const student =
-                    studentMap[
-                        payment.student_id
-                    ];
-
-
-                const name =
-                    [
-                        student?.first_name,
-                        student?.last_name
-                    ]
-                    .filter(Boolean)
-                    .join(" ");
-
-
-                return `
-
-                    <tr>
-
-                        <td>
-                            ${esc(
-                                payment.payment_number ||
-                                "—"
-                            )}
-                        </td>
-
-                        <td>
-                            ${fmtDate(
-                                payment.payment_date
-                            )}
-                        </td>
-
-                        <td>
-
-                            ${esc(
-                                student?.student_number ||
-                                "—"
-                            )}
-
-                            ·
-
-                            ${esc(name)}
-
-                        </td>
-
-                        <td>
-                            ${esc(
-                                payment.payment_method ||
-                                "—"
-                            )}
-                        </td>
-
-                        <td>
-                            ${esc(
-                                payment.transaction_reference ||
-                                "—"
-                            )}
-                        </td>
-
-                        <td>
-                            ${money(
-                                payment.amount
-                            )}
-                        </td>
-
-                    </tr>
-
-                `;
-
-            })
-            .join("")
-
-        ||
-
-        `
-
-            <tr>
-
-                <td
-                    colspan="6"
-                    class="empty"
-                >
-                    No confirmed payments.
-                </td>
-
-            </tr>
-
-        `;
-
-}
-
-
-/* ==========================================================
-   SERVICES & PRICING
-========================================================== */
-
-function renderServices(){
-
-    /*
-     * DRIVING CLASSES
-     *
-     * No duration_weeks is requested.
-     */
-
-    $("drivingServices").innerHTML =
-
-        DRIVING.map(
-            item => `
-
-                <tr>
-
-                    <td>
-                        <strong>
-                            ${esc(
-                                item.class_code
-                            )}
-                        </strong>
-                    </td>
-
-                    <td>
-                        ${esc(
-                            item.class_name
-                        )}
-                    </td>
-
-                </tr>
-
-            `
-        ).join("")
-
-        ||
-
-        `
-
-            <tr>
-
-                <td
-                    colspan="2"
-                    class="empty"
-                >
-                    No driving classes.
-                </td>
-
-            </tr>
-
-        `;
-
-
-    /*
-     * COMPUTER COURSES
-     */
-
-    $("computerServices").innerHTML =
-
-        COMPUTER.map(
-            item => `
-
-                <tr>
-
-                    <td>
-                        ${esc(
-                            item.course_code
-                        )}
-                    </td>
-
-                    <td>
-                        ${esc(
-                            item.course_name
-                        )}
-                    </td>
-
-                    <td>
-                        ${
-                            item.duration_weeks
-                            ? esc(
-                                item.duration_weeks
-                            ) +
-                            " weeks"
-                            : "—"
-                        }
-                    </td>
-
-                    <td>
-                        ${
-                            item.fee == null
-                            ? "—"
-                            : money(item.fee)
-                        }
-                    </td>
-
-                </tr>
-
-            `
-        ).join("")
-
-        ||
-
-        `
-
-            <tr>
-
-                <td
-                    colspan="4"
-                    class="empty"
-                >
-                    No computer courses.
-                </td>
-
-            </tr>
-
-        `;
-
-
-    /*
-     * FEE STRUCTURES
-     *
-     * Amount comes from Supabase.
-     */
-
-    $("feeServices").innerHTML =
-
-        FEES.map(
-            item => `
-
-                <tr>
-
-                    <td>
-                        ${esc(
-                            item.programme
-                        )}
-                    </td>
-
-                    <td>
-
-                        ${esc(
-                            item.name
-                        )}
-
-                        ${
-                            item.option_code
-                            ? " · " +
-                              esc(
-                                  item.option_code
-                              )
-                            : ""
-                        }
-
-                    </td>
-
-                    <td>
-                        ${esc(
-                            item.description ||
-                            "—"
-                        )}
-                    </td>
-
-                    <td>
-                        ${esc(
-                            item.unit ||
-                            "—"
-                        )}
-                    </td>
-
-                    <td>
-                        ${
-                            item.quantity_based
-                            ? "Yes"
-                            : "No"
-                        }
-                    </td>
-
-                    <td>
-                        ${money(
-                            item.amount
-                        )}
-                    </td>
-
-                </tr>
-
-            `
-        ).join("")
-
-        ||
-
-        `
-
-            <tr>
-
-                <td
-                    colspan="6"
-                    class="empty"
-                >
-                    No active fee structures.
-                </td>
-
-            </tr>
-
-        `;
-
-}
-
-
-/* ==========================================================
-   RECEIPT
-========================================================== */
-
-function showReceipt(data){
-
-    const fullName =
-        [
-            data.student?.first_name,
-            data.student?.middle_name,
-            data.student?.last_name
-        ]
-        .filter(Boolean)
-        .join(" ");
-
-
-    $("receiptContent").innerHTML = `
-
-        <h2>
-            Lashawn Academy
-        </h2>
-
-        <p
-            style="text-align:center"
-        >
-            Payment Receipt
-        </p>
-
-        <hr>
-
-
-        <div class="receipt-row">
-
-            <span>
-                Payment No.
-            </span>
-
-            <strong>
-                ${esc(
-                    data.payment?.payment_number ||
-                    "—"
-                )}
-            </strong>
-
-        </div>
-
-
-        <div class="receipt-row">
-
-            <span>
-                Date
-            </span>
-
-            <strong>
-                ${fmtDate(
-                    data.payment?.payment_date
-                )}
-            </strong>
-
-        </div>
-
-
-        <div class="receipt-row">
-
-            <span>
-                Student No.
-            </span>
-
-            <strong>
-                ${esc(
-                    data.student?.student_number ||
-                    "—"
-                )}
-            </strong>
-
-        </div>
-
-
-        <div class="receipt-row">
-
-            <span>
-                Enrolment No.
-            </span>
-
-            <strong>
-                ${esc(
-                    data.enrolment?.enrolment_number ||
-                    "—"
-                )}
-            </strong>
-
-        </div>
-
-
-        <div class="receipt-row">
-
-            <span>
-                Student
-            </span>
-
-            <strong>
-                ${esc(fullName)}
-            </strong>
-
-        </div>
-
-
-        <div class="receipt-row">
-
-            <span>
-                Programme
-            </span>
-
-            <strong>
-                ${esc(
-                    data.enrolment?.programme ||
-                    "—"
-                )}
-            </strong>
-
-        </div>
-
-
-        <hr>
-
-
-        <div class="receipt-row">
-
-            <span>
-                Amount Received
-            </span>
-
-            <strong>
-                ${money(data.paid)}
-            </strong>
-
-        </div>
-
-
-        <div class="receipt-row">
-
-            <span>
-                Method
-            </span>
-
-            <strong>
-                ${esc(data.method)}
-            </strong>
-
-        </div>
-
-
-        <div class="receipt-row">
-
-            <span>
-                Reference
-            </span>
-
-            <strong>
-                ${esc(
-                    data.reference ||
-                    "—"
-                )}
-            </strong>
-
-        </div>
-
-
-        <hr>
-
-
-        <p
-            style="text-align:center;font-size:12px"
-        >
-            Thank you for choosing Lashawn Academy.
-        </p>
-
-    `;
-
-
-    $("receiptModal")
-        .classList
-        .add("open");
-
-}
-
-
-/* ==========================================================
-   PANEL LOADING
-========================================================== */
-
-async function refreshPanel(panel){
-
-    try{
-
-        if(panel === "overview"){
-
-            await loadOverview();
-
-        }
-
-
-        if(panel === "students"){
-
-            await loadStudents();
-
-        }
-
-
-        if(panel === "fees"){
-
-            await loadFees();
-
-        }
-
-
-        if(panel === "payments"){
-
-            await loadPayments();
-
-        }
-
-
-    }catch(error){
-
-        console.error(error);
-
-        toast(
-            error.message ||
-            "Could not load data.",
-            false
-        );
-
-    }
-
-}
-
-
-/* ==========================================================
-   NAVIGATION
-========================================================== */
-
-document
-    .querySelectorAll(".nav button")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            async () => {
-
-                document
-                    .querySelectorAll(
-                        ".nav button"
-                    )
-                    .forEach(
-                        item =>
-                            item.classList.remove(
-                                "active"
-                            )
-                    );
-
-
-                button.classList.add(
-                    "active"
-                );
-
-
-                document
-                    .querySelectorAll(
-                        ".panel"
-                    )
-                    .forEach(
-                        panel =>
-                            panel.classList.remove(
-                                "active"
-                            )
-                    );
-
-
-                const panel =
-                    button.dataset.panel;
-
-
-                $("panel-" + panel)
-                    .classList
-                    .add("active");
-
-
-                $("pageTitle")
-                    .textContent =
-                    button.textContent.trim();
-
-
-                if(
-                    [
-                        "overview",
-                        "students",
-                        "fees",
-                        "payments"
-                    ].includes(panel)
-                ){
-
-                    await refreshPanel(
-                        panel
-                    );
-
-                }
-
-            }
-        );
-
+async function saveEnrolment(e){
+  e.preventDefault(); showNotice("");
+  const programme=$("programme").value;
+  const fee=FEES.find(f=>f.id===$("feeOption").value);
+  if(!programme||!fee) return showNotice("Select a programme and fee option.","err");
+  if(Number($("amountPaid").value||0)>CALC.total) return showNotice("Initial payment cannot exceed the total fee.","err");
+  if(programme==="DRIVING" && !$("drivingClass").value) return showNotice("Select a driving class.","err");
+  if(programme==="COMPUTER" && !$("computerCourse").value) return showNotice("Select a computer course.","err");
+
+  const total=CALC.total, paid=CALC.paid;
+  $("saveBtn").disabled=true; $("saveBtn").textContent="Saving...";
+  try{
+    const {data,error}=await DB.rpc("register_student",{
+      p_first_name:$("firstName").value.trim(),
+      p_middle_name:$("middleName").value.trim()||null,
+      p_last_name:$("lastName").value.trim(),
+      p_phone:$("phone").value.trim(),
+      p_email:$("email").value.trim()||null,
+      p_id_number:$("idNumber").value.trim()||null,
+      p_date_of_birth:$("dob").value||null,
+      p_gender:$("gender").value||null,
+      p_programme:programme,
+      p_driving_class_id:programme==="DRIVING"?($("drivingClass").value||null):null,
+      p_computer_course_id:programme==="COMPUTER"?($("computerCourse").value||null):null,
+      p_branch_id:null,
+      p_start_date:$("startDate").value,
+      p_notes:$("notes").value.trim()||null
     });
-
-
-/* ==========================================================
-   FORM EVENTS
-========================================================== */
-
-$("programme")
-    .addEventListener(
-        "change",
-        programmeChanged
-    );
-
-
-$("drivingClass")
-    .addEventListener(
-        "change",
-        refreshFeeOptions
-    );
-
-
-$("computerCourse")
-    .addEventListener(
-        "change",
-        refreshFeeOptions
-    );
-
-
-$("feeOption")
-    .addEventListener(
-        "change",
-        updateFee
-    );
-
-
-$("quantity")
-    .addEventListener(
-        "input",
-        updateFee
-    );
-
-
-$("amountPaid")
-    .addEventListener(
-        "input",
-        updateFee
-    );
-
-
-$("enrolForm")
-    .addEventListener(
-        "submit",
-        saveEnrolment
-    );
-
-
-$("studentSearch")
-    .addEventListener(
-        "input",
-        renderStudents
-    );
-
-
-/* ==========================================================
-   CLEAR FORM
-========================================================== */
-
-$("clearBtn")
-    .addEventListener(
-        "click",
-        () => {
-
-            $("enrolForm")
-                .reset();
-
-
-            $("startDate")
-                .value =
-                new Date()
-                    .toISOString()
-                    .slice(0,10);
-
-
-            programmeChanged();
-
-            showNotice("");
-
-        }
-    );
-
-
-/* ==========================================================
-   CLOSE RECEIPT
-========================================================== */
-
-$("closeReceipt")
-    .addEventListener(
-        "click",
-        () => {
-
-            $("receiptModal")
-                .classList
-                .remove("open");
-
-        }
-    );
-
-
-/* ==========================================================
-   LOGOUT
-========================================================== */
-
-$("logoutBtn")
-    .addEventListener(
-        "click",
-        async () => {
-
-            await DB.auth.signOut();
-
-            location.href =
-                "login.html";
-
-        }
-    );
-
-
-/* ==========================================================
-   INITIALIZE OFFICE ADMIN
-========================================================== */
-
-(async function initialiseAdmin(){
-
-    try{
-
-        if(!DB){
-
-            $("dbStatus").textContent =
-                "● Supabase CDN unavailable";
-
-            $("dbStatus").className =
-                "db-status bad";
-
-            return;
-
-        }
-
-
-        const authenticated =
-            await guard();
-
-
-        if(!authenticated){
-
-            return;
-
-        }
-
-
-        $("startDate").value =
-            new Date()
-                .toISOString()
-                .slice(0,10);
-
-
-        await loadReference();
-
-        await loadOverview();
-
-        programmeChanged();
-
-
-    }catch(error){
-
-        console.error(
-            "Office Admin initialization error:",
-            error
-        );
-
-
-        $("dbStatus").textContent =
-            "● Database error";
-
-        $("dbStatus").className =
-            "db-status bad";
-
-
-        $("recentActivity").innerHTML = `
-
-            <div class="notice err">
-
-                Office Admin loaded, but database
-                reference data could not be loaded.
-
-                <br><br>
-
-                <strong>
-                    ${esc(
-                        error.message ||
-                        "Unknown database error"
-                    )}
-                </strong>
-
-            </div>
-
-        `;
-
+    if(error) throw error;
+    const r=Array.isArray(data)?data[0]:data;
+    if(!r?.student_id||!r?.enrolment_id) throw new Error("register_student did not return student_id and enrolment_id.");
+
+    const {data:invoice,error:invErr}=await DB.from(T.invoices).insert({
+      student_id:r.student_id,
+      enrolment_id:r.enrolment_id,
+      subtotal:total,
+      total_amount:total,
+      amount_paid:paid,
+      balance:total-paid,
+      status:paid>=total?"PAID":paid>0?"PARTIAL":"PENDING",
+      notes:`${fee.name} x ${CALC.qty}`
+    }).select("id,invoice_number").single();
+    if(invErr) throw new Error("Student saved (No. "+r.student_number+") but invoice failed: "+invErr.message);
+
+    let payment=null;
+    if(paid>0){
+      const {data:p,error:pErr}=await DB.from(T.payments).insert({
+        student_id:r.student_id,
+        enrolment_id:r.enrolment_id,
+        invoice_id:invoice.id,
+        amount:paid,
+        payment_method:$("paymentMethod").value,
+        transaction_reference:$("paymentReference").value.trim()||null,
+        status:"CONFIRMED",
+        notes:"Initial enrolment payment"
+      }).select("payment_number,payment_date").single();
+      if(pErr) throw new Error("Invoice saved but payment failed: "+pErr.message);
+      payment=p;
     }
 
+    showNotice(`Enrolment saved. Student No: ${r.student_number||"—"} | Enrolment No: ${r.enrolment_number||"—"} | Invoice: ${invoice?.invoice_number||"—"}`,"success");
+    if(payment) showReceipt({
+      payment, paid,
+      student:{first_name:$("firstName").value.trim(),middle_name:$("middleName").value.trim(),last_name:$("lastName").value.trim(),student_number:r.student_number},
+      enrolment:{enrolment_number:r.enrolment_number,programme},
+      method:$("paymentMethod").value, reference:$("paymentReference").value.trim()
+    });
+    resetForm();
+    await loadOverview();
+  }catch(err){
+    console.error(err);
+    showNotice(err.message||"Could not save enrolment.","err");
+  }finally{
+    $("saveBtn").disabled=false; $("saveBtn").textContent="Save Enrolment";
+  }
+}
+
+/* ---------- Overview ---------- */
+async function loadOverview(){
+  const [s,e,p,f]=await Promise.all([
+    DB.from(T.students).select("id",{count:"exact",head:true}),
+    DB.from(T.enrolments).select("id",{count:"exact",head:true}),
+    DB.from(T.payments).select("amount").eq("status","CONFIRMED").limit(10000),
+    DB.from(T.fees).select("id",{count:"exact",head:true}).eq("is_active",true)
+  ]);
+  for(const x of [s,e,p,f]) if(x.error) throw x.error;
+  $("statStudents").textContent=s.count??0;
+  $("statEnrolments").textContent=e.count??0;
+  $("statFees").textContent=f.count??0;
+  $("statPayments").textContent=money((p.data||[]).reduce((a,r)=>a+Number(r.amount||0),0));
+  $("recentActivity").innerHTML='<div class="notice info">Office Admin is connected to Supabase.</div>';
+}
+
+/* ---------- Students (from training status view) ---------- */
+async function loadStudents(){
+  const {data,error}=await DB.from(T.status)
+    .select("student_id,enrolment_id,student_number,student_name,phone,programme,class_code,start_date,days_remaining,training_alert,status")
+    .order("start_date",{ascending:false}).limit(1000);
+  if(error) throw error;
+  STUDENT_ROWS=data||[];
+  renderStudents();
+}
+function renderStudents(){
+  const q=$("studentSearch").value.toLowerCase().trim();
+  const rows=STUDENT_ROWS.filter(s=>!q||[s.student_number,s.student_name,s.phone].filter(Boolean).join(" ").toLowerCase().includes(q));
+  $("studentsTable").innerHTML=rows.length?rows.map(s=>`<tr>
+    <td>${esc(s.student_number)}</td><td>${esc(s.student_name)}</td><td>${esc(s.phone)}</td>
+    <td>${esc(s.programme)}${s.class_code?" · "+esc(s.class_code):""}</td>
+    <td>${fmtDate(s.start_date)}</td><td>${s.days_remaining??"—"}</td><td>${esc(s.training_alert||"—")}</td>
+    <td><span class="pill ${s.status==="ACTIVE"?"green":""}">${esc(s.status||"—")}</span></td></tr>`).join("")
+    : empty(8,"No students found.");
+}
+
+/* ---------- Fees ---------- */
+async function loadFees(){
+  const {data,error}=await DB.from(T.invoices)
+    .select("id,invoice_number,total_amount,amount_paid,balance,status,students(student_number,first_name,last_name),enrolments(enrolment_number,programme)")
+    .order("created_at",{ascending:false}).limit(1000);
+  if(error) throw error;
+  $("feesTable").innerHTML=(data||[]).length?data.map(i=>{
+    const total=Number(i.total_amount||0), paid=Number(i.amount_paid||0), bal=Number(i.balance||0);
+    const [st,cls]=bal<=0?["PAID","green"]:paid>0?["PARTIAL","yellow"]:["PENDING","red"];
+    return `<tr><td>${esc(i.invoice_number||"—")}</td>
+      <td>${esc(i.students?.student_number||"—")} · ${esc(fullName(i.students))}</td>
+      <td>${esc(i.enrolments?.enrolment_number||"—")}</td><td>${esc(i.enrolments?.programme||"—")}</td>
+      <td>${money(total)}</td><td>${money(paid)}</td><td>${money(bal)}</td>
+      <td><span class="pill ${cls}">${st}</span></td></tr>`;
+  }).join(""):empty(8,"No invoices found.");
+}
+
+/* ---------- Payments ---------- */
+async function loadPayments(){
+  const {data,error}=await DB.from(T.payments)
+    .select("payment_number,payment_date,amount,payment_method,transaction_reference,mpesa_receipt_number,students(student_number,first_name,last_name)")
+    .eq("status","CONFIRMED").order("payment_date",{ascending:false}).limit(1000);
+  if(error) throw error;
+  $("paymentsTable").innerHTML=(data||[]).length?data.map(p=>`<tr>
+    <td>${esc(p.payment_number||"—")}</td><td>${fmtDate(p.payment_date)}</td>
+    <td>${esc(p.students?.student_number||"—")} · ${esc(fullName(p.students))}</td>
+    <td>${esc(p.payment_method||"—")}</td>
+    <td>${esc(p.transaction_reference||p.mpesa_receipt_number||"—")}</td>
+    <td>${money(p.amount)}</td></tr>`).join(""):empty(6,"No confirmed payments.");
+}
+
+/* ---------- Services ---------- */
+function renderServices(){
+  $("drivingServices").innerHTML=DRIVING.length?DRIVING.map(i=>`<tr><td><strong>${esc(i.class_code)}</strong></td><td>${esc(i.class_name)}</td>
+    <td>${i.training_weeks??"—"}</td><td>${i.minimum_age??"—"}</td></tr>`).join(""):empty(4,"No driving classes.");
+  $("computerServices").innerHTML=COMPUTER.length?COMPUTER.map(i=>`<tr><td>${esc(i.course_code)}</td><td>${esc(i.course_name)}</td>
+    <td>${i.duration_weeks?i.duration_weeks+" weeks":"—"}</td><td>${i.fee==null?"—":money(i.fee)}</td></tr>`).join(""):empty(4,"No computer courses.");
+  $("feeServices").innerHTML=FEES.length?FEES.map(i=>`<tr><td>${esc(i.programme)}</td>
+    <td>${esc(i.name)}${i.option_code?" · "+esc(i.option_code):""}</td><td>${esc(i.description||"—")}</td>
+    <td>${esc(i.unit||"—")}</td><td>${i.quantity_based?"Yes":"No"}</td><td>${money(i.amount)}</td></tr>`).join(""):empty(6,"No active fee structures.");
+}
+
+/* ---------- Receipt ---------- */
+function showReceipt(d){
+  const row=(l,v)=>`<div class="receipt-row"><span>${l}</span><strong>${esc(v)}</strong></div>`;
+  $("receiptContent").innerHTML=`<h2>Lashawn Academy</h2><p style="text-align:center">Payment Receipt</p><hr>
+    ${row("Payment No.",d.payment?.payment_number||"—")}${row("Date",fmtDate(d.payment?.payment_date))}
+    ${row("Student No.",d.student?.student_number||"—")}${row("Enrolment No.",d.enrolment?.enrolment_number||"—")}
+    ${row("Student",fullName(d.student))}${row("Programme",d.enrolment?.programme||"—")}<hr>
+    ${row("Amount Received",money(d.paid))}${row("Method",d.method)}${row("Reference",d.reference||"—")}<hr>
+    <p style="text-align:center;font-size:12px">Thank you for choosing Lashawn Academy.</p>`;
+  $("receiptModal").classList.add("open");
+}
+
+/* ---------- Navigation ---------- */
+const LOADERS={overview:loadOverview,students:loadStudents,fees:loadFees,payments:loadPayments};
+document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",async()=>{
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  btn.classList.add("active");
+  const panel=btn.dataset.panel;
+  $("panel-"+panel).classList.add("active");
+  $("pageTitle").textContent=btn.textContent.trim();
+  if(LOADERS[panel]){
+    try{ await LOADERS[panel](); }catch(err){ console.error(err); toast(err.message||"Could not load data.",false); }
+  }
+}));
+
+$("programme").addEventListener("change",programmeChanged);
+$("drivingClass").addEventListener("change",refreshFeeOptions);
+$("computerCourse").addEventListener("change",refreshFeeOptions);
+$("feeOption").addEventListener("change",updateFee);
+$("quantity").addEventListener("input",updateFee);
+$("amountPaid").addEventListener("input",updateFee);
+$("enrolForm").addEventListener("submit",saveEnrolment);
+$("studentSearch").addEventListener("input",renderStudents);
+$("clearBtn").addEventListener("click",()=>{resetForm();showNotice("");});
+$("closeReceipt").addEventListener("click",()=>$("receiptModal").classList.remove("open"));
+$("logoutBtn").addEventListener("click",async()=>{await DB.auth.signOut();location.href="login.html";});
+
+/* ---------- Init ---------- */
+(async function init(){
+  try{
+    if(!await guard()) return;
+    $("startDate").value=today();
+    await loadReference();
+    programmeChanged();
+    await loadOverview();
+  }catch(err){
+    console.error(err);
+    setStatus("● Database error","bad");
+    $("recentActivity").innerHTML=`<div class="notice err">${esc(err.message||"Unknown database error")}</div>`;
+  }
 })();
-
 </script>
-
 </body>
 </html>
