@@ -2,14 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <meta name="theme-color"
-          content="#0f172a">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Admin Login | Lashawn Academy</title>
+
+    <meta name="theme-color" content="#0f172a">
 
     <style>
         * {
@@ -19,6 +16,12 @@
         }
 
         body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+
             font-family:
                 Inter,
                 -apple-system,
@@ -26,38 +29,32 @@
                 "Segoe UI",
                 sans-serif;
 
-            min-height: 100vh;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
             background:
                 linear-gradient(
                     135deg,
-                    #0f172a 0%,
-                    #172554 50%,
-                    #0f172a 100%
+                    #020617,
+                    #0f172a,
+                    #172554
                 );
 
             color: #0f172a;
-            padding: 20px;
         }
 
-        .login-wrapper {
+        .container {
             width: 100%;
-            max-width: 440px;
+            max-width: 430px;
         }
 
         .brand {
             text-align: center;
             color: white;
-            margin-bottom: 24px;
+            margin-bottom: 25px;
         }
 
-        .brand-icon {
+        .logo {
             width: 72px;
             height: 72px;
+
             margin: 0 auto 14px;
 
             display: flex;
@@ -70,13 +67,12 @@
             font-size: 38px;
 
             box-shadow:
-                0 15px 40px rgba(0, 0, 0, 0.25);
+                0 20px 50px rgba(0,0,0,.30);
         }
 
         .brand h1 {
             font-size: 27px;
             font-weight: 800;
-            letter-spacing: -0.5px;
         }
 
         .brand p {
@@ -85,51 +81,61 @@
             font-size: 14px;
         }
 
-        .login-card {
+        .card {
             background: white;
             border-radius: 20px;
             padding: 34px;
 
             box-shadow:
-                0 25px 70px rgba(0, 0, 0, 0.30);
+                0 25px 80px rgba(0,0,0,.35);
         }
 
-        .login-title {
-            margin-bottom: 25px;
-        }
-
-        .login-title h2 {
-            font-size: 22px;
-            font-weight: 750;
+        .card h2 {
+            font-size: 23px;
+            margin-bottom: 7px;
             color: #111827;
         }
 
-        .login-title p {
-            margin-top: 6px;
+        .subtitle {
             color: #64748b;
             font-size: 14px;
+            margin-bottom: 25px;
         }
 
-        .form-group {
-            margin-bottom: 19px;
+        .admin-badge {
+            display: inline-block;
+
+            margin-bottom: 20px;
+
+            padding: 6px 10px;
+
+            border-radius: 999px;
+
+            background: #eff6ff;
+            color: #1d4ed8;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .field {
+            margin-bottom: 18px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+
+            margin-bottom: 7px;
+
+            color: #334155;
 
             font-size: 14px;
             font-weight: 650;
-            color: #334155;
-        }
-
-        .input-wrapper {
-            position: relative;
         }
 
         input {
             width: 100%;
-            height: 48px;
+            height: 49px;
 
             padding: 0 14px;
 
@@ -137,27 +143,26 @@
             border-radius: 10px;
 
             font-size: 15px;
-            color: #0f172a;
 
             outline: none;
-
-            transition:
-                border-color 0.2s,
-                box-shadow 0.2s;
         }
 
         input:focus {
             border-color: #2563eb;
 
             box-shadow:
-                0 0 0 3px rgba(37, 99, 235, 0.12);
+                0 0 0 3px rgba(37,99,235,.12);
         }
 
-        #password {
+        .password-wrap {
+            position: relative;
+        }
+
+        .password-wrap input {
             padding-right: 70px;
         }
 
-        .toggle-password {
+        .show-password {
             position: absolute;
 
             right: 10px;
@@ -165,54 +170,21 @@
 
             transform: translateY(-50%);
 
-            border: none;
+            border: 0;
             background: transparent;
 
             color: #2563eb;
 
-            font-size: 13px;
             font-weight: 700;
+            font-size: 12px;
 
             cursor: pointer;
-        }
-
-        .login-button {
-            width: 100%;
-            height: 50px;
-
-            border: none;
-            border-radius: 10px;
-
-            background: #2563eb;
-            color: white;
-
-            font-size: 15px;
-            font-weight: 750;
-
-            cursor: pointer;
-
-            transition:
-                background 0.2s,
-                transform 0.1s;
-        }
-
-        .login-button:hover {
-            background: #1d4ed8;
-        }
-
-        .login-button:active {
-            transform: scale(0.99);
-        }
-
-        .login-button:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
         }
 
         .message {
-            min-height: 22px;
+            min-height: 24px;
 
-            margin-bottom: 16px;
+            margin: 12px 0;
 
             padding: 0;
 
@@ -234,9 +206,33 @@
             color: #2563eb;
         }
 
-        .security-note {
-            margin-top: 22px;
+        .login-button {
+            width: 100%;
+            height: 50px;
 
+            border: 0;
+            border-radius: 10px;
+
+            background: #2563eb;
+            color: white;
+
+            font-size: 15px;
+            font-weight: 750;
+
+            cursor: pointer;
+        }
+
+        .login-button:hover {
+            background: #1d4ed8;
+        }
+
+        .login-button:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+        }
+
+        .security {
+            margin-top: 22px;
             padding-top: 18px;
 
             border-top: 1px solid #e2e8f0;
@@ -249,7 +245,7 @@
             line-height: 1.6;
         }
 
-        .back-link {
+        .back {
             display: block;
 
             margin-top: 20px;
@@ -263,27 +259,26 @@
             font-size: 13px;
         }
 
-        .back-link:hover {
+        .back:hover {
             color: white;
-        }
-
-        .loading {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
         }
 
         .spinner {
             width: 16px;
             height: 16px;
 
-            border: 2px solid rgba(255,255,255,0.4);
+            display: inline-block;
+
+            margin-right: 7px;
+
+            vertical-align: middle;
+
+            border: 2px solid rgba(255,255,255,.4);
             border-top-color: white;
 
             border-radius: 50%;
 
-            animation: spin 0.8s linear infinite;
+            animation: spin .8s linear infinite;
         }
 
         @keyframes spin {
@@ -292,24 +287,14 @@
             }
         }
 
-        @media (max-width: 480px) {
+        @media(max-width:480px) {
 
-            body {
-                padding: 15px;
-            }
-
-            .login-card {
+            .card {
                 padding: 26px 22px;
             }
 
             .brand h1 {
                 font-size: 23px;
-            }
-
-            .brand-icon {
-                width: 62px;
-                height: 62px;
-                font-size: 32px;
             }
         }
     </style>
@@ -317,12 +302,11 @@
 
 <body>
 
-<div class="login-wrapper">
+<div class="container">
 
-    <!-- BRAND -->
     <div class="brand">
 
-        <div class="brand-icon">
+        <div class="logo">
             🎓
         </div>
 
@@ -335,33 +319,30 @@
     </div>
 
 
-    <!-- LOGIN CARD -->
-    <div class="login-card">
+    <div class="card">
 
-        <div class="login-title">
+        <span class="admin-badge">
+            ADMINISTRATION PORTAL
+        </span>
 
-            <h2>Administrator Login</h2>
+        <h2>Administrator Login</h2>
 
-            <p>
-                Sign in to access the Lashawn Academy management system.
-            </p>
-
-        </div>
+        <p class="subtitle">
+            Sign in to manage Lashawn Academy.
+        </p>
 
 
-        <form id="loginForm">
+        <form id="adminLoginForm">
 
-            <!-- EMAIL -->
-            <div class="form-group">
+            <div class="field">
 
                 <label for="email">
-                    Email Address
+                    Administrator Email
                 </label>
 
                 <input
-                    type="email"
                     id="email"
-                    name="email"
+                    type="email"
                     placeholder="admin@lashawnacademy.com"
                     autocomplete="username"
                     required
@@ -370,28 +351,26 @@
             </div>
 
 
-            <!-- PASSWORD -->
-            <div class="form-group">
+            <div class="field">
 
                 <label for="password">
                     Password
                 </label>
 
-                <div class="input-wrapper">
+                <div class="password-wrap">
 
                     <input
-                        type="password"
                         id="password"
-                        name="password"
-                        placeholder="Enter your password"
+                        type="password"
+                        placeholder="Enter password"
                         autocomplete="current-password"
                         required
                     >
 
                     <button
                         type="button"
-                        id="togglePassword"
-                        class="toggle-password"
+                        class="show-password"
+                        id="showPassword"
                     >
                         Show
                     </button>
@@ -401,7 +380,6 @@
             </div>
 
 
-            <!-- MESSAGE -->
             <div
                 id="message"
                 class="message"
@@ -409,11 +387,10 @@
             ></div>
 
 
-            <!-- LOGIN -->
             <button
-                type="submit"
                 id="loginButton"
                 class="login-button"
+                type="submit"
             >
                 Sign In
             </button>
@@ -421,13 +398,9 @@
         </form>
 
 
-        <div class="security-note">
-
-            🔒 Secure staff access<br>
-
-            Only authorized Lashawn Academy staff can access
-            the administration system.
-
+        <div class="security">
+            🔒 Secure administrator access<br>
+            Authorized Lashawn Academy administrators only.
         </div>
 
     </div>
@@ -435,78 +408,392 @@
 
     <a
         href="index.html"
-        class="back-link"
+        class="back"
     >
-        ← Back to Lashawn Academy
+        ← Back to website
     </a>
 
 </div>
 
 
-<!-- SUPABASE -->
+<!-- Supabase library loaded directly -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- YOUR SUPABASE CLIENT -->
-<script src="js/supabase.js"></script>
-
-<!-- YOUR AUTHENTICATION LOGIC -->
-<script src="js/auth.js"></script>
 
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    const password =
-        document.getElementById("password");
-
-    const toggle =
-        document.getElementById("togglePassword");
-
-    const form =
-        document.getElementById("loginForm");
-
-    const button =
-        document.getElementById("loginButton");
+"use strict";
 
 
-    /* SHOW / HIDE PASSWORD */
+/* ============================================================
+   LASHAWN ACADEMY ADMIN LOGIN
+   ============================================================ */
 
-    toggle.addEventListener("click", function () {
+const SUPABASE_URL =
+    "https://qjfinbftcserrjiedduf.supabase.co";
 
-        if (password.type === "password") {
+const SUPABASE_KEY =
+    "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
 
-            password.type = "text";
 
-            toggle.textContent = "Hide";
+const db = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+        auth: {
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true
+        }
+    }
+);
+
+
+/* Elements */
+
+const form =
+    document.getElementById("adminLoginForm");
+
+const emailInput =
+    document.getElementById("email");
+
+const passwordInput =
+    document.getElementById("password");
+
+const loginButton =
+    document.getElementById("loginButton");
+
+const message =
+    document.getElementById("message");
+
+const showPassword =
+    document.getElementById("showPassword");
+
+
+/* Message */
+
+function showMessage(text, type = "error") {
+
+    message.textContent = text;
+
+    message.className =
+        "message " + type;
+}
+
+
+/* Password visibility */
+
+showPassword.addEventListener(
+    "click",
+    function () {
+
+        if (passwordInput.type === "password") {
+
+            passwordInput.type = "text";
+
+            showPassword.textContent = "Hide";
 
         } else {
 
-            password.type = "password";
+            passwordInput.type = "password";
 
-            toggle.textContent = "Show";
+            showPassword.textContent = "Show";
 
         }
 
-    });
+    }
+);
 
 
-    /* ENTER KEY / FORM HANDLING */
+/* ============================================================
+   LOGIN
+   ============================================================ */
 
-    form.addEventListener("submit", function () {
+form.addEventListener(
+    "submit",
+    async function (event) {
 
-        button.disabled = true;
+        event.preventDefault();
 
-        button.innerHTML = `
-            <span class="loading">
-                <span class="spinner"></span>
-                Signing in...
-            </span>
-        `;
+        const email =
+            emailInput.value.trim().toLowerCase();
 
-    });
+        const password =
+            passwordInput.value;
 
-});
+
+        if (!email) {
+
+            showMessage(
+                "Please enter your email address."
+            );
+
+            emailInput.focus();
+
+            return;
+        }
+
+
+        if (!password) {
+
+            showMessage(
+                "Please enter your password."
+            );
+
+            passwordInput.focus();
+
+            return;
+        }
+
+
+        loginButton.disabled = true;
+
+        loginButton.innerHTML =
+            '<span class="spinner"></span>Signing in...';
+
+        showMessage(
+            "Authenticating...",
+            "info"
+        );
+
+
+        try {
+
+            /* ---------------------------------------------
+               AUTHENTICATE WITH SUPABASE
+            --------------------------------------------- */
+
+            const {
+                data,
+                error
+            } = await db.auth.signInWithPassword({
+
+                email: email,
+
+                password: password
+
+            });
+
+
+            if (error) {
+
+                console.error(
+                    "Supabase login error:",
+                    error
+                );
+
+                showMessage(
+                    error.message ||
+                    "Invalid email or password."
+                );
+
+                loginButton.disabled = false;
+
+                loginButton.textContent =
+                    "Sign In";
+
+                return;
+            }
+
+
+            if (!data || !data.user) {
+
+                showMessage(
+                    "Login failed. No user was returned."
+                );
+
+                loginButton.disabled = false;
+
+                loginButton.textContent =
+                    "Sign In";
+
+                return;
+            }
+
+
+            const user =
+                data.user;
+
+
+            console.log(
+                "Authenticated user:",
+                user
+            );
+
+
+            /* ---------------------------------------------
+               FIND STAFF PROFILE
+            --------------------------------------------- */
+
+            const {
+                data: staff,
+                error: staffError
+            } = await db
+                .from("staff")
+                .select(`
+                    id,
+                    auth_user_id,
+                    staff_number,
+                    first_name,
+                    last_name,
+                    email,
+                    role,
+                    branch_id,
+                    is_active
+                `)
+                .eq(
+                    "auth_user_id",
+                    user.id
+                )
+                .maybeSingle();
+
+
+            if (staffError) {
+
+                console.error(
+                    "Staff lookup error:",
+                    staffError
+                );
+
+                await db.auth.signOut();
+
+                showMessage(
+                    "Unable to load administrator profile. " +
+                    staffError.message
+                );
+
+                loginButton.disabled = false;
+
+                loginButton.textContent =
+                    "Sign In";
+
+                return;
+            }
+
+
+            if (!staff) {
+
+                await db.auth.signOut();
+
+                showMessage(
+                    "This account is not linked to a Lashawn Academy staff profile."
+                );
+
+                loginButton.disabled = false;
+
+                loginButton.textContent =
+                    "Sign In";
+
+                return;
+            }
+
+
+            /* ---------------------------------------------
+               ACTIVE CHECK
+            --------------------------------------------- */
+
+            if (!staff.is_active) {
+
+                await db.auth.signOut();
+
+                showMessage(
+                    "This administrator account is inactive."
+                );
+
+                loginButton.disabled = false;
+
+                loginButton.textContent =
+                    "Sign In";
+
+                return;
+            }
+
+
+            /* ---------------------------------------------
+               ADMIN CHECK
+            --------------------------------------------- */
+
+            const allowedRoles = [
+                "SUPER_ADMIN",
+                "ADMIN"
+            ];
+
+
+            if (!allowedRoles.includes(staff.role)) {
+
+                await db.auth.signOut();
+
+                showMessage(
+                    "You do not have administrator access."
+                );
+
+                loginButton.disabled = false;
+
+                loginButton.textContent =
+                    "Sign In";
+
+                return;
+            }
+
+
+            /* ---------------------------------------------
+               SAVE STAFF SESSION
+            --------------------------------------------- */
+
+            sessionStorage.setItem(
+                "lashawn_staff",
+                JSON.stringify(staff)
+            );
+
+
+            showMessage(
+                "Welcome " +
+                staff.first_name +
+                ". Opening administration dashboard...",
+                "success"
+            );
+
+
+            /* ---------------------------------------------
+               ADMIN DASHBOARD
+            --------------------------------------------- */
+
+            setTimeout(
+                function () {
+
+                    window.location.href =
+                        "dashboard.html";
+
+                },
+                700
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Admin login exception:",
+                error
+            );
+
+            try {
+                await db.auth.signOut();
+            } catch (e) {}
+
+            showMessage(
+                error.message ||
+                "Unable to sign in."
+            );
+
+            loginButton.disabled = false;
+
+            loginButton.textContent =
+                "Sign In";
+        }
+
+    }
+);
 
 </script>
 
