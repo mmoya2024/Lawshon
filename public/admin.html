@@ -269,10 +269,6 @@ async function loadReference(){
   $("drivingClass").innerHTML='<option value="">Select Class</option>'+DRIVING.map(i=>`<option value="${esc(i.id)}">${esc(i.class_code)} — ${esc(i.class_name)}</option>`).join("");
   $("computerCourse").innerHTML='<option value="">Select Course</option>'+COMPUTER.map(i=>`<option value="${esc(i.id)}">${esc(i.course_code)} — ${esc(i.course_name)}</option>`).join("");
   renderServices();
-  if(!DRIVING.length||!COMPUTER.length||!FEES.length){
-    const m=`Loaded: ${DRIVING.length} driving classes, ${COMPUTER.length} computer courses, ${FEES.length} fee structures. Empty lists usually mean a Supabase RLS policy is blocking reads or no active rows exist.`;
-    console.warn(m); setStatus("● Connected — "+m,"bad");
-  }
 }
 
 /* ---------- Enrolment form ---------- */
