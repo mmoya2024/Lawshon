@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color"
+          content="#0f172a">
+
+    <title>Admin Login | Lashawn Academy</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0f172a 0%,
+                    #172554 50%,
+                    #0f172a 100%
+                );
+
+            color: #0f172a;
+            padding: 20px;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .brand {
+            text-align: center;
+            color: white;
+            margin-bottom: 24px;
+        }
+
+        .brand-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 14px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: white;
+            border-radius: 20px;
+
+            font-size: 38px;
+
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .brand h1 {
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            margin-top: 6px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 34px;
+
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, 0.30);
+        }
+
+        .login-title {
+            margin-bottom: 25px;
+        }
+
+        .login-title h2 {
+            font-size: 22px;
+            font-weight: 750;
+            color: #111827;
+        }
+
+        .login-title p {
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 19px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+
+            font-size: 14px;
+            font-weight: 650;
+            color: #334155;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            height: 48px;
+
+            padding: 0 14px;
+
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+
+            font-size: 15px;
+            color: #0f172a;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s,
+                box-shadow 0.2s;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        #password {
+            padding-right: 70px;
+        }
+
+        .toggle-password {
+            position: absolute;
+
+            right: 10px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            border: none;
+            background: transparent;
+
+            color: #2563eb;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .login-button {
+            width: 100%;
+            height: 50px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: #2563eb;
+            color: white;
+
+            font-size: 15px;
+            font-weight: 750;
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s,
+                transform 0.1s;
+        }
+
+        .login-button:hover {
+            background: #1d4ed8;
+        }
+
+        .login-button:active {
+            transform: scale(0.99);
+        }
+
+        .login-button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .message {
+            min-height: 22px;
+
+            margin-bottom: 16px;
+
+            padding: 0;
+
+            font-size: 13px;
+            line-height: 1.5;
+
+            text-align: center;
+        }
+
+        .message.error {
+            color: #dc2626;
+        }
+
+        .message.success {
+            color: #16a34a;
+        }
+
+        .message.info {
+            color: #2563eb;
+        }
+
+        .security-note {
+            margin-top: 22px;
+
+            padding-top: 18px;
+
+            border-top: 1px solid #e2e8f0;
+
+            text-align: center;
+
+            color: #64748b;
+
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .back-link {
+            display: block;
+
+            margin-top: 20px;
+
+            text-align: center;
+
+            color: #cbd5e1;
+
+            text-decoration: none;
+
+            font-size: 13px;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: white;
+
+            border-radius: 50%;
+
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .login-card {
+                padding: 26px 22px;
+            }
+
+            .brand h1 {
+                font-size: 23px;
+            }
+
+            .brand-icon {
+                width: 62px;
+                height: 62px;
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-wrapper">
+
+    <!-- BRAND -->
+    <div class="brand">
+
+        <div class="brand-icon">
+            🎓
+        </div>
+
+        <h1>Lashawn Academy</h1>
+
+        <p>
+            Driving & Computer College
+        </p>
+
+    </div>
+
+
+    <!-- LOGIN CARD -->
+    <div class="login-card">
+
+        <div class="login-title">
+
+            <h2>Administrator Login</h2>
+
+            <p>
+                Sign in to access the Lashawn Academy management system.
+            </p>
+
+        </div>
+
+
+        <form id="loginForm">
+
+            <!-- EMAIL -->
+            <div class="form-group">
+
+                <label for="email">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="admin@lashawnacademy.com"
+                    autocomplete="username"
+                    required
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <div class="input-wrapper">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        id="togglePassword"
+                        class="toggle-password"
+                    >
+                        Show
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- MESSAGE -->
+            <div
+                id="message"
+                class="message"
+                aria-live="polite"
+            ></div>
+
+
+            <!-- LOGIN -->
+            <button
+                type="submit"
+                id="loginButton"
+                class="login-button"
+            >
+                Sign In
+            </button>
+
+        </form>
+
+
+        <div class="security-note">
+
+            🔒 Secure staff access<br>
+
+            Only authorized Lashawn Academy staff can access
+            the administration system.
+
+        </div>
+
+    </div>
+
+
+    <a
+        href="index.html"
+        class="back-link"
+    >
+        ← Back to Lashawn Academy
+    </a>
+
+</div>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- YOUR SUPABASE CLIENT -->
+<script src="js/supabase.js"></script>
+
+<!-- YOUR AUTHENTICATION LOGIC -->
+<script src="js/auth.js"></script>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const password =
+        document.getElementById("password");
+
+    const toggle =
+        document.getElementById("togglePassword");
+
+    const form =
+        document.getElementById("loginForm");
+
+    const button =
+        document.getElementById("loginButton");
+
+
+    /* SHOW / HIDE PASSWORD */
+
+    toggle.addEventListener("click", function () {
+
+        if (password.type === "password") {
+
+            password.type = "text";
+
+            toggle.textContent = "Hide";
+
+        } else {
+
+            password.type = "password";
+
+            toggle.textContent = "Show";
+
+        }
+
+    });
+
+
+    /* ENTER KEY / FORM HANDLING */
+
+    form.addEventListener("submit", function () {
+
+        button.disabled = true;
+
+        button.innerHTML = `
+            <span class="loading">
+                <span class="spinner"></span>
+                Signing in...
+            </span>
+        `;
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>
