@@ -50,6 +50,10 @@
             font-weight: 700;
         }
 
+        .logout:hover {
+            background: #b91c1c;
+        }
+
         .layout {
             display: flex;
             min-height: calc(100vh - 70px);
@@ -80,8 +84,16 @@
             padding: 30px;
         }
 
-        .welcome {
+        .top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
             margin-bottom: 25px;
+        }
+
+        .welcome {
+            margin: 0;
         }
 
         .welcome h1 {
@@ -91,13 +103,32 @@
 
         .welcome p {
             color: #64748b;
+            margin-bottom: 0;
+        }
+
+        .refresh-btn {
+            border: 0;
+            background: #2563eb;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .refresh-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .refresh-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
         }
 
         .cards {
             display: grid;
             grid-template-columns:
                 repeat(auto-fit, minmax(200px, 1fr));
-
             gap: 20px;
         }
 
@@ -121,6 +152,12 @@
             font-weight: 800;
         }
 
+        .card-note {
+            margin-top: 8px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
         #loading {
             min-height: 100vh;
 
@@ -138,9 +175,23 @@
             display: none;
         }
 
-        .error {
-            color: #fca5a5;
-            margin-top: 10px;
+        .stats-error {
+            display: none;
+            margin-top: 20px;
+            padding: 12px 15px;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            display: none;
+            margin-top: 20px;
+            padding: 12px 15px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 8px;
             font-size: 14px;
         }
 
@@ -156,6 +207,15 @@
 
             .admin-info span {
                 display: none;
+            }
+
+            .top-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .refresh-btn {
+                width: 100%;
             }
         }
     </style>
@@ -246,18 +306,29 @@
 
         <main class="main">
 
-            <div class="welcome">
+            <div class="top-row">
 
-                <h1>
-                    Dashboard
-                </h1>
+                <div class="welcome">
 
-                <p>
-                    Welcome back,
-                    <strong id="welcomeName">
-                        Administrator
-                    </strong>
-                </p>
+                    <h1>
+                        Dashboard
+                    </h1>
+
+                    <p>
+                        Welcome back,
+                        <strong id="welcomeName">
+                            Administrator
+                        </strong>
+                    </p>
+
+                </div>
+
+                <button
+                    class="refresh-btn"
+                    id="refreshButton"
+                >
+                    🔄 Refresh Dashboard
+                </button>
 
             </div>
 
@@ -265,6 +336,7 @@
             <div class="cards">
 
                 <div class="card">
+
                     <div class="card-title">
                         Active Students
                     </div>
@@ -275,10 +347,16 @@
                     >
                         —
                     </div>
+
+                    <div class="card-note">
+                        Currently active students
+                    </div>
+
                 </div>
 
 
                 <div class="card">
+
                     <div class="card-title">
                         Approaching 6 Weeks
                     </div>
@@ -289,10 +367,16 @@
                     >
                         —
                     </div>
+
+                    <div class="card-note">
+                        Training ending within 7 days
+                    </div>
+
                 </div>
 
 
                 <div class="card">
+
                     <div class="card-title">
                         Over 6 Weeks
                     </div>
@@ -303,10 +387,16 @@
                     >
                         —
                     </div>
+
+                    <div class="card-note">
+                        Active training past expected end date
+                    </div>
+
                 </div>
 
 
                 <div class="card">
+
                     <div class="card-title">
                         Test Ready
                     </div>
@@ -317,8 +407,29 @@
                     >
                         —
                     </div>
+
+                    <div class="card-note">
+                        Students marked ready for testing
+                    </div>
+
                 </div>
 
+            </div>
+
+
+            <div
+                id="statsError"
+                class="stats-error"
+            >
+                Unable to load dashboard statistics.
+            </div>
+
+
+            <div
+                id="successMessage"
+                class="success-message"
+            >
+                Dashboard statistics updated successfully.
             </div>
 
         </main>
@@ -359,7 +470,9 @@ const db = supabase.createClient(
 );
 
 
-/* Elements */
+/* ============================================================
+   ELEMENTS
+   ============================================================ */
 
 const loading =
     document.getElementById("loading");
@@ -375,6 +488,138 @@ const welcomeName =
 
 const logoutButton =
     document.getElementById("logoutButton");
+
+const refreshButton =
+    document.getElementById("refreshButton");
+
+const activeStudents =
+    document.getElementById("activeStudents");
+
+const approaching =
+    document.getElementById("approaching");
+
+const overdue =
+    document.getElementById("overdue");
+
+const testReady =
+    document.getElementById("testReady");
+
+const statsError =
+    document.getElementById("statsError");
+
+const successMessage =
+    document.getElementById("successMessage");
+
+
+/* ============================================================
+   LOAD DASHBOARD STATISTICS
+   ============================================================ */
+
+async function loadDashboardStats(showSuccess = false) {
+
+    statsError.style.display = "none";
+
+    if (showSuccess) {
+        successMessage.style.display = "none";
+    }
+
+    try {
+
+        const {
+            data,
+            error
+        } = await db.rpc(
+            "get_admin_dashboard_stats"
+        );
+
+
+        if (error) {
+
+            console.error(
+                "Dashboard statistics error:",
+                error
+            );
+
+            activeStudents.textContent = "0";
+            approaching.textContent = "0";
+            overdue.textContent = "0";
+            testReady.textContent = "0";
+
+            statsError.textContent =
+                "Dashboard statistics could not be loaded. Please check the Supabase dashboard function.";
+
+            statsError.style.display = "block";
+
+            return;
+        }
+
+
+        console.log(
+            "Dashboard statistics:",
+            data
+        );
+
+
+        /*
+         * The database function returns:
+         *
+         * {
+         *   activeStudents: 0,
+         *   approaching: 0,
+         *   overdue: 0,
+         *   testReady: 0
+         * }
+         */
+
+
+        activeStudents.textContent =
+            data?.activeStudents ?? 0;
+
+        approaching.textContent =
+            data?.approaching ?? 0;
+
+        overdue.textContent =
+            data?.overdue ?? 0;
+
+        testReady.textContent =
+            data?.testReady ?? 0;
+
+
+        if (showSuccess) {
+
+            successMessage.style.display =
+                "block";
+
+            setTimeout(
+                function () {
+                    successMessage.style.display =
+                        "none";
+                },
+                3000
+            );
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Failed to load dashboard statistics:",
+            error
+        );
+
+        activeStudents.textContent = "0";
+        approaching.textContent = "0";
+        overdue.textContent = "0";
+        testReady.textContent = "0";
+
+        statsError.textContent =
+            "An unexpected error occurred while loading dashboard statistics.";
+
+        statsError.style.display =
+            "block";
+    }
+}
 
 
 /* ============================================================
@@ -393,7 +638,10 @@ async function checkAdmin() {
 
         if (sessionError) {
 
-            console.error(sessionError);
+            console.error(
+                "Session error:",
+                sessionError
+            );
 
             window.location.href =
                 "admin-login.html";
@@ -408,6 +656,10 @@ async function checkAdmin() {
 
         if (!session) {
 
+            console.log(
+                "No authenticated session."
+            );
+
             window.location.href =
                 "admin-login.html";
 
@@ -421,9 +673,9 @@ async function checkAdmin() {
         );
 
 
-        /* ---------------------------------------------
+        /* ====================================================
            GET STAFF PROFILE
-        --------------------------------------------- */
+           ==================================================== */
 
         const {
             data: staff,
@@ -455,8 +707,28 @@ async function checkAdmin() {
                 staffError
             );
 
-            window.location.href =
-                "admin-login.html";
+            /*
+             * Do not automatically sign the user out
+             * simply because of a database/RLS error.
+             */
+
+            loading.innerHTML = `
+                <div style="text-align:center;padding:20px;">
+                    <strong>Unable to verify administrator profile.</strong>
+                    <br><br>
+                    <button
+                        onclick="window.location.href='admin-login.html'"
+                        style="
+                            padding:10px 18px;
+                            border:0;
+                            border-radius:7px;
+                            cursor:pointer;
+                        "
+                    >
+                        Return to Login
+                    </button>
+                </div>
+            `;
 
             return;
         }
@@ -465,7 +737,7 @@ async function checkAdmin() {
         if (!staff) {
 
             console.error(
-                "No staff profile found."
+                "No staff profile found for authenticated user."
             );
 
             await db.auth.signOut();
@@ -477,11 +749,15 @@ async function checkAdmin() {
         }
 
 
-        /* ---------------------------------------------
+        /* ====================================================
            ACTIVE CHECK
-        --------------------------------------------- */
+           ==================================================== */
 
         if (!staff.is_active) {
+
+            console.error(
+                "Staff account is inactive."
+            );
 
             await db.auth.signOut();
 
@@ -492,9 +768,9 @@ async function checkAdmin() {
         }
 
 
-        /* ---------------------------------------------
+        /* ====================================================
            ADMIN ROLE CHECK
-        --------------------------------------------- */
+           ==================================================== */
 
         const adminRoles = [
             "SUPER_ADMIN",
@@ -504,6 +780,11 @@ async function checkAdmin() {
 
         if (!adminRoles.includes(staff.role)) {
 
+            console.error(
+                "User does not have administrator role:",
+                staff.role
+            );
+
             await db.auth.signOut();
 
             window.location.href =
@@ -513,9 +794,9 @@ async function checkAdmin() {
         }
 
 
-        /* ---------------------------------------------
-           SAVE SESSION
-        --------------------------------------------- */
+        /* ====================================================
+           SAVE STAFF SESSION
+           ==================================================== */
 
         sessionStorage.setItem(
             "lashawn_staff",
@@ -523,33 +804,43 @@ async function checkAdmin() {
         );
 
 
-        /* ---------------------------------------------
-           DISPLAY ADMIN
-        --------------------------------------------- */
+        /* ====================================================
+           DISPLAY ADMIN NAME
+           ==================================================== */
 
         const fullName =
-            staff.first_name +
-            " " +
-            staff.last_name;
+            [
+                staff.first_name,
+                staff.last_name
+            ]
+            .filter(Boolean)
+            .join(" ");
 
 
         adminName.textContent =
-            fullName;
+            fullName || "Administrator";
 
 
         welcomeName.textContent =
-            fullName;
+            fullName || "Administrator";
 
 
-        /* ---------------------------------------------
+        /* ====================================================
            SHOW DASHBOARD
-        --------------------------------------------- */
+           ==================================================== */
 
         loading.style.display =
             "none";
 
         dashboard.style.display =
             "block";
+
+
+        /* ====================================================
+           LOAD DATABASE STATISTICS
+           ==================================================== */
+
+        await loadDashboardStats();
 
 
         console.log(
@@ -572,6 +863,31 @@ async function checkAdmin() {
 
 
 /* ============================================================
+   REFRESH DASHBOARD
+   ============================================================ */
+
+refreshButton.addEventListener(
+    "click",
+    async function () {
+
+        refreshButton.disabled =
+            true;
+
+        refreshButton.textContent =
+            "⏳ Loading...";
+
+        await loadDashboardStats(true);
+
+        refreshButton.disabled =
+            false;
+
+        refreshButton.textContent =
+            "🔄 Refresh Dashboard";
+    }
+);
+
+
+/* ============================================================
    LOGOUT
    ============================================================ */
 
@@ -591,7 +907,18 @@ logoutButton.addEventListener(
         );
 
 
-        await db.auth.signOut();
+        const {
+            error
+        } = await db.auth.signOut();
+
+
+        if (error) {
+
+            console.error(
+                "Logout error:",
+                error
+            );
+        }
 
 
         window.location.href =
@@ -600,7 +927,40 @@ logoutButton.addEventListener(
 );
 
 
-/* START */
+/* ============================================================
+   AUTH STATE MONITOR
+   ============================================================ */
+
+db.auth.onAuthStateChange(
+    function (event, session) {
+
+        console.log(
+            "Auth state changed:",
+            event
+        );
+
+
+        if (
+            event === "SIGNED_OUT" &&
+            !window.location.pathname.endsWith(
+                "admin-login.html"
+            )
+        ) {
+
+            sessionStorage.removeItem(
+                "lashawn_staff"
+            );
+
+            window.location.href =
+                "admin-login.html";
+        }
+    }
+);
+
+
+/* ============================================================
+   START
+   ============================================================ */
 
 checkAdmin();
 
