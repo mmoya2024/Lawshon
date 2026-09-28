@@ -137,7 +137,7 @@ input[readonly]{background:#f5f7fa}
   <section class="panel" id="panel-fees">
     <p class="lede">Invoices with totals, payments and balances.</p>
     <div class="card"><div class="table-wrap"><table class="table">
-      <thead><tr><th>Invoice</th><th>Student</th><th>Enrolment</th><th>Programme</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead>
+      <thead><tr><th>Invoice</th><th>Student</th><th>Enrolment</th><th>Programme</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th></th></tr></thead>
       <tbody id="feesTable"></tbody>
     </table></div></div>
   </section>
@@ -145,7 +145,7 @@ input[readonly]{background:#f5f7fa}
   <section class="panel" id="panel-payments">
     <p class="lede">Confirmed payments recorded by the office.</p>
     <div class="card"><div class="table-wrap"><table class="table">
-      <thead><tr><th>Payment No.</th><th>Date</th><th>Student</th><th>Method</th><th>Reference</th><th>Amount</th></tr></thead>
+      <thead><tr><th>Payment No.</th><th>Date</th><th>Student</th><th>Method</th><th>Reference</th><th>Amount</th><th></th></tr></thead>
       <tbody id="paymentsTable"></tbody>
     </table></div></div>
   </section>
@@ -165,6 +165,21 @@ input[readonly]{background:#f5f7fa}
   <div class="receipt" id="receiptContent"></div>
   <div class="actions"><button class="btn" onclick="window.print()">Print</button><button class="btn outline" id="closeReceipt">Close</button></div>
 </div></div>
+<div class="modal" id="payModal"><div class="modal-box" style="width:min(460px,100%)">
+  <h2 style="margin-top:0">Receive Payment</h2>
+  <div id="payInfo" class="hint" style="margin:0 0 14px"></div>
+  <div id="payErr"></div>
+  <form id="payForm">
+    <div class="form-grid" style="grid-template-columns:1fr">
+      <div class="form-group"><label>Amount *</label><input id="payAmount" type="number" min="0.01" step="0.01" required></div>
+      <div class="form-group"><label>Payment Method</label>
+        <select id="payMethod"><option value="CASH">Cash</option><option value="MPESA">M-Pesa</option><option value="BANK">Bank Transfer</option><option value="CARD">Card</option><option value="CHEQUE">Cheque</option><option value="OTHER">Other</option></select></div>
+      <div class="form-group"><label>Reference</label><input id="payRef" placeholder="M-Pesa code / receipt / cheque no."></div>
+      <div class="form-group"><label>Notes</label><input id="payNotes"></div>
+    </div>
+    <div class="actions"><button class="btn" type="submit" id="payBtn">Save &amp; Issue Receipt</button><button class="btn outline" type="button" id="payCancel">Cancel</button></div>
+  </form>
+</div></div>
 <div id="toast"></div>
 
 <script>
@@ -179,6 +194,7 @@ const T = {
   status:"academy_student_training_status", balances:"student_balances"
 };
 
+let INVOICES=[], PAYS=[], PAY_INV=null;
 let DRIVING=[], COMPUTER=[], FEES=[], STUDENT_ROWS=[];
 let CALC={unit:0,qty:1,total:0,paid:0,balance:0};
 
@@ -394,9 +410,10 @@ function renderStudents(){
 /* ---------- Fees ---------- */
 async function loadFees(){
   const {data,error}=await DB.from(T.invoices)
-    .select("id,invoice_number,total_amount,amount_paid,balance,status,students(student_number,first_name,last_name),enrolments(enrolment_number,programme)")
+    .select("id,invoice_number,student_id,enrolment_id,total_amount,amount_paid,balance,status,students(student_number,first_name,last_name),enrolments(enrolment_number,programme)")
     .order("created_at",{ascending:false}).limit(1000);
   if(error) throw error;
+  INVOICES=data||[];
   $("feesTable").innerHTML=(data||[]).length?data.map(i=>{
     const total=Number(i.total_amount||0), paid=Number(i.amount_paid||0), bal=Number(i.balance||0);
     const [st,cls]=bal<=0?["PAID","green"]:paid>0?["PARTIAL","yellow"]:["PENDING","red"];
@@ -404,22 +421,25 @@ async function loadFees(){
       <td>${esc(i.students?.student_number||"—")} · ${esc(fullName(i.students))}</td>
       <td>${esc(i.enrolments?.enrolment_number||"—")}</td><td>${esc(i.enrolments?.programme||"—")}</td>
       <td>${money(total)}</td><td>${money(paid)}</td><td>${money(bal)}</td>
-      <td><span class="pill ${cls}">${st}</span></td></tr>`;
-  }).join(""):empty(8,"No invoices found.");
+      <td><span class="pill ${cls}">${st}</span></td>
+      <td>${bal>0?`<button class="btn outline" data-pay="${esc(i.id)}">Receive Payment</button>`:""}</td></tr>`;
+  }).join(""):empty(9,"No invoices found.");
 }
 
 /* ---------- Payments ---------- */
 async function loadPayments(){
   const {data,error}=await DB.from(T.payments)
-    .select("payment_number,payment_date,amount,payment_method,transaction_reference,mpesa_receipt_number,students(student_number,first_name,last_name)")
+    .select("id,payment_number,payment_date,amount,payment_method,transaction_reference,mpesa_receipt_number,students(student_number,first_name,middle_name,last_name),enrolments(enrolment_number,programme),invoices(invoice_number)")
     .eq("status","CONFIRMED").order("payment_date",{ascending:false}).limit(1000);
   if(error) throw error;
-  $("paymentsTable").innerHTML=(data||[]).length?data.map(p=>`<tr>
+  PAYS=data||[];
+  $("paymentsTable").innerHTML=PAYS.length?PAYS.map((p,n)=>`<tr>
     <td>${esc(p.payment_number||"—")}</td><td>${fmtDate(p.payment_date)}</td>
     <td>${esc(p.students?.student_number||"—")} · ${esc(fullName(p.students))}</td>
     <td>${esc(p.payment_method||"—")}</td>
     <td>${esc(p.transaction_reference||p.mpesa_receipt_number||"—")}</td>
-    <td>${money(p.amount)}</td></tr>`).join(""):empty(6,"No confirmed payments.");
+    <td>${money(p.amount)}</td>
+    <td><button class="btn outline" data-receipt="${n}">Receipt</button></td></tr>`).join(""):empty(7,"No confirmed payments.");
 }
 
 /* ---------- Services ---------- */
@@ -440,10 +460,70 @@ function showReceipt(d){
     ${row("Payment No.",d.payment?.payment_number||"—")}${row("Date",fmtDate(d.payment?.payment_date))}
     ${row("Student No.",d.student?.student_number||"—")}${row("Enrolment No.",d.enrolment?.enrolment_number||"—")}
     ${row("Student",fullName(d.student))}${row("Programme",d.enrolment?.programme||"—")}<hr>
-    ${row("Amount Received",money(d.paid))}${row("Method",d.method)}${row("Reference",d.reference||"—")}<hr>
+    ${d.invoice?.invoice_number?row("Invoice No.",d.invoice.invoice_number):""}${row("Amount Received",money(d.paid))}${d.balance!=null?row("Balance Remaining",money(d.balance)):""}${row("Method",d.method)}${row("Reference",d.reference||"—")}<hr>
     <p style="text-align:center;font-size:12px">Thank you for choosing Lashawn Academy.</p>`;
   $("receiptModal").classList.add("open");
 }
+
+/* ---------- Receipting ---------- */
+function payErr(m){ $("payErr").innerHTML=m?`<div class="notice err">${esc(m)}</div>`:""; }
+function openPay(id){
+  const inv=INVOICES.find(x=>x.id===id); if(!inv) return;
+  PAY_INV=id; payErr("");
+  $("payForm").reset();
+  $("payAmount").value=Number(inv.balance||0);
+  $("payInfo").textContent=`${inv.invoice_number||"Invoice"} · ${inv.students?.student_number||""} ${fullName(inv.students)} · Balance ${money(inv.balance)}`;
+  $("payModal").classList.add("open");
+}
+async function submitPay(e){
+  e.preventDefault(); payErr("");
+  const inv=INVOICES.find(x=>x.id===PAY_INV); if(!inv) return;
+  const amt=Number($("payAmount").value||0), bal=Number(inv.balance||0);
+  if(amt<=0) return payErr("Enter an amount.");
+  if(amt>bal) return payErr("Amount exceeds the balance of "+money(bal));
+  $("payBtn").disabled=true; $("payBtn").textContent="Saving...";
+  try{
+    const {data:p,error}=await DB.from(T.payments).insert({
+      student_id:inv.student_id, enrolment_id:inv.enrolment_id, invoice_id:inv.id,
+      amount:amt, payment_method:$("payMethod").value,
+      transaction_reference:$("payRef").value.trim()||null,
+      status:"CONFIRMED", notes:$("payNotes").value.trim()||"Payment received"
+    }).select("payment_number,payment_date").single();
+    if(error) throw error;
+
+    /* If no database trigger updated the invoice, update it here */
+    const total=Number(inv.total_amount||0), expected=Number(inv.amount_paid||0)+amt;
+    const {data:cur}=await DB.from(T.invoices).select("amount_paid").eq("id",inv.id).single();
+    if(Number(cur?.amount_paid||0)<expected){
+      const {error:ue}=await DB.from(T.invoices).update({
+        amount_paid:expected, balance:Math.max(0,total-expected),
+        status:expected>=total?"PAID":"PARTIAL"
+      }).eq("id",inv.id);
+      if(ue) throw new Error("Payment "+p.payment_number+" saved but invoice update failed: "+ue.message);
+    }
+    $("payModal").classList.remove("open");
+    showReceipt({
+      payment:p, paid:amt, student:inv.students, enrolment:inv.enrolments,
+      invoice:inv, balance:Math.max(0,total-expected),
+      method:$("payMethod").value, reference:$("payRef").value.trim()
+    });
+    toast("Payment recorded");
+    await loadFees();
+  }catch(err){
+    console.error(err); payErr(err.message||"Could not save payment.");
+  }finally{
+    $("payBtn").disabled=false; $("payBtn").textContent="Save & Issue Receipt";
+  }
+}
+$("feesTable").addEventListener("click",e=>{ const b=e.target.closest("[data-pay]"); if(b) openPay(b.dataset.pay); });
+$("paymentsTable").addEventListener("click",e=>{
+  const b=e.target.closest("[data-receipt]"); if(!b) return;
+  const p=PAYS[b.dataset.receipt];
+  showReceipt({payment:p,paid:p.amount,student:p.students,enrolment:p.enrolments,invoice:p.invoices,
+    method:p.payment_method,reference:p.transaction_reference||p.mpesa_receipt_number||""});
+});
+$("payForm").addEventListener("submit",submitPay);
+$("payCancel").addEventListener("click",()=>$("payModal").classList.remove("open"));
 
 /* ---------- Navigation ---------- */
 const LOADERS={overview:loadOverview,students:loadStudents,fees:loadFees,payments:loadPayments};
