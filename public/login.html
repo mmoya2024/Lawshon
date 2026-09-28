@@ -19,8 +19,13 @@
             box-sizing: border-box;
         }
 
+        html,
         body {
             margin: 0;
+            min-height: 100%;
+        }
+
+        body {
             min-height: 100vh;
             font-family:
                 Inter,
@@ -53,7 +58,7 @@
 
         .brand {
             text-align: center;
-            color: white;
+            color: #fff;
             margin-bottom: 20px;
         }
 
@@ -61,7 +66,7 @@
             height: 84px;
             max-width: 160px;
             object-fit: contain;
-            background: white;
+            background: #fff;
             padding: 4px;
             border-radius: 12px;
             margin-bottom: 10px;
@@ -84,7 +89,7 @@
         }
 
         .card {
-            background: white;
+            background: #fff;
             border-radius: 18px;
             padding: 30px;
             box-shadow: 0 25px 70px rgba(0, 0, 0, .28);
@@ -121,6 +126,7 @@
             outline: none;
             font: inherit;
             color: var(--text);
+            background: #fff;
         }
 
         .field input:focus {
@@ -144,8 +150,8 @@
             border: 0;
             background: transparent;
             color: var(--blue);
-            font-weight: 700;
             font-size: 12px;
+            font-weight: 700;
             cursor: pointer;
         }
 
@@ -155,7 +161,7 @@
             border-radius: 10px;
             padding: 13px 16px;
             background: var(--blue);
-            color: white;
+            color: #fff;
             font-size: 15px;
             font-weight: 800;
             cursor: pointer;
@@ -168,10 +174,10 @@
 
         .forgot-button {
             width: 100%;
+            margin-top: 14px;
             border: 0;
             background: transparent;
             color: var(--blue);
-            margin-top: 14px;
             cursor: pointer;
             font-size: 13px;
         }
@@ -212,7 +218,7 @@
         }
 
         .footer a {
-            color: white;
+            color: #fff;
             text-decoration: none;
         }
 
@@ -221,7 +227,7 @@
             width: 15px;
             height: 15px;
             border: 2px solid rgba(255,255,255,.4);
-            border-top-color: white;
+            border-top-color: #fff;
             border-radius: 50%;
             animation: spin .7s linear infinite;
             vertical-align: -3px;
@@ -362,9 +368,7 @@
 </div>
 
 
-<!-- =========================================================
-     SUPABASE CDN
-     ========================================================= -->
+<!-- SUPABASE -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -374,7 +378,7 @@
 
 
 /* =========================================================
-   LASHAWN SUPABASE CONFIGURATION
+   SUPABASE
    ========================================================= */
 
 const SUPABASE_URL =
@@ -384,52 +388,32 @@ const SUPABASE_KEY =
     "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
 
 
-/* =========================================================
-   CREATE SUPABASE CLIENT DIRECTLY
-   ========================================================= */
-
 let DB = null;
 
 
-console.log("======================================");
-console.log("LASHAWN LOGIN STARTING");
-console.log("======================================");
-
-
-if (
-    typeof window.supabase === "undefined"
-) {
+if (typeof window.supabase === "undefined") {
 
     console.error(
-        "Supabase CDN did not load."
+        "Supabase CDN failed to load."
     );
 
 } else {
 
     try {
 
-        DB =
-            window.supabase.createClient(
-                SUPABASE_URL,
-                SUPABASE_KEY
-            );
-
-
-        console.log(
-            "Lashawn Supabase client created successfully."
+        DB = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
         );
 
-
         console.log(
-            "Supabase URL:",
-            SUPABASE_URL
+            "Lashawn login Supabase client ready."
         );
-
 
     } catch (error) {
 
         console.error(
-            "Failed to create Supabase client:",
+            "Supabase client creation failed:",
             error
         );
 
@@ -445,19 +429,19 @@ if (
 const notice =
     document.getElementById("notice");
 
-const loginForm =
+const form =
     document.getElementById("loginForm");
 
-const emailInput =
+const email =
     document.getElementById("email");
 
-const passwordInput =
+const password =
     document.getElementById("password");
 
 const loginButton =
     document.getElementById("loginButton");
 
-const showPasswordButton =
+const showPassword =
     document.getElementById("showPassword");
 
 const forgotButton =
@@ -468,38 +452,27 @@ const forgotButton =
    NOTICE
    ========================================================= */
 
-function showNotice(message, type) {
+function message(text, type) {
 
     notice.className =
         "notice " + type;
 
     notice.textContent =
-        message;
-
-}
-
-
-function clearNotice() {
-
-    notice.className =
-        "hidden";
-
-    notice.textContent =
-        "";
+        text;
 
 }
 
 
 /* =========================================================
-   BUTTON
+   BUSY
    ========================================================= */
 
-function setBusy(busy) {
+function setBusy(value) {
 
     loginButton.disabled =
-        busy;
+        value;
 
-    if (busy) {
+    if (value) {
 
         loginButton.innerHTML =
             '<span class="spinner"></span>Signing in...';
@@ -515,52 +488,49 @@ function setBusy(busy) {
 
 
 /* =========================================================
-   STAFF ROLE CHECK
+   STAFF ACCESS
    ========================================================= */
 
-function hasOfficeAdminAccess(user) {
+function isStaff(user) {
 
     if (!user) {
         return false;
     }
 
-
     const app =
         user.app_metadata || {};
 
-    const metadata =
+    const meta =
         user.user_metadata || {};
 
 
     const role =
         app.role ||
-        metadata.role ||
+        meta.role ||
         "";
-
 
     const accountType =
         app.account_type ||
-        metadata.account_type ||
+        meta.account_type ||
         "";
 
-
     const officeRole =
-        metadata.office_role ||
+        meta.office_role ||
         "";
 
 
     console.log(
-        "User role:",
+        "ROLE:",
         role
     );
 
     console.log(
-        "Account type:",
+        "ACCOUNT TYPE:",
         accountType
     );
 
     console.log(
-        "Office role:",
+        "OFFICE ROLE:",
         officeRole
     );
 
@@ -568,11 +538,9 @@ function hasOfficeAdminAccess(user) {
     return (
 
         role === "admin" ||
-
         role === "staff" ||
 
         accountType === "admin" ||
-
         accountType === "staff" ||
 
         officeRole === "Office Admin"
@@ -583,22 +551,19 @@ function hasOfficeAdminAccess(user) {
 
 
 /* =========================================================
-   ERROR MESSAGE
+   ERROR
    ========================================================= */
 
-function getErrorMessage(error) {
+function errorMessage(error) {
 
-    if (!error) {
-        return "Unable to sign in.";
-    }
-
-
-    const message =
-        error.message || "";
+    const text =
+        error && error.message
+            ? error.message
+            : "Unable to sign in.";
 
 
     const lower =
-        message.toLowerCase();
+        text.toLowerCase();
 
 
     if (
@@ -618,7 +583,7 @@ function getErrorMessage(error) {
         )
     ) {
 
-        return "The email address has not been confirmed.";
+        return "Email confirmation is required.";
 
     }
 
@@ -634,18 +599,7 @@ function getErrorMessage(error) {
     }
 
 
-    if (
-        lower.includes(
-            "rate limit"
-        )
-    ) {
-
-        return "Too many login attempts. Please wait and try again.";
-
-    }
-
-
-    return message;
+    return text;
 
 }
 
@@ -658,38 +612,36 @@ async function login(event) {
 
     event.preventDefault();
 
-    clearNotice();
+
+    const emailValue =
+        email.value.trim();
+
+    const passwordValue =
+        password.value;
 
 
-    const email =
-        emailInput.value.trim();
+    if (!emailValue) {
 
-    const password =
-        passwordInput.value;
-
-
-    if (!email) {
-
-        showNotice(
+        message(
             "Please enter your email address.",
             "error"
         );
 
-        emailInput.focus();
+        email.focus();
 
         return;
 
     }
 
 
-    if (!password) {
+    if (!passwordValue) {
 
-        showNotice(
+        message(
             "Please enter your password.",
             "error"
         );
 
-        passwordInput.focus();
+        password.focus();
 
         return;
 
@@ -698,13 +650,9 @@ async function login(event) {
 
     if (!DB) {
 
-        showNotice(
+        message(
             "Supabase connection is unavailable.",
             "error"
-        );
-
-        console.error(
-            "DB is null."
         );
 
         return;
@@ -718,25 +666,18 @@ async function login(event) {
     try {
 
         console.log(
-            "Signing in:",
-            email
+            "Attempting Supabase login..."
         );
 
 
         const result =
             await DB.auth.signInWithPassword({
 
-                email: email,
+                email: emailValue,
 
-                password: password
+                password: passwordValue
 
             });
-
-
-        console.log(
-            "Supabase response:",
-            result
-        );
 
 
         if (result.error) {
@@ -746,50 +687,42 @@ async function login(event) {
         }
 
 
-        if (
-            !result.data ||
-            !result.data.session ||
-            !result.data.user
-        ) {
+        const user =
+            result.data.user;
+
+
+        const session =
+            result.data.session;
+
+
+        if (!user || !session) {
 
             throw new Error(
-                "Authentication succeeded but no session was returned."
+                "Authentication succeeded but no session was created."
             );
 
         }
 
 
-        const user =
-            result.data.user;
-
-
         console.log(
-            "Authenticated:",
+            "LOGIN SUCCESS:",
             user.email
         );
 
 
         console.log(
-            "User ID:",
-            user.id
-        );
-
-
-        console.log(
-            "App metadata:",
-            user.app_metadata
-        );
-
-
-        console.log(
-            "User metadata:",
+            "USER METADATA:",
             user.user_metadata
         );
 
 
-        if (
-            !hasOfficeAdminAccess(user)
-        ) {
+        console.log(
+            "APP METADATA:",
+            user.app_metadata
+        );
+
+
+        if (!isStaff(user)) {
 
             await DB.auth.signOut();
 
@@ -801,11 +734,16 @@ async function login(event) {
         }
 
 
-        showNotice(
+        message(
             "Login successful. Opening Office Admin...",
             "success"
         );
 
+
+        /*
+         * Only redirect AFTER successful authentication
+         * and successful Office Admin access check.
+         */
 
         setTimeout(
             function () {
@@ -814,7 +752,7 @@ async function login(event) {
                     "admin.html";
 
             },
-            500
+            700
         );
 
 
@@ -826,8 +764,8 @@ async function login(event) {
         );
 
 
-        showNotice(
-            getErrorMessage(error),
+        message(
+            errorMessage(error),
             "error"
         );
 
@@ -845,21 +783,18 @@ async function login(event) {
 
 async function forgotPassword() {
 
-    clearNotice();
+    const emailValue =
+        email.value.trim();
 
 
-    const email =
-        emailInput.value.trim();
+    if (!emailValue) {
 
-
-    if (!email) {
-
-        showNotice(
+        message(
             "Enter your email address first.",
             "info"
         );
 
-        emailInput.focus();
+        email.focus();
 
         return;
 
@@ -868,7 +803,7 @@ async function forgotPassword() {
 
     if (!DB) {
 
-        showNotice(
+        message(
             "Supabase connection is unavailable.",
             "error"
         );
@@ -882,11 +817,11 @@ async function forgotPassword() {
 
         const result =
             await DB.auth.resetPasswordForEmail(
-                email,
+                emailValue,
                 {
                     redirectTo:
                         window.location.origin +
-                        window.location.pathname
+                        "/login.html"
                 }
             );
 
@@ -898,7 +833,7 @@ async function forgotPassword() {
         }
 
 
-        showNotice(
+        message(
             "If the account exists, a password reset link has been sent.",
             "success"
         );
@@ -912,8 +847,8 @@ async function forgotPassword() {
         );
 
 
-        showNotice(
-            getErrorMessage(error),
+        message(
+            errorMessage(error),
             "error"
         );
 
@@ -923,31 +858,29 @@ async function forgotPassword() {
 
 
 /* =========================================================
-   SHOW / HIDE PASSWORD
+   SHOW PASSWORD
    ========================================================= */
 
-showPasswordButton.addEventListener(
+showPassword.addEventListener(
     "click",
     function () {
 
-        const isPassword =
-            passwordInput.type === "password";
+        if (
+            password.type === "password"
+        ) {
 
-
-        if (isPassword) {
-
-            passwordInput.type =
+            password.type =
                 "text";
 
-            showPasswordButton.textContent =
+            showPassword.textContent =
                 "Hide";
 
         } else {
 
-            passwordInput.type =
+            password.type =
                 "password";
 
-            showPasswordButton.textContent =
+            showPassword.textContent =
                 "Show";
 
         }
@@ -960,7 +893,7 @@ showPasswordButton.addEventListener(
    EVENTS
    ========================================================= */
 
-loginForm.addEventListener(
+form.addEventListener(
     "submit",
     login
 );
@@ -973,83 +906,15 @@ forgotButton.addEventListener(
 
 
 /* =========================================================
-   CHECK EXISTING SESSION
+   IMPORTANT:
+   NO AUTOMATIC SESSION REDIRECT HERE.
    ========================================================= */
 
-async function checkSession() {
+console.log(
+    "Lashawn login page ready."
+);
 
-    if (!DB) {
-
-        console.error(
-            "Cannot check session because DB is unavailable."
-        );
-
-        return;
-
-    }
-
-
-    try {
-
-        const result =
-            await DB.auth.getSession();
-
-
-        console.log(
-            "Current session:",
-            result.data.session
-        );
-
-
-        if (
-            result.data &&
-            result.data.session &&
-            result.data.session.user
-        ) {
-
-            const user =
-                result.data.session.user;
-
-
-            if (
-                hasOfficeAdminAccess(user)
-            ) {
-
-                console.log(
-                    "Existing Office Admin session found."
-                );
-
-
-                window.location.href =
-                    "admin.html";
-
-
-                return;
-
-            }
-
-
-            await DB.auth.signOut();
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "SESSION CHECK ERROR:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   START
-   ========================================================= */
-
-checkSession();
+email.focus();
 
 </script>
 
