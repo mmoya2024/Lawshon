@@ -3,95 +3,457 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Dashboard — Lashawn Academy</title>
+
 <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
 <div class="dashboard-layout">
 
-  <aside class="sidebar">
-    <div class="brand">🎓 Lashawn Academy</div>
-    <nav>
-      <a href="dashboard.html" class="active"><span class="icon">📊</span> Dashboard</a>
-      <a href="students.html"><span class="icon">👥</span> Students</a>
-      <a href="driving.html"><span class="icon">🚗</span> Driving</a>
-      <a href="computer.html"><span class="icon">💻</span> Computer</a>
-      <a href="printing.html"><span class="icon">🖨️</span> Printing</a>
-      <a href="finance.html"><span class="icon">💰</span> Finance</a>
-      <a href="vehicles.html"><span class="icon">🚙</span> Vehicles</a>
-      <a href="staff.html"><span class="icon">👔</span> Staff</a>
-      <a href="reports.html"><span class="icon">📈</span> Reports</a>
-      <a href="settings.html"><span class="icon">⚙️</span> Settings</a>
-      <a href="#" onclick="window.signOut();return false;"><span class="icon">🚪</span> Logout</a>
-    </nav>
-  </aside>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
 
-  <main class="main-content">
+        <div class="brand">
+            🎓 Lashawn Academy
+        </div>
 
-    <div class="flex-between mb-3">
-      <div>
-        <h2 style="text-align:left;margin:0;">Dashboard</h2>
-        <p class="text-muted" style="margin:0;">Welcome back, <span id="userName">...</span></p>
-      </div>
-      <a href="students.html" class="btn">+ Register Student</a>
-    </div>
+        <nav>
 
-    <!-- STATS -->
-    <div class="grid grid-4 mb-3" id="statsGrid">
-      <div class="stat-card">
-        <span class="stat-label">Active Students</span>
-        <span class="stat-value" id="statActiveStudents">—</span>
-      </div>
-      <div class="stat-card warning">
-        <span class="stat-label">Approaching 6 Weeks</span>
-        <span class="stat-value" id="statApproaching">—</span>
-      </div>
-      <div class="stat-card danger">
-        <span class="stat-label">Over 6 Weeks</span>
-        <span class="stat-value" id="statOverdue">—</span>
-      </div>
-      <div class="stat-card success">
-        <span class="stat-label">Test Ready</span>
-        <span class="stat-value" id="statReady">—</span>
-      </div>
-    </div>
+            <a href="dashboard.html" class="active">
+                <span class="icon">📊</span>
+                Dashboard
+            </a>
 
-    <!-- TRAINING ALERTS -->
-    <div class="card mb-3">
-      <div class="flex-between mb-2">
-        <h3 style="margin:0;">6-Week Training Tracker</h3>
-        <a href="driving.html" class="btn small secondary">View All</a>
-      </div>
-      <div id="trainingAlerts">
-        <p class="text-muted">Loading...</p>
-      </div>
-    </div>
+            <a href="students.html">
+                <span class="icon">👥</span>
+                Students
+            </a>
 
-    <!-- TEST READINESS -->
-    <div class="card mb-3">
-      <div class="flex-between mb-2">
-        <h3 style="margin:0;">Students Due for Test</h3>
-        <a href="driving.html" class="btn small secondary">View All</a>
-      </div>
-      <div id="testReadyList">
-        <p class="text-muted">Loading...</p>
-      </div>
-    </div>
+            <a href="driving.html">
+                <span class="icon">🚗</span>
+                Driving
+            </a>
 
-    <!-- RECENT ACTIVITY -->
-    <div class="card">
-      <h3 style="margin:0 0 1rem;">Recent Activity</h3>
-      <div id="recentActivity">
-        <p class="text-muted">Loading...</p>
-      </div>
-    </div>
+            <a href="computer.html">
+                <span class="icon">💻</span>
+                Computer
+            </a>
 
-  </main>
+            <a href="printing.html">
+                <span class="icon">🖨️</span>
+                Printing
+            </a>
+
+            <a href="finance.html">
+                <span class="icon">💰</span>
+                Finance
+            </a>
+
+            <a href="vehicles.html">
+                <span class="icon">🚙</span>
+                Vehicles
+            </a>
+
+            <a href="staff.html">
+                <span class="icon">👔</span>
+                Staff
+            </a>
+
+            <a href="reports.html">
+                <span class="icon">📈</span>
+                Reports
+            </a>
+
+            <a href="settings.html">
+                <span class="icon">⚙️</span>
+                Settings
+            </a>
+
+            <a href="#" id="logoutLink">
+                <span class="icon">🚪</span>
+                Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <div class="flex-between mb-3">
+
+            <div>
+
+                <h2 style="text-align:left;margin:0;">
+                    Dashboard
+                </h2>
+
+                <p class="text-muted" style="margin:0;">
+                    Welcome back,
+                    <span id="userName">...</span>
+                </p>
+
+            </div>
+
+            <a href="students.html" class="btn">
+                + Register Student
+            </a>
+
+        </div>
+
+
+        <!-- STAT CARDS -->
+        <div class="grid grid-4 mb-3" id="statsGrid">
+
+            <div class="stat-card">
+
+                <span class="stat-label">
+                    Active Students
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="statActiveStudents">
+                    —
+                </span>
+
+            </div>
+
+
+            <div class="stat-card warning">
+
+                <span class="stat-label">
+                    Approaching 6 Weeks
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="statApproaching">
+                    —
+                </span>
+
+            </div>
+
+
+            <div class="stat-card danger">
+
+                <span class="stat-label">
+                    Over 6 Weeks
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="statOverdue">
+                    —
+                </span>
+
+            </div>
+
+
+            <div class="stat-card success">
+
+                <span class="stat-label">
+                    Test Ready
+                </span>
+
+                <span
+                    class="stat-value"
+                    id="statReady">
+                    —
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- TRAINING ALERTS -->
+        <div class="card mb-3">
+
+            <div class="flex-between mb-2">
+
+                <h3 style="margin:0;">
+                    6-Week Training Tracker
+                </h3>
+
+                <a
+                    href="driving.html"
+                    class="btn small secondary">
+                    View All
+                </a>
+
+            </div>
+
+            <div id="trainingAlerts">
+
+                <p class="text-muted">
+                    Loading...
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- TEST READINESS -->
+        <div class="card mb-3">
+
+            <div class="flex-between mb-2">
+
+                <h3 style="margin:0;">
+                    Students Due for Test
+                </h3>
+
+                <a
+                    href="driving.html"
+                    class="btn small secondary">
+                    View All
+                </a>
+
+            </div>
+
+            <div id="testReadyList">
+
+                <p class="text-muted">
+                    Loading...
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- RECENT ACTIVITY -->
+        <div class="card">
+
+            <h3 style="margin:0 0 1rem;">
+                Recent Activity
+            </h3>
+
+            <div id="recentActivity">
+
+                <p class="text-muted">
+                    Loading...
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
 </div>
 
+
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- LASHAWN SUPABASE CLIENT -->
 <script src="js/supabase.js"></script>
+
+<!-- DASHBOARD LOGIC -->
 <script src="js/dashboard.js"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const db = window.LashawnDB;
+
+    if (!db) {
+        console.error("LashawnDB is not available.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+
+        /*
+         * Check current authentication session
+         */
+        const {
+            data: sessionData,
+            error: sessionError
+        } = await db.auth.getSession();
+
+        if (sessionError) {
+            console.error(sessionError);
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (!sessionData || !sessionData.session) {
+            window.location.href = "login.html";
+            return;
+        }
+
+
+        /*
+         * Get logged-in user
+         */
+        const user = sessionData.session.user;
+
+        /*
+         * Get staff profile
+         */
+        const {
+            data: staff,
+            error: staffError
+        } = await db
+            .from("staff")
+            .select(`
+                id,
+                staff_number,
+                first_name,
+                last_name,
+                email,
+                role,
+                branch_id,
+                is_active
+            `)
+            .eq("auth_user_id", user.id)
+            .maybeSingle();
+
+
+        if (staffError) {
+
+            console.error(
+                "Staff profile error:",
+                staffError
+            );
+
+            alert(
+                "Unable to load your staff profile."
+            );
+
+            await db.auth.signOut();
+
+            window.location.href =
+                "login.html";
+
+            return;
+        }
+
+
+        if (!staff) {
+
+            alert(
+                "No staff profile is linked to this account."
+            );
+
+            await db.auth.signOut();
+
+            window.location.href =
+                "login.html";
+
+            return;
+        }
+
+
+        /*
+         * Check account status
+         */
+        if (!staff.is_active) {
+
+            alert(
+                "Your staff account is inactive."
+            );
+
+            await db.auth.signOut();
+
+            window.location.href =
+                "login.html";
+
+            return;
+        }
+
+
+        /*
+         * Display staff name
+         */
+        const userName =
+            document.getElementById("userName");
+
+        if (userName) {
+
+            userName.textContent =
+                `${staff.first_name} ${staff.last_name}`;
+
+        }
+
+
+        /*
+         * Save staff profile
+         */
+        sessionStorage.setItem(
+            "lashawn_staff",
+            JSON.stringify(staff)
+        );
+
+
+        /*
+         * Make staff information available
+         */
+        window.LashawnStaff = staff;
+
+
+        console.log(
+            "Lashawn staff authenticated:",
+            staff
+        );
+
+
+        /*
+         * Logout
+         */
+        const logoutLink =
+            document.getElementById("logoutLink");
+
+        if (logoutLink) {
+
+            logoutLink.addEventListener(
+                "click",
+                async (event) => {
+
+                    event.preventDefault();
+
+                    logoutLink.textContent =
+                        "🚪 Signing out...";
+
+                    await db.auth.signOut();
+
+                    sessionStorage.removeItem(
+                        "lashawn_staff"
+                    );
+
+                    window.location.href =
+                        "login.html";
+
+                }
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard authentication error:",
+            error
+        );
+
+        window.location.href =
+            "login.html";
+
+    }
+
+});
+</script>
+
 </body>
 </html>
