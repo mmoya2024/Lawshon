@@ -55,6 +55,7 @@ input[readonly]{background:#f5f7fa}
     <button data-panel="students">Students</button>
     <button data-panel="fees">Fees &amp; Balances</button>
     <button data-panel="payments">Payments</button>
+    <button data-panel="approvals" id="navApprovals" style="display:none">Approvals</button>
     <button data-panel="services">Services &amp; Pricing</button>
   </nav>
   <div class="userbox">
@@ -90,6 +91,9 @@ input[readonly]{background:#f5f7fa}
           <div class="form-group"><label>Phone *</label><input id="phone" required></div>
           <div class="form-group"><label>Email</label><input id="email" type="email"></div>
           <div class="form-group"><label>National ID</label><input id="idNumber"></div>
+          <div class="form-group"><label>Next of Kin Name *</label><input id="nokName" required></div>
+          <div class="form-group"><label>Relationship *</label><select id="nokRelation" required><option value="">Select</option><option>Parent</option><option>Spouse</option><option>Sibling</option><option>Guardian</option><option>Relative</option><option>Friend</option><option>Other</option></select></div>
+          <div class="form-group"><label>Next of Kin Phone *</label><input id="nokPhone" required></div>
           <div class="form-group"><label>Date of Birth</label><input id="dob" type="date"></div>
           <div class="form-group"><label>Gender</label>
             <select id="gender"><option value="">Select</option><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select>
@@ -113,10 +117,16 @@ input[readonly]{background:#f5f7fa}
             <select id="paymentMethod"><option value="CASH">Cash</option><option value="MPESA">M-Pesa</option><option value="BANK">Bank Transfer</option><option value="CARD">Card</option><option value="CHEQUE">Cheque</option><option value="OTHER">Other</option></select>
           </div>
           <div class="form-group"><label>Payment Reference</label><input id="paymentReference" placeholder="M-Pesa code / receipt / cheque no."></div>
+          <div class="form-group"><label>Who is Paying? *</label>
+            <select id="payer" required><option value="Self">Self</option><option value="Parent / Guardian">Parent / Guardian</option><option value="Sponsor">Sponsor</option><option value="Corporate">Corporate</option><option value="CDF">CDF</option><option value="NGO">NGO</option><option value="Other">Other</option></select></div>
+          <div class="form-group" id="payerNameGroup" style="display:none"><label>Payer Name *</label><input id="payerName" placeholder="Sponsor / company / CDF constituency / NGO name"></div>
+          <div class="form-group"><label>Payment Mode *</label>
+            <select id="payMode"><option value="FULL">Full payment</option><option value="INSTALMENTS">Instalments (50% / 30% / 20%)</option></select></div>
           <div class="form-group"><label>Start Date *</label><input id="startDate" type="date" required></div>
           <div class="form-group full"><label>Notes</label><textarea id="notes" rows="3"></textarea></div>
         </div>
         <div id="feeDescription" class="hint"></div>
+        <div id="payRule" class="hint" style="font-weight:700"></div>
         <div class="actions">
           <button class="btn" type="submit" id="saveBtn">Save Enrolment</button>
           <button class="btn outline" type="button" id="clearBtn">Clear</button>
@@ -147,6 +157,14 @@ input[readonly]{background:#f5f7fa}
     <div class="card"><div class="table-wrap"><table class="table">
       <thead><tr><th>Payment No.</th><th>Date</th><th>Student</th><th>Method</th><th>Reference</th><th>Amount</th><th></th></tr></thead>
       <tbody id="paymentsTable"></tbody>
+    </table></div></div>
+  </section>
+
+  <section class="panel" id="panel-approvals">
+    <p class="lede">Payments below 50% of the fee. No receipt is issued until a Super Admin approves.</p>
+    <div class="card"><div class="table-wrap"><table class="table">
+      <thead><tr><th>Payment No.</th><th>Date</th><th>Student</th><th>Invoice</th><th>Amount</th><th>% of Fee</th><th>Details</th><th></th></tr></thead>
+      <tbody id="approvalsTable"></tbody>
     </table></div></div>
   </section>
 
@@ -194,7 +212,7 @@ const T = {
   status:"academy_student_training_status", balances:"student_balances"
 };
 
-let INVOICES=[], PAYS=[], PAY_INV=null;
+let INVOICES=[], PAYS=[], PAY_INV=null, PENDING=[], IS_SUPER=false;
 let DRIVING=[], COMPUTER=[], FEES=[], STUDENT_ROWS=[];
 let CALC={unit:0,qty:1,total:0,paid:0,balance:0};
 
@@ -231,6 +249,8 @@ async function guard(){
   $("adminEmail").textContent=u.email||"";
   $("adminName").textContent=u.user_metadata?.full_name||u.user_metadata?.office_role||"Office Admin";
   setStatus("● Connected","ok");
+  try{ IS_SUPER=(await DB.rpc("is_super_admin")).data===true; }catch(_){ IS_SUPER=false; }
+  $("navApprovals").style.display=IS_SUPER?"":"none";
   return true;
 }
 
@@ -249,6 +269,10 @@ async function loadReference(){
   $("drivingClass").innerHTML='<option value="">Select Class</option>'+DRIVING.map(i=>`<option value="${esc(i.id)}">${esc(i.class_code)} — ${esc(i.class_name)}</option>`).join("");
   $("computerCourse").innerHTML='<option value="">Select Course</option>'+COMPUTER.map(i=>`<option value="${esc(i.id)}">${esc(i.course_code)} — ${esc(i.course_name)}</option>`).join("");
   renderServices();
+  if(!DRIVING.length||!COMPUTER.length||!FEES.length){
+    const m=`Loaded: ${DRIVING.length} driving classes, ${COMPUTER.length} computer courses, ${FEES.length} fee structures. Empty lists usually mean a Supabase RLS policy is blocking reads or no active rows exist.`;
+    console.warn(m); setStatus("● Connected — "+m,"bad");
+  }
 }
 
 /* ---------- Enrolment form ---------- */
@@ -284,9 +308,24 @@ function updateFee(){
   $("unitFee").value=money(CALC.unit);
   $("totalFee").value=money(CALC.total);
   $("balance").value=money(CALC.balance);
+  updateRule();
+}
+function updateRule(){
+  const t=CALC.total; let m="";
+  if(t>0){
+    if($("payMode").value==="INSTALMENTS") m=`Instalments: 1st 50% = ${money(t*.5)}, 2nd 30% = ${money(t*.3)}, 3rd 20% = ${money(t*.2)}. `;
+    m+=`Payments below 50% (${money(t*.5)}) get no receipt and need Super Admin approval.`;
+    if(CALC.paid>0 && CALC.paid<t*.5-0.005) m+=" This payment will be held for approval.";
+  }
+  $("payRule").textContent=m;
+}
+function payerChanged(){
+  const other=$("payer").value!=="Self";
+  $("payerNameGroup").style.display=other?"flex":"none";
+  $("payerName").required=other;
 }
 function resetForm(){
-  $("enrolForm").reset(); $("startDate").value=today(); programmeChanged();
+  $("enrolForm").reset(); $("startDate").value=today(); payerChanged(); programmeChanged();
 }
 
 async function saveEnrolment(e){
@@ -299,6 +338,9 @@ async function saveEnrolment(e){
   if(programme==="COMPUTER" && !$("computerCourse").value) return showNotice("Select a computer course.","err");
 
   const total=CALC.total, paid=CALC.paid;
+  const pending=paid>0 && paid<total*0.5-0.005;
+  const payerText=$("payer").value+($("payer").value!=="Self"&&$("payerName").value.trim()?` (${$("payerName").value.trim()})`:"");
+  const modeText=$("payMode").value==="INSTALMENTS"?"Instalments 50/30/20":"Full payment";
   $("saveBtn").disabled=true; $("saveBtn").textContent="Saving...";
   try{
     const {data,error}=await DB.rpc("register_student",{
@@ -318,11 +360,13 @@ async function saveEnrolment(e){
     const r=Array.isArray(data)?data[0]:data;
     if(!r?.student_id||!r?.enrolment_id) throw new Error("register_student did not return student_id and enrolment_id.");
 
-    if($("middleName").value.trim()||$("dob").value||$("gender").value){
+    {
       const {error:upErr}=await DB.from(T.students).update({
         middle_name:$("middleName").value.trim()||null,
         date_of_birth:$("dob").value||null,
-        gender:$("gender").value||null
+        gender:$("gender").value||null,
+        emergency_contact_name:`${$("nokName").value.trim()} (${$("nokRelation").value})`,
+        emergency_contact_phone:$("nokPhone").value.trim()
       }).eq("id",r.student_id);
       if(upErr) throw new Error("Student saved (No. "+r.student_number+") but optional details failed: "+upErr.message);
     }
@@ -332,10 +376,10 @@ async function saveEnrolment(e){
       enrolment_id:r.enrolment_id,
       subtotal:total,
       total_amount:total,
-      amount_paid:paid,
-      balance:total-paid,
-      status:paid>=total?"PAID":paid>0?"PARTIAL":"PENDING",
-      notes:`${fee.name} x ${CALC.qty}`
+      amount_paid:pending?0:paid,
+      balance:pending?total:total-paid,
+      status:pending?"PENDING":paid>=total?"PAID":paid>0?"PARTIAL":"PENDING",
+      notes:`${fee.name} x ${CALC.qty} | Payer: ${payerText} | Mode: ${modeText}`
     }).select("id,invoice_number").single();
     if(invErr) throw new Error("Student saved (No. "+r.student_number+") but invoice failed: "+invErr.message);
 
@@ -348,15 +392,16 @@ async function saveEnrolment(e){
         amount:paid,
         payment_method:$("paymentMethod").value,
         transaction_reference:$("paymentReference").value.trim()||null,
-        status:"CONFIRMED",
-        notes:"Initial enrolment payment"
+        status:pending?"PENDING":"CONFIRMED",
+        notes:"Initial enrolment payment | Payer: "+payerText+(pending?" | Awaiting Super Admin approval (below 50%)":"")
       }).select("payment_number,payment_date").single();
       if(pErr) throw new Error("Invoice saved but payment failed: "+pErr.message);
       payment=p;
     }
 
-    showNotice(`Enrolment saved. Student No: ${r.student_number||"—"} | Enrolment No: ${r.enrolment_number||"—"} | Invoice: ${invoice?.invoice_number||"—"}`,"success");
-    if(payment) showReceipt({
+    showNotice(`Enrolment saved. Student No: ${r.student_number||"—"} | Enrolment No: ${r.enrolment_number||"—"} | Invoice: ${invoice?.invoice_number||"—"}`+(pending?" | Payment is below 50%: held for Super Admin approval, no receipt issued.":""),pending?"info":"success");
+    if(payment && !pending) showReceipt({
+      payer:payerText, invoice:{invoice_number:invoice?.invoice_number},
       payment, paid,
       student:{first_name:$("firstName").value.trim(),middle_name:$("middleName").value.trim(),last_name:$("lastName").value.trim(),student_number:r.student_number},
       enrolment:{enrolment_number:r.enrolment_number,programme},
@@ -460,7 +505,7 @@ function showReceipt(d){
     ${row("Payment No.",d.payment?.payment_number||"—")}${row("Date",fmtDate(d.payment?.payment_date))}
     ${row("Student No.",d.student?.student_number||"—")}${row("Enrolment No.",d.enrolment?.enrolment_number||"—")}
     ${row("Student",fullName(d.student))}${row("Programme",d.enrolment?.programme||"—")}<hr>
-    ${d.invoice?.invoice_number?row("Invoice No.",d.invoice.invoice_number):""}${row("Amount Received",money(d.paid))}${d.balance!=null?row("Balance Remaining",money(d.balance)):""}${row("Method",d.method)}${row("Reference",d.reference||"—")}<hr>
+    ${d.payer?row("Paid By",d.payer):""}${d.invoice?.invoice_number?row("Invoice No.",d.invoice.invoice_number):""}${row("Amount Received",money(d.paid))}${d.balance!=null?row("Balance Remaining",money(d.balance)):""}${row("Method",d.method)}${row("Reference",d.reference||"—")}<hr>
     <p style="text-align:center;font-size:12px">Thank you for choosing Lashawn Academy.</p>`;
   $("receiptModal").classList.add("open");
 }
@@ -492,8 +537,10 @@ function openPay(id){
   const inv=INVOICES.find(x=>x.id===id); if(!inv) return;
   PAY_INV=id; payErr("");
   $("payForm").reset();
-  $("payAmount").value=Number(inv.balance||0);
-  $("payInfo").textContent=`${inv.invoice_number||"Invoice"} · ${inv.students?.student_number||""} ${fullName(inv.students)} · Balance ${money(inv.balance)}`;
+  { const t=Number(inv.total_amount||0), pd=Number(inv.amount_paid||0);
+    const target=[.5,.8,1].map(x=>t*x).find(x=>x>pd+0.005)??t;
+    $("payAmount").value=Math.min(Number(inv.balance||0),+(target-pd).toFixed(2)); }
+  $("payInfo").textContent=`${inv.invoice_number||"Invoice"} · ${inv.students?.student_number||""} ${fullName(inv.students)} · Balance ${money(inv.balance)} · Cumulative payment under 50% needs Super Admin approval`;
   $("payModal").classList.add("open");
 }
 async function submitPay(e){
@@ -502,15 +549,21 @@ async function submitPay(e){
   const amt=Number($("payAmount").value||0), bal=Number(inv.balance||0);
   if(amt<=0) return payErr("Enter an amount.");
   if(amt>bal) return payErr("Amount exceeds the balance of "+money(bal));
+  const pend=(Number(inv.amount_paid||0)+amt)<Number(inv.total_amount||0)*0.5-0.005;
   $("payBtn").disabled=true; $("payBtn").textContent="Saving...";
   try{
     const {data:p,error}=await DB.from(T.payments).insert({
       student_id:inv.student_id, enrolment_id:inv.enrolment_id, invoice_id:inv.id,
       amount:amt, payment_method:$("payMethod").value,
       transaction_reference:$("payRef").value.trim()||null,
-      status:"CONFIRMED", notes:$("payNotes").value.trim()||"Payment received"
+      status:pend?"PENDING":"CONFIRMED", notes:($("payNotes").value.trim()||"Payment received")+(pend?" | Awaiting Super Admin approval (below 50%)":"")
     }).select("payment_number,payment_date").single();
     if(error) throw error;
+    if(pend){
+      $("payModal").classList.remove("open");
+      toast("Below 50%: held for Super Admin approval. No receipt issued.");
+      await loadFees(); return;
+    }
 
     /* If no database trigger updated the invoice, update it here */
     const total=Number(inv.total_amount||0), expected=Number(inv.amount_paid||0)+amt;
@@ -546,8 +599,42 @@ $("paymentsTable").addEventListener("click",e=>{
 $("payForm").addEventListener("submit",submitPay);
 $("payCancel").addEventListener("click",()=>$("payModal").classList.remove("open"));
 
+/* ---------- Approvals (Super Admin) ---------- */
+async function loadApprovals(){
+  if(!IS_SUPER){ $("approvalsTable").innerHTML=empty(8,"Super Admin access required."); return; }
+  const {data,error}=await DB.from(T.payments)
+    .select("id,payment_number,payment_date,amount,payment_method,transaction_reference,notes,students(student_number,first_name,middle_name,last_name),enrolments(enrolment_number,programme),invoices(invoice_number,total_amount,amount_paid)")
+    .eq("status","PENDING").order("created_at",{ascending:false});
+  if(error) throw error;
+  PENDING=data||[];
+  $("approvalsTable").innerHTML=PENDING.length?PENDING.map((p,n)=>{
+    const t=Number(p.invoices?.total_amount||0), pct=t?Math.round((Number(p.invoices?.amount_paid||0)+Number(p.amount))/t*100):"—";
+    return `<tr><td>${esc(p.payment_number||"—")}</td><td>${fmtDate(p.payment_date)}</td>
+      <td>${esc(p.students?.student_number||"—")} · ${esc(fullName(p.students))}</td>
+      <td>${esc(p.invoices?.invoice_number||"—")}</td><td>${money(p.amount)}</td><td>${pct}%</td>
+      <td>${esc(p.payment_method||"")} ${esc(p.transaction_reference||"")} ${esc(p.notes||"")}</td>
+      <td><button class="btn" data-approve="${n}">Approve &amp; Receipt</button></td></tr>`;
+  }).join(""):empty(8,"No payments awaiting approval.");
+}
+$("approvalsTable").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-approve]"); if(!b) return;
+  const p=PENDING[b.dataset.approve];
+  if(!confirm(`Approve ${money(p.amount)} for ${fullName(p.students)}?`)) return;
+  b.disabled=true;
+  try{
+    const {error}=await DB.rpc("approve_payment",{p_payment_id:p.id});
+    if(error) throw error;
+    const t=Number(p.invoices?.total_amount||0);
+    showReceipt({payment:p,paid:p.amount,student:p.students,enrolment:p.enrolments,invoice:p.invoices,
+      balance:Math.max(0,t-Number(p.invoices?.amount_paid||0)-Number(p.amount)),
+      method:p.payment_method,reference:p.transaction_reference||""});
+    toast("Payment approved");
+    await loadApprovals();
+  }catch(err){ console.error(err); toast(err.message||"Approval failed",false); b.disabled=false; }
+});
+
 /* ---------- Navigation ---------- */
-const LOADERS={overview:loadOverview,students:loadStudents,fees:loadFees,payments:loadPayments};
+const LOADERS={overview:loadOverview,students:loadStudents,fees:loadFees,payments:loadPayments,approvals:loadApprovals};
 document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",async()=>{
   document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
@@ -564,6 +651,11 @@ $("programme").addEventListener("change",programmeChanged);
 $("drivingClass").addEventListener("change",refreshFeeOptions);
 $("computerCourse").addEventListener("change",refreshFeeOptions);
 $("feeOption").addEventListener("change",updateFee);
+$("payer").addEventListener("change",payerChanged);
+$("payMode").addEventListener("change",()=>{
+  if($("payMode").value==="INSTALMENTS" && CALC.total>0 && Number($("amountPaid").value||0)===0) $("amountPaid").value=(CALC.total*.5).toFixed(2);
+  updateFee();
+});
 $("quantity").addEventListener("input",updateFee);
 $("amountPaid").addEventListener("input",updateFee);
 $("enrolForm").addEventListener("submit",saveEnrolment);
