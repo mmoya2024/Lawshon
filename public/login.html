@@ -264,7 +264,6 @@
 
     </div>
 
-
     <div class="card">
 
         <h2>Staff Login</h2>
@@ -274,14 +273,12 @@
             fees and payments.
         </p>
 
-
         <div
             id="notice"
             class="hidden"
             role="alert"
             aria-live="polite"
         ></div>
-
 
         <form id="loginForm">
 
@@ -300,7 +297,6 @@
                 >
 
             </div>
-
 
             <div class="field">
 
@@ -330,7 +326,6 @@
 
             </div>
 
-
             <button
                 id="loginButton"
                 type="submit"
@@ -338,7 +333,6 @@
             >
                 Sign In
             </button>
-
 
             <button
                 id="forgotButton"
@@ -351,7 +345,6 @@
         </form>
 
     </div>
-
 
     <div class="footer">
 
@@ -368,17 +361,18 @@
 </div>
 
 
-<!-- SUPABASE -->
+<!-- =========================================================
+     SUPABASE
+     ========================================================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 
 <script>
 "use strict";
 
 
 /* =========================================================
-   SUPABASE
+   SUPABASE CONFIGURATION
    ========================================================= */
 
 const SUPABASE_URL =
@@ -464,7 +458,7 @@ function message(text, type) {
 
 
 /* =========================================================
-   BUSY
+   BUSY STATE
    ========================================================= */
 
 function setBusy(value) {
@@ -488,7 +482,7 @@ function setBusy(value) {
 
 
 /* =========================================================
-   STAFF ACCESS
+   STAFF ACCESS CHECK
    ========================================================= */
 
 function isStaff(user) {
@@ -520,18 +514,45 @@ function isStaff(user) {
 
 
     console.log(
-        "ROLE:",
+        "--------------------------------"
+    );
+
+    console.log(
+        "LASHAWN STAFF ACCESS CHECK"
+    );
+
+    console.log(
+        "Email:",
+        user.email
+    );
+
+    console.log(
+        "Role:",
         role
     );
 
     console.log(
-        "ACCOUNT TYPE:",
+        "Account Type:",
         accountType
     );
 
     console.log(
-        "OFFICE ROLE:",
+        "Office Role:",
         officeRole
+    );
+
+    console.log(
+        "App Metadata:",
+        app
+    );
+
+    console.log(
+        "User Metadata:",
+        meta
+    );
+
+    console.log(
+        "--------------------------------"
     );
 
 
@@ -551,7 +572,7 @@ function isStaff(user) {
 
 
 /* =========================================================
-   ERROR
+   ERROR MESSAGE
    ========================================================= */
 
 function errorMessage(error) {
@@ -662,13 +683,23 @@ async function login(event) {
 
     setBusy(true);
 
+    message(
+        "Connecting to Supabase...",
+        "info"
+    );
+
 
     try {
 
         console.log(
-            "Attempting Supabase login..."
+            "Attempting Supabase login for:",
+            emailValue
         );
 
+
+        /* ================================================
+           AUTHENTICATE
+           ================================================ */
 
         const result =
             await DB.auth.signInWithPassword({
@@ -690,12 +721,20 @@ async function login(event) {
         const user =
             result.data.user;
 
-
         const session =
             result.data.session;
 
 
-        if (!user || !session) {
+        if (!user) {
+
+            throw new Error(
+                "Authentication succeeded but no user was returned."
+            );
+
+        }
+
+
+        if (!session) {
 
             throw new Error(
                 "Authentication succeeded but no session was created."
@@ -709,12 +748,15 @@ async function login(event) {
             user.email
         );
 
+        console.log(
+            "USER ID:",
+            user.id
+        );
 
         console.log(
             "USER METADATA:",
             user.user_metadata
         );
-
 
         console.log(
             "APP METADATA:",
@@ -722,17 +764,36 @@ async function login(event) {
         );
 
 
+        /* ================================================
+           OFFICE ADMIN ACCESS
+           ================================================ */
+
         if (!isStaff(user)) {
 
-            await DB.auth.signOut();
+            /*
+             * IMPORTANT:
+             *
+             * Do NOT sign the user out here.
+             *
+             * If the role check fails, keep the authenticated
+             * session alive so we can diagnose the problem
+             * instead of creating a login/logout loop.
+             */
 
+            console.error(
+                "Authenticated user does not have Office Admin access."
+            );
 
             throw new Error(
-                "This account does not have Office Admin access."
+                "This account is authenticated but does not have Office Admin access."
             );
 
         }
 
+
+        /* ================================================
+           SUCCESS
+           ================================================ */
 
         message(
             "Login successful. Opening Office Admin...",
@@ -740,19 +801,25 @@ async function login(event) {
         );
 
 
+        setBusy(true);
+
+
         /*
-         * Only redirect AFTER successful authentication
-         * and successful Office Admin access check.
+         * Use replace instead of href.
+         *
+         * This prevents the login page from being retained
+         * in browser history.
          */
 
         setTimeout(
             function () {
 
-                window.location.href =
-                    "admin.html";
+                window.location.replace(
+                    "admin.html"
+                );
 
             },
-            700
+            500
         );
 
 
@@ -815,6 +882,12 @@ async function forgotPassword() {
 
     try {
 
+        message(
+            "Sending password reset request...",
+            "info"
+        );
+
+
         const result =
             await DB.auth.resetPasswordForEmail(
                 emailValue,
@@ -858,7 +931,7 @@ async function forgotPassword() {
 
 
 /* =========================================================
-   SHOW PASSWORD
+   SHOW / HIDE PASSWORD
    ========================================================= */
 
 showPassword.addEventListener(
@@ -906,8 +979,22 @@ forgotButton.addEventListener(
 
 
 /* =========================================================
-   IMPORTANT:
-   NO AUTOMATIC SESSION REDIRECT HERE.
+   NO AUTOMATIC SESSION REDIRECT
+   =========================================================
+   
+   We deliberately do NOT check getSession() here.
+   
+   This prevents:
+   
+       login.html
+          ↓
+       admin.html
+          ↓
+       login.html
+          ↓
+       admin.html
+       
+   flickering / redirect loops.
    ========================================================= */
 
 console.log(
