@@ -3,624 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Login — Lashawn Driving & Computer College</title>
-
+<title>Staff Login — Lashawn Driving School & Computer College</title>
 <style>
-:root{
-  --navy:#0b1730;
-  --blue:#1455d9;
-  --green:#159447;
-  --bg:#f4f7fb;
-  --card:#ffffff;
-  --border:#dfe5ee;
-  --text:#172033;
-  --muted:#697386;
-  --danger:#c62828;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  min-height:100vh;
-  font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;
-  background:
-    linear-gradient(135deg,#0b1730 0%,#12356e 55%,#1455d9 100%);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  color:var(--text);
-}
-
-.login-wrap{
-  width:100%;
-  max-width:430px;
-}
-
-.brand{
-  text-align:center;
-  color:#fff;
-  margin-bottom:20px;
-}
-
-.brand-icon{
-  font-size:45px;
-  margin-bottom:5px;
-}
-
-.brand h1{
-  margin:0;
-  font-size:28px;
-  font-weight:800;
-}
-
-.brand h1 span{
-  color:#6ee7a1;
-}
-
-.brand p{
-  margin:7px 0 0;
-  color:#cbd7e8;
-  font-size:13px;
-}
-
-.card{
-  background:var(--card);
-  border-radius:18px;
-  padding:30px;
-  box-shadow:0 25px 70px rgba(0,0,0,.28);
-}
-
-.card h2{
-  margin:0 0 7px;
-  font-size:22px;
-}
-
-.subtitle{
-  margin:0 0 22px;
-  color:var(--muted);
-  font-size:13px;
-}
-
-.field{
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-  margin-bottom:17px;
-}
-
-.field label{
-  font-size:13px;
-  font-weight:700;
-}
-
-.field input{
-  width:100%;
-  padding:12px 13px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  outline:none;
-  font:inherit;
-  color:var(--text);
-}
-
-.field input:focus{
-  border-color:var(--blue);
-  box-shadow:0 0 0 3px rgba(20,85,217,.10);
-}
-
-.password-wrap{
-  position:relative;
-}
-
-.password-wrap input{
-  padding-right:70px;
-}
-
-.show-password{
-  position:absolute;
-  right:9px;
-  top:50%;
-  transform:translateY(-50%);
-  border:0;
-  background:transparent;
-  color:var(--blue);
-  cursor:pointer;
-  font-size:12px;
-  font-weight:700;
-}
-
-.btn{
-  width:100%;
-  border:0;
-  border-radius:10px;
-  padding:13px 16px;
-  background:var(--blue);
-  color:#fff;
-  font-weight:800;
-  font-size:15px;
-  cursor:pointer;
-}
-
-.btn:hover{
-  filter:brightness(.96);
-}
-
-.btn:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-}
-
-.notice{
-  padding:11px 13px;
-  border-radius:9px;
-  margin-bottom:17px;
-  font-size:13px;
-  line-height:1.45;
-}
-
-.notice.error{
-  background:#fdecec;
-  color:#9d2020;
-}
-
-.notice.success{
-  background:#e8f7ee;
-  color:#126d35;
-}
-
-.notice.info{
-  background:#eaf1ff;
-  color:#1f4da6;
-}
-
-.hidden{
-  display:none;
-}
-
-.footer{
-  text-align:center;
-  color:#cbd7e8;
-  font-size:12px;
-  margin-top:18px;
-}
-
-.footer a{
-  color:#fff;
-  text-decoration:none;
-}
-
-.spinner{
-  display:inline-block;
-  width:15px;
-  height:15px;
-  border:2px solid rgba(255,255,255,.4);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:spin .7s linear infinite;
-  vertical-align:-3px;
-  margin-right:7px;
-}
-
-@keyframes spin{
-  to{
-    transform:rotate(360deg);
-  }
-}
-
-@media(max-width:480px){
-  .card{
-    padding:23px;
-  }
-
-  .brand h1{
-    font-size:24px;
-  }
-}
+:root{--blue:#1455d9;--border:#dfe5ee;--text:#172033;--muted:#697386}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#0b1730 0%,#12356e 55%,#1455d9 100%);display:flex;align-items:center;justify-content:center;padding:20px;color:var(--text)}
+.wrap{width:100%;max-width:430px}
+.brand{text-align:center;color:#fff;margin-bottom:20px}
+.brand img{height:84px;border-radius:12px;background:#fff;padding:4px;margin-bottom:10px}
+.brand h1{margin:0;font-size:24px;font-weight:800}.brand h1 span{color:#6ee7a1}
+.brand p{margin:6px 0 0;color:#cbd7e8;font-size:13px}
+.card{background:#fff;border-radius:18px;padding:30px;box-shadow:0 25px 70px rgba(0,0,0,.28)}
+.card h2{margin:0 0 6px;font-size:22px}.sub{margin:0 0 20px;color:var(--muted);font-size:13px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.field label{font-size:13px;font-weight:700}
+.field input{width:100%;padding:12px 13px;border:1px solid var(--border);border-radius:10px;outline:none;font:inherit;color:var(--text)}
+.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(20,85,217,.1)}
+.pw{position:relative}.pw input{padding-right:70px}
+.show{position:absolute;right:9px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--blue);cursor:pointer;font-size:12px;font-weight:700}
+.btn{width:100%;border:0;border-radius:10px;padding:13px 16px;background:var(--blue);color:#fff;font-weight:800;font-size:15px;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.link{display:block;text-align:center;margin-top:14px;font-size:13px;color:var(--blue);background:none;border:0;cursor:pointer;width:100%}
+.notice{padding:11px 13px;border-radius:9px;margin-bottom:16px;font-size:13px;line-height:1.45}
+.notice.error{background:#fdecec;color:#9d2020}.notice.success{background:#e8f7ee;color:#126d35}.notice.info{background:#eaf1ff;color:#1f4da6}
+.hidden{display:none}
+.footer{text-align:center;color:#cbd7e8;font-size:12px;margin-top:18px}.footer a{color:#fff;text-decoration:none}
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:7px}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
-
 <body>
-
-<div class="login-wrap">
-
+<div class="wrap">
   <div class="brand">
-    <div class="brand-icon">🎓</div>
-
-    <h1>
-      Lashawn <span>Academy</span>
-    </h1>
-
-    <p>
-      Driving & Computer College
-    </p>
+    <img src="images/logo.png" alt="Lashawn logo" onerror="this.style.display='none'">
+    <h1>Lashawn <span>Academy</span></h1>
+    <p>Driving School &amp; Computer College</p>
   </div>
-
-
   <div class="card">
-
-    <h2>Office Admin Login</h2>
-
-    <p class="subtitle">
-      Sign in to manage students, enrolments, fees and payments.
-    </p>
-
-
+    <h2>Staff Login</h2>
+    <p class="sub">Sign in to manage students, enrolments, fees and payments.</p>
     <div id="notice" class="hidden"></div>
-
-
-    <form id="loginForm">
-
-      <div class="field">
-
-        <label for="email">
-          Email Address
-        </label>
-
-        <input
-          id="email"
-          type="email"
-          autocomplete="username"
-          placeholder="Enter your email address"
-          required
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label for="password">
-          Password
-        </label>
-
-        <div class="password-wrap">
-
-          <input
-            id="password"
-            type="password"
-            autocomplete="current-password"
-            placeholder="Enter your password"
-            required
-          >
-
-          <button
-            type="button"
-            class="show-password"
-            id="togglePassword"
-          >
-            Show
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <button
-        type="submit"
-        class="btn"
-        id="loginBtn"
-      >
-        Sign In
-      </button>
-
+    <form id="loginForm" novalidate>
+      <div class="field"><label for="email">Email Address</label>
+        <input id="email" type="email" autocomplete="username" placeholder="Enter your email address" required></div>
+      <div class="field"><label for="password">Password</label>
+        <div class="pw"><input id="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+        <button type="button" class="show" id="toggle">Show</button></div></div>
+      <button type="submit" class="btn" id="loginBtn">Sign In</button>
+      <button type="button" class="link" id="forgot">Forgot password?</button>
     </form>
-
   </div>
-
-
-  <div class="footer">
-
-    Lashawn Driving & Computer College
-
-    <br>
-
-    <a href="index.html">
-      ← Back to website
-    </a>
-
-  </div>
-
+  <div class="footer">Lashawn Driving &amp; Computer College<br><a href="index.html">← Back to website</a></div>
 </div>
 
-
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- Your existing Supabase configuration -->
 <script src="js/supabase.js"></script>
-
 <script>
-
 const DB = window.LashawnDB;
-
 const $ = id => document.getElementById(id);
+const DEST = "admin.html";
 
+function notice(msg, type){ const b=$("notice"); b.className="notice "+type; b.textContent=msg; }
+function clearNotice(){ $("notice").className="hidden"; $("notice").textContent=""; }
+function busy(on){ const b=$("loginBtn"); b.disabled=on; b.innerHTML=on?'<span class="spinner"></span>Signing in...':"Sign In"; }
 
-/* -----------------------------------------
-   SHOW MESSAGE
------------------------------------------ */
-
-function showNotice(message,type="info"){
-
-  const box = $("notice");
-
-  box.className = "notice " + type;
-
-  box.textContent = message;
-
-  box.classList.remove("hidden");
-
+// Same rule as js/role-guard.js
+function isStaff(user){
+  const a=user.app_metadata||{}, u=user.user_metadata||{};
+  return a.role==="admin"||a.role==="staff"||u.role==="admin"||u.role==="staff"||
+         a.account_type==="admin"||a.account_type==="staff"||u.account_type==="admin"||u.account_type==="staff"||
+         u.office_role==="Office Admin";
 }
 
-
-/* -----------------------------------------
-   HIDE MESSAGE
------------------------------------------ */
-
-function hideNotice(){
-
-  const box = $("notice");
-
-  box.className = "hidden";
-
-  box.textContent = "";
-
+function friendly(err){
+  const m=(err&&err.message||"").toLowerCase();
+  if(m.includes("invalid login credentials")) return "Invalid email or password.";
+  if(m.includes("email not confirmed")) return "This email is not confirmed yet. Check your inbox for the confirmation link.";
+  if(m.includes("failed to fetch")||m.includes("network")) return "Network problem. Check your internet connection and try again.";
+  if(m.includes("rate limit")||m.includes("too many")) return "Too many attempts. Please wait a minute and try again.";
+  return (err&&err.message)||"Unable to sign in.";
 }
 
-
-/* -----------------------------------------
-   LOGIN
------------------------------------------ */
-
-async function login(event){
-
-  event.preventDefault();
-
-  hideNotice();
-
-  const email =
-    $("email").value.trim();
-
-  const password =
-    $("password").value;
-
-
-  if(!email || !password){
-
-    showNotice(
-      "Please enter your email address and password.",
-      "error"
-    );
-
-    return;
-  }
-
-
-  if(!DB || !DB.auth){
-
-    showNotice(
-      "Supabase is not configured. Please check js/supabase.js.",
-      "error"
-    );
-
-    return;
-  }
-
-
-  const button =
-    $("loginBtn");
-
-
-  button.disabled = true;
-
-  button.innerHTML =
-    '<span class="spinner"></span>Signing in...';
-
-
+async function login(e){
+  e.preventDefault(); clearNotice();
+  const email=$("email").value.trim(), password=$("password").value;
+  if(!email||!password) return notice("Please enter your email address and password.","error");
+  if(!DB||!DB.auth) return notice("System is not configured. Please add the Supabase key in js/supabase.js.","error");
+  busy(true);
   try{
-
-    const {
-      data,
-      error
-    } =
-    await DB.auth.signInWithPassword({
-      email:email,
-      password:password
-    });
-
-
-    if(error){
-
-      throw error;
-
+    const {data,error}=await DB.auth.signInWithPassword({email,password});
+    if(error) throw error;
+    if(!data||!data.session) throw new Error("Login succeeded but no session was created.");
+    if(!isStaff(data.user)){
+      await DB.auth.signOut();
+      throw new Error("This account does not have staff access. Contact the administrator.");
     }
-
-
-    if(!data || !data.session){
-
-      throw new Error(
-        "Login succeeded but no active session was created."
-      );
-
-    }
-
-
-    showNotice(
-      "Login successful. Opening Office Admin...",
-      "success"
-    );
-
-
-    /*
-      Give Supabase a moment to persist
-      the authenticated session.
-    */
-
-    await new Promise(
-      resolve => setTimeout(resolve,500)
-    );
-
-
-    /*
-      IMPORTANT:
-
-      Office Admin goes to admin.html.
-
-      admin.html itself contains:
-
-          requireAdminAccess()
-
-      so the protected page remains protected.
-    */
-
-    window.location.replace(
-      "admin.html"
-    );
-
-
-  }catch(error){
-
-    console.error(
-      "Login error:",
-      error
-    );
-
-
-    let message =
-      error?.message ||
-      "Unable to sign in.";
-
-
-    if(
-      message
-        .toLowerCase()
-        .includes("invalid login credentials")
-    ){
-
-      message =
-        "Invalid email or password.";
-
-    }
-
-
-    showNotice(
-      message,
-      "error"
-    );
-
-
-    button.disabled = false;
-
-    button.textContent =
-      "Sign In";
-
+    notice("Login successful. Opening Office Admin...","success");
+    setTimeout(()=>location.replace(DEST),400);
+  }catch(err){
+    console.error("Login error:",err);
+    notice(friendly(err),"error");
+    busy(false);
   }
-
 }
 
+async function forgot(){
+  clearNotice();
+  const email=$("email").value.trim();
+  if(!email) return notice("Enter your email address above, then click Forgot password.","info");
+  if(!DB||!DB.auth) return notice("System is not configured.","error");
+  const {error}=await DB.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+  if(error) return notice(friendly(error),"error");
+  notice("If that email has an account, a password reset link has been sent.","success");
+}
 
-/* -----------------------------------------
-   SHOW / HIDE PASSWORD
------------------------------------------ */
+$("loginForm").addEventListener("submit",login);
+$("forgot").addEventListener("click",forgot);
+$("toggle").addEventListener("click",function(){
+  const i=$("password"), show=i.type==="password";
+  i.type=show?"text":"password"; this.textContent=show?"Hide":"Show";
+});
 
-$("togglePassword").addEventListener(
-  "click",
-  function(){
-
-    const input =
-      $("password");
-
-    if(input.type === "password"){
-
-      input.type = "text";
-
-      this.textContent =
-        "Hide";
-
-    }else{
-
-      input.type = "password";
-
-      this.textContent =
-        "Show";
-
-    }
-
-  }
-);
-
-
-/* -----------------------------------------
-   SUBMIT
------------------------------------------ */
-
-$("loginForm").addEventListener(
-  "submit",
-  login
-);
-
-
-/* -----------------------------------------
-   CHECK EXISTING SESSION
------------------------------------------ */
-
-async function checkExistingSession(){
-
+(async function init(){
+  if(!DB||!DB.auth){ notice("System is not configured. Add your Supabase key in js/supabase.js.","error"); return; }
   try{
-
-    if(!DB || !DB.auth){
-
-      return;
-
+    const {data}=await DB.auth.getSession();
+    if(data&&data.session){
+      if(isStaff(data.session.user)){ location.replace(DEST); return; }
+      await DB.auth.signOut();
     }
-
-
-    const {
-      data
-    } =
-    await DB.auth.getSession();
-
-
-    if(data && data.session){
-
-      /*
-        Already logged in.
-        Go directly to Office Admin.
-      */
-
-      window.location.replace(
-        "admin.html"
-      );
-
-      return;
-
-    }
-
-
-    $("email").focus();
-
-
-  }catch(error){
-
-    console.error(
-      "Session check error:",
-      error
-    );
-
-  }
-
-}
-
-
-checkExistingSession();
-
+  }catch(e){ console.error("Session check error:",e); }
+  $("email").focus();
+})();
 </script>
-
 </body>
 </html>
