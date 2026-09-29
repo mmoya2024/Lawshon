@@ -205,6 +205,9 @@ const SUPABASE_URL = "https://qjfinbftcserrjiedduf.supabase.co";
 const SUPABASE_KEY = "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
 const DB = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
+/* Receipt logo: put logo.png in the same folder as admin.html (or use a full https:// URL). Set to "" to hide. */
+const LOGO_URL = "logo.png";
+
 /* Table / view names in one place */
 const T = {
   students:"students", enrolments:"enrolments", invoices:"invoices", payments:"payments",
@@ -497,7 +500,7 @@ function renderServices(){
 /* ---------- Receipt ---------- */
 function showReceipt(d){
   const row=(l,v)=>`<div class="receipt-row"><span>${l}</span><strong>${esc(v)}</strong></div>`;
-  $("receiptContent").innerHTML=`<h2>Lashawn Academy</h2><p style="text-align:center">Payment Receipt</p><hr>
+  $("receiptContent").innerHTML=`${LOGO_URL?`<div style="text-align:center;margin-bottom:8px"><img src="${esc(LOGO_URL)}" alt="Lashawn Academy" style="max-height:70px;max-width:220px" onerror="this.style.display='none'"></div>`:""}<h2>Lashawn Academy</h2><p style="text-align:center">Payment Receipt</p><hr>
     ${row("Payment No.",d.payment?.payment_number||"—")}${row("Date",fmtDate(d.payment?.payment_date))}
     ${row("Student No.",d.student?.student_number||"—")}${row("Enrolment No.",d.enrolment?.enrolment_number||"—")}
     ${row("Student",fullName(d.student))}${row("Programme",d.enrolment?.programme||"—")}<hr>
@@ -516,7 +519,7 @@ function printReceipt(){
   document.body.appendChild(f);
   const d=f.contentWindow.document;
   d.open();
-  d.write(`<!DOCTYPE html><html><head><title>Receipt</title><style>
+  d.write(`<!DOCTYPE html><html><head><title>Receipt</title><base href="${location.href}"><style>
     @page{margin:10mm}
     body{font-family:Arial,Helvetica,sans-serif;color:#000;max-width:380px;margin:0 auto;font-size:13px}
     h2{text-align:center;margin:0}
@@ -524,7 +527,10 @@ function printReceipt(){
     .receipt-row{display:flex;justify-content:space-between;gap:16px;padding:4px 0}
   </style></head><body>${html}</body></html>`);
   d.close();
-  setTimeout(()=>{ f.contentWindow.focus(); f.contentWindow.print(); },250);
+  const go=()=>{ f.contentWindow.focus(); f.contentWindow.print(); };
+  const img=d.querySelector("img");
+  if(img && !img.complete){ let done=false; const once=()=>{ if(!done){done=true;go();} }; img.onload=once; img.onerror=once; setTimeout(once,3000); }
+  else setTimeout(go,250);
 }
 
 /* ---------- Receipting ---------- */
