@@ -19,6 +19,7 @@
     const nav = document.querySelector("nav.tabs");
     nav.insertAdjacentHTML("beforeend",
       '<button data-panel="approvals">Approvals <span id="apprBadge"></span></button>' +
+      '<button data-panel="activity">Activity</button>' +
       '<button data-panel="users">Office Users</button>');
     nav.addEventListener("click", (e) => {
       const b = e.target.closest("button[data-panel]"); if (!b) return;
@@ -27,6 +28,7 @@
       $("panel-" + b.dataset.panel).classList.add("active");
       if (b.dataset.panel === "approvals") loadApprovals();
       if (b.dataset.panel === "users") loadUsers();
+      if (b.dataset.panel === "activity") loadActivity();
     });
 
     /* Panels */
@@ -37,6 +39,19 @@
         <div class="card"><div class="tbl-wrap"><table>
           <thead><tr><th>Payment No.</th><th>Date</th><th>Student / Customer</th><th>Invoice</th><th>Amount</th><th>% of Fee</th><th>Details</th><th></th></tr></thead>
           <tbody id="appr-table"></tbody></table></div></div>
+      </section>
+      <section class="panel" id="panel-activity">
+        <h1>Office Activity</h1>
+        <p class="lede">Everything office staff create, change or delete, newest first.</p>
+        <div class="toolbar"><input class="search" id="actSearch" placeholder="Search person, action or record...">
+          <select class="filter-select" id="actTable"><option value="">All records</option>
+            <option value="students">Students</option><option value="enrolments">Enrolments</option>
+            <option value="invoices">Invoices</option><option value="payments">Payments</option>
+            <option value="printing_jobs">Printing jobs</option></select>
+          <button class="btn small outline" id="actRefresh" type="button">Refresh</button></div>
+        <div class="card"><div class="tbl-wrap"><table>
+          <thead><tr><th>Time</th><th>Who</th><th>Action</th><th>Record</th><th>Details</th></tr></thead>
+          <tbody id="act-table"></tbody></table></div></div>
       </section>
       <section class="panel" id="panel-users">
         <h1>Office Users</h1>
@@ -62,6 +77,9 @@
 
     $("appr-table").addEventListener("click", onApprovalClick);
     $("userForm").addEventListener("submit", createUser);
+    $("actSearch").addEventListener("input", renderActivity);
+    $("actTable").addEventListener("change", renderActivity);
+    $("actRefresh").addEventListener("click", loadActivity);
     document.addEventListener("click", onDeleteClick);
 
     /* Delete buttons on the Enrolments tab (re-added whenever the table redraws) */
@@ -160,6 +178,44 @@
     if (error) { toast(error.message); return; }
     toast("Student deleted");
     await Promise.all([loadTracker(), loadEnrolments(), loadFees()]); loadStats();
+  }
+
+  /* ---------- Activity log ---------- */
+  let ACT = [], STAFF_BY_UID = {};
+  async function loadActivity() {
+    const [a, st] = await Promise.all([
+      LashawnDB.from("audit_logs").select("created_at,user_id,action,table_name,record_id,old_data,new_data")
+        .order("created_at", { ascending: false }).limit(300),
+      LashawnDB.from("staff").select("auth_user_id,first_name,last_name,email,role"),
+    ]);
+    if (a.error) { toast(a.error.message); return; }
+    STAFF_BY_UID = {}; (st.data || []).forEach((x) => { STAFF_BY_UID[x.auth_user_id] = x; });
+    ACT = a.data || []; renderActivity();
+  }
+  function actWho(r) {
+    const s = STAFF_BY_UID[r.user_id];
+    return s ? s.first_name + " " + s.last_name + " (" + s.role + ")" : (r.user_id ? "Unknown user" : "System");
+  }
+  function actDetail(r) {
+    const d = r.new_data || r.old_data || {};
+    const ref = d.payment_number || d.invoice_number || d.enrolment_number || d.job_number || d.student_number || d.customer_number || "";
+    const bits = [ref, d.first_name ? nm(d) : "", d.amount != null ? money(d.amount) : "", d.total_amount != null ? "Total " + money(d.total_amount) : "",
+      d.amount_paid != null && d.total_amount != null ? "Paid " + money(d.amount_paid) : "", d.status || "", d.payment_method || "", d.notes || ""];
+    if (r.action === "UPDATE" && r.old_data && r.new_data) {
+      const ch = Object.keys(r.new_data).filter((k) => k !== "updated_at" && JSON.stringify(r.new_data[k]) !== JSON.stringify(r.old_data[k]));
+      if (ch.length) return ch.map((k) => k + ": " + (r.old_data[k] ?? "—") + " → " + (r.new_data[k] ?? "—")).join("; ");
+    }
+    return bits.filter(Boolean).join(" · ");
+  }
+  function renderActivity() {
+    const q = $("actSearch").value.toLowerCase(), t = $("actTable").value;
+    const rows = ACT.filter((r) => (!t || r.table_name === t) &&
+      (!q || (actWho(r) + " " + r.action + " " + r.table_name + " " + actDetail(r)).toLowerCase().includes(q)));
+    $("act-table").innerHTML = rows.map((r) => `<tr>
+      <td style="white-space:nowrap">${new Date(r.created_at).toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" })}</td>
+      <td>${esc(actWho(r))}</td><td>${esc(r.action)}</td><td>${esc(r.table_name)}</td>
+      <td><small>${esc(actDetail(r)).slice(0, 220)}</small></td></tr>`).join("")
+      || '<tr><td colspan="5" class="text-muted">No activity recorded yet.</td></tr>';
   }
 
   /* ---------- Office users ---------- */
