@@ -146,7 +146,7 @@ input[readonly]{background:#f5f7fa}
     <p class="lede">Registered students and their latest training status.</p>
     <input class="search" id="studentSearch" placeholder="Search name, student number or phone">
     <div class="card"><div class="table-wrap"><table class="table">
-      <thead><tr><th>Student No.</th><th>Name</th><th>Phone</th><th>Programme</th><th>Start</th><th>Days Left</th><th>Alert</th><th>Status</th></tr></thead>
+      <thead><tr><th>Student No.</th><th>Name</th><th>Phone</th><th>Programme</th><th>Start</th><th>Days Left</th><th>Alert</th><th>Status</th><th></th></tr></thead>
       <tbody id="studentsTable"></tbody>
     </table></div></div>
   </section>
@@ -204,6 +204,10 @@ input[readonly]{background:#f5f7fa}
     </div>
     <div class="actions"><button class="btn" type="submit" id="payBtn">Save &amp; Issue Receipt</button><button class="btn outline" type="button" id="payCancel">Cancel</button></div>
   </form>
+</div></div>
+<div class="modal" id="viewModal"><div class="modal-box">
+  <div id="viewBody"></div>
+  <div class="actions"><button class="btn outline" id="closeView">Close</button></div>
 </div></div>
 <div id="toast"></div>
 
@@ -499,8 +503,9 @@ function renderStudents(){
     <td>${esc(s.student_number)}</td><td>${esc(s.student_name)}</td><td>${esc(s.phone)}</td>
     <td>${esc(s.programme)}${s.class_code?" · "+esc(s.class_code):""}</td>
     <td>${fmtDate(s.start_date)}</td><td>${s.days_remaining??"—"}</td><td>${esc(s.training_alert||"—")}</td>
-    <td><span class="pill ${s.status==="ACTIVE"?"green":""}">${esc(s.status||"—")}</span></td></tr>`).join("")
-    : empty(8,"No students found.");
+    <td><span class="pill ${s.status==="ACTIVE"?"green":""}">${esc(s.status||"—")}</span></td>
+    <td><button class="btn outline" data-view="${esc(s.student_id)}">View</button></td></tr>`).join("")
+    : empty(9,"No students found.");
 }
 
 /* ---------- Fees ---------- */
@@ -652,6 +657,37 @@ $("paymentsTable").addEventListener("click",e=>{
 });
 $("payForm").addEventListener("submit",submitPay);
 $("payCancel").addEventListener("click",()=>$("payModal").classList.remove("open"));
+
+/* ---------- View student ---------- */
+const drow=(l,v)=>`<div class="receipt-row" style="border-bottom:1px solid #edf0f5"><span style="color:var(--muted)">${l}</span><strong style="text-align:right">${esc(v||"—")}</strong></div>`;
+async function viewStudent(id){
+  $("viewBody").innerHTML="Loading..."; $("viewModal").classList.add("open");
+  try{
+    const [st,en,inv]=await Promise.all([
+      DB.from(T.students).select("*").eq("id",id).single(),
+      DB.from(T.enrolments).select("enrolment_number,programme,start_date,status,driving_classes(class_code,class_name),computer_courses(course_name)").eq("student_id",id).order("created_at",{ascending:false}),
+      DB.from(T.invoices).select("invoice_number,total_amount,amount_paid,balance,status").eq("student_id",id).order("created_at",{ascending:false})
+    ]);
+    if(st.error) throw st.error;
+    const x=st.data;
+    const m=String(x.emergency_contact_name||"").match(/^(.*)\s\(([^()]+)\)$/);
+    const nokName=m?m[1]:x.emergency_contact_name, nokRel=m?m[2]:"";
+    const enRows=(en.data||[]).map(e=>`<tr><td>${esc(e.enrolment_number)}</td><td>${esc(e.programme)}${e.driving_classes?" · "+esc(e.driving_classes.class_code):""}${e.computer_courses?" · "+esc(e.computer_courses.course_name):""}</td><td>${fmtDate(e.start_date)}</td><td>${esc(e.status)}</td></tr>`).join("")||empty(4,"No enrolments.");
+    const invRows=(inv.data||[]).map(i=>`<tr><td>${esc(i.invoice_number)}</td><td>${money(i.total_amount)}</td><td>${money(i.amount_paid)}</td><td>${money(i.balance)}</td><td>${esc(i.status)}</td></tr>`).join("")||empty(5,"No invoices.");
+    $("viewBody").innerHTML=`<h2 style="margin:0 0 12px">${esc(fullName(x))}</h2>
+      ${drow("Student No.",x.student_number)}${drow("Status",x.status)}${drow("Phone",x.phone)}${drow("Email",x.email)}
+      ${drow("National ID",x.national_id)}${drow("Passport No.",x.passport_number)}${drow("Date of Birth",x.date_of_birth?fmtDate(x.date_of_birth):"")}
+      ${drow("Gender",x.gender)}${drow("Address",x.address)}${drow("Registered",fmtDate(x.registration_date))}${drow("Notes",x.notes)}
+      <h3 style="margin:18px 0 6px">Next of Kin</h3>
+      ${drow("Name",nokName)}${drow("Relationship",nokRel)}${drow("Phone",x.emergency_contact_phone)}
+      <h3 style="margin:18px 0 6px">Enrolments</h3>
+      <div class="table-wrap"><table class="table"><thead><tr><th>No.</th><th>Programme</th><th>Start</th><th>Status</th></tr></thead><tbody>${enRows}</tbody></table></div>
+      <h3 style="margin:18px 0 6px">Fees</h3>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Invoice</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead><tbody>${invRows}</tbody></table></div>`;
+  }catch(err){ console.error(err); $("viewBody").innerHTML=`<div class="notice err">${esc(err.message||"Could not load student.")}</div>`; }
+}
+$("studentsTable").addEventListener("click",e=>{ const b=e.target.closest("[data-view]"); if(b) viewStudent(b.dataset.view); });
+$("closeView").addEventListener("click",()=>$("viewModal").classList.remove("open"));
 
 /* ---------- Approvals (Super Admin) ---------- */
 async function loadApprovals(){
