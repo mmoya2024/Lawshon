@@ -43,7 +43,7 @@ button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}
 .connection-dot{width:9px;height:9px;border-radius:50%;background:var(--green)}
 .mobile-toggle{display:none;border:0;background:var(--navy);color:#fff;border-radius:7px;padding:9px 12px}
 .content{padding:25px}
-.alert{display:none;padding:14px 16px;border-radius:10px;margin-bottom:20px}.alert.show{display:block}
+.alert{display:none;padding:14px 16px;border-radius:10px;margin-bottom:20px}.alert.show{display:block;position:fixed;top:80px;right:20px;z-index:2000;max-width:420px;box-shadow:var(--shadow)}
 .alert.error{background:#fff0f1;color:#991b1b;border:1px solid #fecaca}
 .alert.success{background:#ecfdf3;color:#166534;border:1px solid #bbf7d0}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:25px}
@@ -225,7 +225,7 @@ function showAlert(message, type="error"){
   a.className = "alert show " + type;
   a.textContent = message;
   clearTimeout(window.__alertTimer);
-  window.__alertTimer = setTimeout(()=>{ a.className = "alert"; a.textContent = ""; }, 5000);
+  window.__alertTimer = setTimeout(()=>{ a.className = "alert"; a.textContent = ""; }, 9000);
 }
 
 /* Run a loader from a button and show any error */
@@ -504,11 +504,11 @@ document.addEventListener("click", async e => {
       const {error} = await db.rpc("reject_payment",{p_payment_id:id,p_reason:reason}); if(error) throw error;
       showAlert("Payment rejected.","success"); await loadPayments();
     }else if(act === "del-student"){
-      if(prompt(`Permanently delete ${name} and their unpaid records?\nStudents with confirmed payments cannot be deleted.\n\nType DELETE to continue:`) !== "DELETE") return;
+      if(prompt(`Permanently delete ${name} and their unpaid records?\nStudents with confirmed payments cannot be deleted.\n\nType DELETE to continue:`) !== "DELETE") return showAlert("Delete cancelled. You must type DELETE in capital letters.");
       const {error} = await db.rpc("delete_student",{p_student_id:id}); if(error) throw error;
       showAlert("Student deleted.","success"); await loadStudents();
     }else if(act === "del-job"){
-      if(prompt(`Permanently delete the job for ${name} and its unpaid records?\nJobs with confirmed payments cannot be deleted.\n\nType DELETE to continue:`) !== "DELETE") return;
+      if(prompt(`Permanently delete the job for ${name} and its unpaid records?\nJobs with confirmed payments cannot be deleted.\n\nType DELETE to continue:`) !== "DELETE") return showAlert("Delete cancelled. You must type DELETE in capital letters.");
       const {error} = await db.rpc("delete_printing_job",{p_job_id:id}); if(error) throw error;
       showAlert("Walk-in job deleted.","success"); await loadClients();
     }
