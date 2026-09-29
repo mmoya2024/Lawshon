@@ -331,7 +331,7 @@ async function saveEnrolment(e){
   if(!programme||!fee) return showNotice("Select a programme and fee option.","err");
   if(Number($("amountPaid").value||0)>CALC.total) return showNotice("Initial payment cannot exceed the total fee.","err");
   if(programme==="DRIVING" && !$("drivingClass").value) return showNotice("Select a driving class.","err");
-  if(programme==="COMPUTER" && !$("computerCourse").value) return showNotice("Select a computer course.","err");
+  if(programme==="COMPUTER" && COMPUTER.length && !$("computerCourse").value) return showNotice("Select a computer course.","err");
 
   const total=CALC.total, paid=CALC.paid;
   const pending=paid>0 && paid<total*0.5-0.005;
