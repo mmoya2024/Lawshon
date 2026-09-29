@@ -73,8 +73,12 @@ input[readonly]{background:#f5f7fa}
     <div class="grid">
       <div class="card stat"><div class="label">Students</div><div class="value" id="statStudents">—</div></div>
       <div class="card stat"><div class="label">Enrolments</div><div class="value" id="statEnrolments">—</div></div>
-      <div class="card stat"><div class="label">Confirmed Payments</div><div class="value" id="statPayments">—</div></div>
+      <div class="card stat"><div class="label">Printing Jobs</div><div class="value" id="statJobs">—</div></div>
       <div class="card stat"><div class="label">Active Fee Structures</div><div class="value" id="statFees">—</div></div>
+      <div class="card stat"><div class="label">Student Revenue (Driving &amp; Computer)</div><div class="value" id="statStudentRev">—</div></div>
+      <div class="card stat"><div class="label">Printing Revenue</div><div class="value" id="statPrintRev">—</div></div>
+      <div class="card stat"><div class="label">Total Revenue</div><div class="value" id="statTotalRev">—</div></div>
+      <div class="card stat"><div class="label">Payments Awaiting Approval</div><div class="value" id="statPending">—</div></div>
     </div>
     <div class="card"><h2>Status</h2><div id="recentActivity">Loading...</div></div>
   </section>
@@ -458,17 +462,25 @@ async function saveEnrolment(e){
 
 /* ---------- Overview ---------- */
 async function loadOverview(){
-  const [s,e,p,f]=await Promise.all([
+  const [s,e,j,p,f,q]=await Promise.all([
     DB.from(T.students).select("id",{count:"exact",head:true}),
     DB.from(T.enrolments).select("id",{count:"exact",head:true}),
-    DB.from(T.payments).select("amount").eq("status","CONFIRMED").limit(10000),
-    DB.from(T.fees).select("id",{count:"exact",head:true}).eq("is_active",true)
+    DB.from("printing_jobs").select("id",{count:"exact",head:true}),
+    DB.from(T.payments).select("amount,printing_job_id").eq("status","CONFIRMED").limit(10000),
+    DB.from(T.fees).select("id",{count:"exact",head:true}).eq("is_active",true),
+    DB.from(T.payments).select("id",{count:"exact",head:true}).eq("status","PENDING")
   ]);
-  for(const x of [s,e,p,f]) if(x.error) throw x.error;
+  for(const x of [s,e,j,p,f,q]) if(x.error) throw x.error;
+  let stu=0, prt=0;
+  (p.data||[]).forEach(r=>{ if(r.printing_job_id) prt+=Number(r.amount||0); else stu+=Number(r.amount||0); });
   $("statStudents").textContent=s.count??0;
   $("statEnrolments").textContent=e.count??0;
+  $("statJobs").textContent=j.count??0;
   $("statFees").textContent=f.count??0;
-  $("statPayments").textContent=money((p.data||[]).reduce((a,r)=>a+Number(r.amount||0),0));
+  $("statStudentRev").textContent=money(stu);
+  $("statPrintRev").textContent=money(prt);
+  $("statTotalRev").textContent=money(stu+prt);
+  $("statPending").textContent=q.count??0;
   $("recentActivity").innerHTML='<div class="notice info">Office Admin is connected to Supabase.</div>';
 }
 
