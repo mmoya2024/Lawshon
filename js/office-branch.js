@@ -14,11 +14,20 @@
     grp.innerHTML = '<label>Branch *</label><select id="branch" required><option value="">Select Branch</option></select>';
     grid.prepend(grp);
   }
-  DB.from("branches").select("id,branch_name").eq("is_active", true).order("branch_name").then(({ data, error }) => {
-    if (error) { console.error("Branches:", error.message); return; }
-    (data || []).forEach(b => { BR[b.id] = b.branch_name; });
-    if (g("branch")) g("branch").innerHTML = '<option value="">Select Branch</option>' +
-      (data || []).map(b => `<option value="${esc(b.id)}">${esc(b.branch_name)}</option>`).join("");
+  Promise.all([
+    DB.from("branches").select("id,branch_name").eq("is_active", true).order("branch_name"),
+    DB.rpc("my_branch")
+  ]).then(([br, mine]) => {
+    if (br.error) { console.error("Branches:", br.error.message); return; }
+    const list = br.data || [];
+    list.forEach(b => { BR[b.id] = b.branch_name; });
+    const mineId = mine && !mine.error ? mine.data : null;   // set for branch-restricted staff
+    const sel = g("branch");
+    if (!sel) return;
+    const opt = b => `<option value="${esc(b.id)}">${esc(b.branch_name)}</option>`;
+    sel.innerHTML = mineId
+      ? list.filter(b => b.id === mineId).map(opt).join("")            // locked to own branch
+      : '<option value="">Select Branch</option>' + list.map(opt).join("");
   });
 
   /* 2. Send the branch with student and walk-in saves */
