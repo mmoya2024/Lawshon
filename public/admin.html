@@ -227,6 +227,15 @@ const money = v => "KES " + Number(v||0).toLocaleString("en-KE",{minimumFraction
 const esc = v => String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 const fmtDate = v => v ? new Date(v).toLocaleDateString("en-KE") : "—";
 const fullName = s => [s?.first_name,s?.middle_name,s?.last_name].filter(Boolean).join(" ");
+function party(r){
+  if(r?.students) return {no:r.students.student_number,name:fullName(r.students),obj:r.students};
+  const c=r?.printing_jobs?.printing_customers;
+  return {no:c?.customer_number||"—",name:c?.customer_name||"",obj:{student_number:c?.customer_number,first_name:c?.customer_name}};
+}
+function enr(r){
+  if(r?.enrolments) return r.enrolments;
+  return r?.printing_jobs?{enrolment_number:r.printing_jobs.job_number,programme:"PRINTING_DIGITAL"}:null;
+}
 const today = () => new Date().toISOString().slice(0,10);
 const empty = (cols,msg) => `<tr><td colspan="${cols}" class="empty">${msg}</td></tr>`;
 
@@ -335,6 +344,27 @@ function resetForm(){
   $("enrolForm").reset(); $("startDate").value=today(); payerChanged(); programmeChanged();
 }
 
+async function savePrinting(fee,paid,payerText,modeText){
+  const {data,error}=await DB.rpc("register_printing_job",{
+    p_first_name:$("firstName").value.trim(), p_last_name:$("lastName").value.trim(),
+    p_phone:$("phone").value.trim(), p_email:$("email").value.trim()||null,
+    p_description:fee.name, p_quantity:CALC.qty, p_unit_price:CALC.unit,
+    p_amount_paid:paid, p_payment_method:$("paymentMethod").value,
+    p_reference:$("paymentReference").value.trim()||null,
+    p_notes:`${fee.name} x ${CALC.qty} | Payer: ${payerText} | Mode: ${modeText}`+($("notes").value.trim()?" | "+$("notes").value.trim():"")
+  });
+  if(error) throw error;
+  const r=Array.isArray(data)?data[0]:data;
+  showNotice(`Job saved. Customer No: ${r.customer_number} | Job No: ${r.job_number} | Invoice: ${r.invoice_number}`+(r.pending?" | Payment is below 50%: held for Super Admin approval, no receipt issued.":""),r.pending?"info":"success");
+  if(r.payment_number && !r.pending) showReceipt({
+    payer:payerText, invoice:{invoice_number:r.invoice_number},
+    payment:{payment_number:r.payment_number,payment_date:r.payment_date}, paid,
+    student:{first_name:$("firstName").value.trim(),last_name:$("lastName").value.trim(),student_number:r.customer_number},
+    enrolment:{enrolment_number:r.job_number,programme:"PRINTING_DIGITAL"},
+    method:$("paymentMethod").value, reference:$("paymentReference").value.trim()
+  });
+  resetForm(); await loadOverview();
+}
 async function saveEnrolment(e){
   e.preventDefault(); showNotice("");
   const programme=$("programme").value;
@@ -351,6 +381,7 @@ async function saveEnrolment(e){
   const modeText=$("payMode").value==="INSTALMENTS"?"Instalments 50/30/20":"Full payment";
   $("saveBtn").disabled=true; $("saveBtn").textContent="Saving...";
   try{
+    if(!isStudent){ await savePrinting(fee,paid,payerText,modeText); return; }
     const {data,error}=await DB.rpc("register_student",{
       p_first_name:$("firstName").value.trim(),
       p_last_name:$("lastName").value.trim(),
@@ -463,7 +494,7 @@ function renderStudents(){
 /* ---------- Fees ---------- */
 async function loadFees(){
   const {data,error}=await DB.from(T.invoices)
-    .select("id,invoice_number,student_id,enrolment_id,total_amount,amount_paid,balance,status,students(student_number,first_name,last_name),enrolments(enrolment_number,programme)")
+    .select("id,invoice_number,student_id,enrolment_id,printing_job_id,total_amount,amount_paid,balance,status,students(student_number,first_name,last_name),enrolments(enrolment_number,programme),printing_jobs(job_number,printing_customers(customer_name,customer_number))")
     .order("created_at",{ascending:false}).limit(1000);
   if(error) throw error;
   INVOICES=data||[];
@@ -471,8 +502,8 @@ async function loadFees(){
     const total=Number(i.total_amount||0), paid=Number(i.amount_paid||0), bal=Number(i.balance||0);
     const [st,cls]=bal<=0?["PAID","green"]:paid>0?["PARTIAL","yellow"]:["PENDING","red"];
     return `<tr><td>${esc(i.invoice_number||"—")}</td>
-      <td>${esc(i.students?.student_number||"—")} · ${esc(fullName(i.students))}</td>
-      <td>${esc(i.enrolments?.enrolment_number||"—")}</td><td>${esc(i.enrolments?.programme||"—")}</td>
+      <td>${esc(party(i).no)} · ${esc(party(i).name)}</td>
+      <td>${esc(enr(i)?.enrolment_number||"—")}</td><td>${esc(enr(i)?.programme||"—")}</td>
       <td>${money(total)}</td><td>${money(paid)}</td><td>${money(bal)}</td>
       <td><span class="pill ${cls}">${st}</span></td>
       <td>${bal>0?`<button class="btn outline" data-pay="${esc(i.id)}">Receive Payment</button>`:""}</td></tr>`;
@@ -482,13 +513,13 @@ async function loadFees(){
 /* ---------- Payments ---------- */
 async function loadPayments(){
   const {data,error}=await DB.from(T.payments)
-    .select("id,payment_number,payment_date,amount,payment_method,transaction_reference,mpesa_receipt_number,students(student_number,first_name,middle_name,last_name),enrolments(enrolment_number,programme),invoices(invoice_number)")
+    .select("id,payment_number,payment_date,amount,payment_method,transaction_reference,mpesa_receipt_number,students(student_number,first_name,middle_name,last_name),enrolments(enrolment_number,programme),printing_jobs(job_number,printing_customers(customer_name,customer_number)),invoices(invoice_number)")
     .eq("status","CONFIRMED").order("payment_date",{ascending:false}).limit(1000);
   if(error) throw error;
   PAYS=data||[];
   $("paymentsTable").innerHTML=PAYS.length?PAYS.map((p,n)=>`<tr>
     <td>${esc(p.payment_number||"—")}</td><td>${fmtDate(p.payment_date)}</td>
-    <td>${esc(p.students?.student_number||"—")} · ${esc(fullName(p.students))}</td>
+    <td>${esc(party(p).no)} · ${esc(party(p).name)}</td>
     <td>${esc(p.payment_method||"—")}</td>
     <td>${esc(p.transaction_reference||p.mpesa_receipt_number||"—")}</td>
     <td>${money(p.amount)}</td>
@@ -511,7 +542,7 @@ function showReceipt(d){
   const row=(l,v)=>`<div class="receipt-row"><span>${l}</span><strong>${esc(v)}</strong></div>`;
   $("receiptContent").innerHTML=`${LOGO_URL?`<div style="text-align:center;margin-bottom:8px"><img src="${esc(LOGO_URL)}" alt="Lashawn Academy" style="max-height:70px;max-width:220px" onerror="this.style.display='none'"></div>`:""}<h2>Lashawn Academy</h2><p style="text-align:center">Payment Receipt</p><hr>
     ${row("Payment No.",d.payment?.payment_number||"—")}${row("Date",fmtDate(d.payment?.payment_date))}
-    ${row("Student No.",d.student?.student_number||"—")}${row("Enrolment No.",d.enrolment?.enrolment_number||"—")}
+    ${row(d.enrolment?.programme==="PRINTING_DIGITAL"?"Customer No.":"Student No.",d.student?.student_number||"—")}${row(d.enrolment?.programme==="PRINTING_DIGITAL"?"Job No.":"Enrolment No.",d.enrolment?.enrolment_number||"—")}
     ${row(d.enrolment?.programme==="PRINTING_DIGITAL"?"Client":"Student",fullName(d.student))}${row("Programme",d.enrolment?.programme||"—")}<hr>
     ${d.payer?row("Paid By",d.payer):""}${d.invoice?.invoice_number?row("Invoice No.",d.invoice.invoice_number):""}${row("Amount Received",money(d.paid))}${d.balance!=null?row("Balance Remaining",money(d.balance)):""}${row("Method",d.method)}${row("Reference",d.reference||"—")}<hr>
     <p style="text-align:center;font-size:12px">Thank you for choosing Lashawn Academy.</p>`;
@@ -551,7 +582,7 @@ function openPay(id){
   { const t=Number(inv.total_amount||0), pd=Number(inv.amount_paid||0);
     const target=[.5,.8,1].map(x=>t*x).find(x=>x>pd+0.005)??t;
     $("payAmount").value=Math.min(Number(inv.balance||0),+(target-pd).toFixed(2)); }
-  $("payInfo").textContent=`${inv.invoice_number||"Invoice"} · ${inv.students?.student_number||""} ${fullName(inv.students)} · Balance ${money(inv.balance)} · Cumulative payment under 50% needs Super Admin approval`;
+  $("payInfo").textContent=`${inv.invoice_number||"Invoice"} · ${party(inv).no} ${party(inv).name} · Balance ${money(inv.balance)} · Cumulative payment under 50% needs Super Admin approval`;
   $("payModal").classList.add("open");
 }
 async function submitPay(e){
@@ -564,7 +595,7 @@ async function submitPay(e){
   $("payBtn").disabled=true; $("payBtn").textContent="Saving...";
   try{
     const {data:p,error}=await DB.from(T.payments).insert({
-      student_id:inv.student_id, enrolment_id:inv.enrolment_id, invoice_id:inv.id,
+      student_id:inv.student_id, enrolment_id:inv.enrolment_id, printing_job_id:inv.printing_job_id, invoice_id:inv.id,
       amount:amt, payment_method:$("payMethod").value,
       transaction_reference:$("payRef").value.trim()||null,
       status:pend?"PENDING":"CONFIRMED", notes:($("payNotes").value.trim()||"Payment received")+(pend?" | Awaiting Super Admin approval (below 50%)":"")
@@ -588,7 +619,7 @@ async function submitPay(e){
     }
     $("payModal").classList.remove("open");
     showReceipt({
-      payment:p, paid:amt, student:inv.students, enrolment:inv.enrolments,
+      payment:p, paid:amt, student:party(inv).obj, enrolment:enr(inv),
       invoice:inv, balance:Math.max(0,total-expected),
       method:$("payMethod").value, reference:$("payRef").value.trim()
     });
@@ -604,7 +635,7 @@ $("feesTable").addEventListener("click",e=>{ const b=e.target.closest("[data-pay
 $("paymentsTable").addEventListener("click",e=>{
   const b=e.target.closest("[data-receipt]"); if(!b) return;
   const p=PAYS[b.dataset.receipt];
-  showReceipt({payment:p,paid:p.amount,student:p.students,enrolment:p.enrolments,invoice:p.invoices,
+  showReceipt({payment:p,paid:p.amount,student:party(p).obj,enrolment:enr(p),invoice:p.invoices,
     method:p.payment_method,reference:p.transaction_reference||p.mpesa_receipt_number||""});
 });
 $("payForm").addEventListener("submit",submitPay);
@@ -614,14 +645,14 @@ $("payCancel").addEventListener("click",()=>$("payModal").classList.remove("open
 async function loadApprovals(){
   if(!IS_SUPER){ $("approvalsTable").innerHTML=empty(8,"Super Admin access required."); return; }
   const {data,error}=await DB.from(T.payments)
-    .select("id,payment_number,payment_date,amount,payment_method,transaction_reference,notes,students(student_number,first_name,middle_name,last_name),enrolments(enrolment_number,programme),invoices(invoice_number,total_amount,amount_paid)")
+    .select("id,payment_number,payment_date,amount,payment_method,transaction_reference,notes,students(student_number,first_name,middle_name,last_name),enrolments(enrolment_number,programme),printing_jobs(job_number,printing_customers(customer_name,customer_number)),invoices(invoice_number,total_amount,amount_paid)")
     .eq("status","PENDING").order("created_at",{ascending:false});
   if(error) throw error;
   PENDING=data||[];
   $("approvalsTable").innerHTML=PENDING.length?PENDING.map((p,n)=>{
     const t=Number(p.invoices?.total_amount||0), pct=t?Math.round((Number(p.invoices?.amount_paid||0)+Number(p.amount))/t*100):"—";
     return `<tr><td>${esc(p.payment_number||"—")}</td><td>${fmtDate(p.payment_date)}</td>
-      <td>${esc(p.students?.student_number||"—")} · ${esc(fullName(p.students))}</td>
+      <td>${esc(party(p).no)} · ${esc(party(p).name)}</td>
       <td>${esc(p.invoices?.invoice_number||"—")}</td><td>${money(p.amount)}</td><td>${pct}%</td>
       <td>${esc(p.payment_method||"")} ${esc(p.transaction_reference||"")} ${esc(p.notes||"")}</td>
       <td><button class="btn" data-approve="${n}">Approve &amp; Receipt</button></td></tr>`;
@@ -630,13 +661,13 @@ async function loadApprovals(){
 $("approvalsTable").addEventListener("click",async e=>{
   const b=e.target.closest("[data-approve]"); if(!b) return;
   const p=PENDING[b.dataset.approve];
-  if(!confirm(`Approve ${money(p.amount)} for ${fullName(p.students)}?`)) return;
+  if(!confirm(`Approve ${money(p.amount)} for ${party(p).name}?`)) return;
   b.disabled=true;
   try{
     const {error}=await DB.rpc("approve_payment",{p_payment_id:p.id});
     if(error) throw error;
     const t=Number(p.invoices?.total_amount||0);
-    showReceipt({payment:p,paid:p.amount,student:p.students,enrolment:p.enrolments,invoice:p.invoices,
+    showReceipt({payment:p,paid:p.amount,student:party(p).obj,enrolment:enr(p),invoice:p.invoices,
       balance:Math.max(0,t-Number(p.invoices?.amount_paid||0)-Number(p.amount)),
       method:p.payment_method,reference:p.transaction_reference||""});
     toast("Payment approved");
