@@ -92,6 +92,7 @@ tr:last-child td{border-bottom:0}
     <button class="nav-btn active" data-section="dashboard">Dashboard</button>
     <button class="nav-btn" data-section="training">6-Week Training</button>
     <button class="nav-btn" data-section="students">Students</button>
+    <button class="nav-btn" data-section="clients">Walk-in Clients</button>
     <button class="nav-btn" data-section="enrolments">Enrolments</button>
     <button class="nav-btn" data-section="payments">Payments</button>
     <button class="nav-btn" data-section="fees">Fees & Pricing</button>
@@ -120,6 +121,14 @@ tr:last-child td{border-bottom:0}
     <div class="card"><div class="metric-label">Pending Payments</div><div class="metric-value" id="metricPayments">—</div><div class="metric-note">Awaiting approval</div></div>
     <div class="card"><div class="metric-label">Active Staff</div><div class="metric-value" id="metricStaff">—</div><div class="metric-note">Active staff records</div></div>
   </div>
+  <div class="cards">
+    <div class="card"><div class="metric-label">Student Revenue</div><div class="metric-value" id="revStudents">—</div><div class="metric-note">Driving &amp; Computer (confirmed)</div></div>
+    <div class="card"><div class="metric-label">Walk-in Revenue</div><div class="metric-value" id="revWalkin">—</div><div class="metric-note">Printing, Cyber &amp; Digital (confirmed)</div></div>
+    <div class="card"><div class="metric-label">Total Revenue</div><div class="metric-value" id="revTotal">—</div><div class="metric-note">All branches</div></div>
+    <div class="card"><div class="metric-label">Walk-in Jobs</div><div class="metric-value" id="metricJobs">—</div><div class="metric-note">Registered jobs</div></div>
+  </div>
+  <div class="section-title"><h3>Revenue by Branch</h3></div>
+  <div class="table-wrap" style="margin-bottom:25px"><div id="branchRevenue"><div class="loading">Loading...</div></div></div>
   <div class="section-title"><h3>Recent Enrolments</h3><button class="btn btn-light" onclick="run(loadRecentEnrolments)">Refresh</button></div>
   <div class="table-wrap"><div id="recentEnrolments"><div class="loading">Loading...</div></div></div>
 </section>
@@ -130,9 +139,14 @@ tr:last-child td{border-bottom:0}
 </section>
 
 <section id="students" class="section">
-  <div class="section-title"><h3>Students</h3>
+  <div class="section-title"><h3>Students (Driving &amp; Computer)</h3>
     <div class="toolbar"><input type="search" id="studentSearch" placeholder="Search student..."><button class="btn btn-light" onclick="run(loadStudents)">Search</button></div></div>
   <div class="table-wrap"><div id="studentsTable"><div class="loading">Loading students...</div></div></div>
+</section>
+
+<section id="clients" class="section">
+  <div class="section-title"><h3>Walk-in Clients (Printing, Cyber &amp; Digital)</h3><button class="btn btn-light" onclick="run(loadClients)">Refresh</button></div>
+  <div class="table-wrap"><div id="clientsTable"><div class="loading">Loading walk-in clients...</div></div></div>
 </section>
 
 <section id="enrolments" class="section">
@@ -143,8 +157,9 @@ tr:last-child td{border-bottom:0}
 <section id="payments" class="section">
   <div class="section-title"><h3>Payments</h3>
     <div class="toolbar">
+      <select id="paymentType" onchange="run(loadPayments)"><option value="">Students &amp; Walk-in</option><option value="student">Students only</option><option value="walkin">Walk-in only</option></select>
       <select id="paymentFilter" onchange="run(loadPayments)">
-        <option value="">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option>
+        <option value="">All statuses</option><option value="PENDING">Pending</option><option value="CONFIRMED">Confirmed</option><option value="REJECTED">Rejected</option>
       </select>
       <button class="btn btn-light" onclick="run(loadPayments)">Refresh</button>
     </div></div>
@@ -198,7 +213,7 @@ const byId = rows => Object.fromEntries((rows||[]).map(r => [r.id,r]));
 function badge(status){
   const v = String(status || "unknown"), l = v.toLowerCase();
   let c = "";
-  if(["approved","active","completed","paid","ready"].includes(l)) c = "green";
+  if(["approved","confirmed","active","completed","paid","ready"].includes(l)) c = "green";
   else if(["pending","in progress","ongoing"].includes(l)) c = "yellow";
   else if(["rejected","cancelled","inactive"].includes(l)) c = "red";
   else if(l === "new") c = "blue";
@@ -278,8 +293,8 @@ async function checkAuthentication(){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {dashboard:"Dashboard",training:"6-Week Training",students:"Students",enrolments:"Enrolments",payments:"Payments",fees:"Fees & Pricing",staff:"Staff",audit:"Audit Activity"};
-const LOADERS = {dashboard:loadDashboard,training:loadTraining,students:loadStudents,enrolments:loadEnrolments,payments:loadPayments,fees:loadFees,staff:loadStaff,audit:loadAudit};
+const TITLES = {dashboard:"Dashboard",training:"6-Week Training",students:"Students (Driving & Computer)",clients:"Walk-in Clients",enrolments:"Enrolments",payments:"Payments",fees:"Fees & Pricing",staff:"Staff",audit:"Audit Activity"};
+const LOADERS = {dashboard:loadDashboard,training:loadTraining,students:loadStudents,clients:loadClients,enrolments:loadEnrolments,payments:loadPayments,fees:loadFees,staff:loadStaff,audit:loadAudit};
 
 document.querySelectorAll(".nav-btn").forEach(button => {
   button.addEventListener("click", async () => {
@@ -304,18 +319,50 @@ async function countTable(table, filterFn=null){
   return count || 0;
 }
 
+let BRANCHES = {};
+async function loadBranches(){
+  const {data,error} = await db.from("branches").select("*");
+  if(error){ console.warn("Branches:", error.message); return; }
+  BRANCHES = Object.fromEntries((data||[]).map(b => [b.id, b.name || b.branch_name || b.code || "Branch"]));
+}
+const branchName = id => BRANCHES[id] || "—";
+
 async function loadDashboard(){
-  const [s,e,p,st] = await Promise.all([
+  const [s,j,e,p,st] = await Promise.all([
     countTable("students"),
-    countTable("enrolments", q => q.in("status",["active","in_progress","ongoing"])),
-    countTable("payments", q => q.eq("status","pending")),
+    countTable("printing_jobs"),
+    countTable("enrolments", q => q.eq("status","ACTIVE")),
+    countTable("payments", q => q.eq("status","PENDING")),
     countTable("staff", q => q.eq("is_active",true))
   ]);
   $("metricStudents").textContent = s;
+  $("metricJobs").textContent = j;
   $("metricEnrolments").textContent = e;
   $("metricPayments").textContent = p;
   $("metricStaff").textContent = st;
-  await loadRecentEnrolments();
+  await Promise.all([loadRevenue(), loadRecentEnrolments()]);
+}
+
+async function loadRevenue(){
+  const {data,error} = await db.from("payments")
+    .select("amount,printing_job_id,students(branch_id),enrolments(branch_id),printing_jobs(branch_id)")
+    .eq("status","CONFIRMED").limit(10000);
+  if(error) throw error;
+  let stu = 0, wal = 0; const by = {};
+  (data||[]).forEach(r => {
+    const a = Number(r.amount||0), walk = !!r.printing_job_id;
+    const b = (walk ? r.printing_jobs?.branch_id : (r.enrolments?.branch_id || r.students?.branch_id)) || "none";
+    by[b] = by[b] || {stu:0, wal:0};
+    if(walk){ wal += a; by[b].wal += a; } else { stu += a; by[b].stu += a; }
+  });
+  $("revStudents").textContent = money(stu);
+  $("revWalkin").textContent = money(wal);
+  $("revTotal").textContent = money(stu + wal);
+  const keys = Object.keys(by);
+  $("branchRevenue").innerHTML = keys.length ? tableHtml(
+    ["Branch","Student Revenue","Walk-in Revenue","Total"],
+    keys.map(k => [cell(k === "none" ? "Unassigned" : branchName(k)), money(by[k].stu), money(by[k].wal), "<strong>"+money(by[k].stu+by[k].wal)+"</strong>"])
+  ) : empty("No confirmed payments yet.");
 }
 
 async function loadRecentEnrolments(){
@@ -342,7 +389,7 @@ async function loadTraining(){
   target.innerHTML = data && data.length ? autoTable(data) : empty("No training records found.");
 }
 
-/* ---------- Students ---------- */
+/* ---------- Students (Driving & Computer) ---------- */
 async function loadStudents(){
   const target = $("studentsTable");
   target.innerHTML = loadingHtml("Loading students...");
@@ -358,8 +405,26 @@ async function loadStudents(){
   if(error) throw error;
   if(!data || !data.length){ target.innerHTML = empty("No students found."); return; }
   target.innerHTML = tableHtml(
-    ["Student No.","Name","Phone","Email","ID","Gender","Status","Registered"],
-    data.map(s => [cell(s.student_number), cell(fullName(s)), cell(s.phone), cell(s.email), cell(s.national_id), cell(s.gender), badge(s.status), dateOnly(s.registration_date)])
+    ["Student No.","Name","Phone","Email","ID","Branch","Status","Registered","Actions"],
+    data.map(s => [cell(s.student_number), cell(fullName(s)), cell(s.phone), cell(s.email), cell(s.national_id), cell(branchName(s.branch_id)), badge(s.status), dateOnly(s.registration_date),
+      `<button class="btn btn-red" data-act="del-student" data-id="${escapeHtml(s.id)}" data-name="${escapeHtml(fullName(s))}">Delete</button>`])
+  );
+}
+
+/* ---------- Walk-in clients ---------- */
+async function loadClients(){
+  const target = $("clientsTable");
+  target.innerHTML = loadingHtml("Loading walk-in clients...");
+  const {data,error} = await db.from("printing_jobs")
+    .select("*,printing_customers(customer_name,customer_number,phone)")
+    .order("created_at",{ascending:false}).limit(200);
+  if(error) throw error;
+  if(!data || !data.length){ target.innerHTML = empty("No walk-in clients found."); return; }
+  target.innerHTML = tableHtml(
+    ["Job No.","Customer","Phone","Branch","Date","Status","Actions"],
+    data.map(j => { const c = j.printing_customers;
+      return [cell(j.job_number), `${cell(c?.customer_name)}<br><small>${escapeHtml(c?.customer_number||"")}</small>`, cell(c?.phone), cell(branchName(j.branch_id)), dateOnly(j.created_at), badge(j.status || "active"),
+      `<button class="btn btn-red" data-act="del-job" data-id="${escapeHtml(j.id)}" data-name="${escapeHtml(c?.customer_name||j.job_number)}">Delete</button>`]; })
   );
 }
 
@@ -384,13 +449,13 @@ async function loadEnrolments(){
   if(cr.error) throw cr.error;
   const dm = byId(dr.data), cm = byId(cr.data);
   target.innerHTML = tableHtml(
-    ["Enrolment","Student","Programme","Course/Class","Start","End","Weeks","Status"],
+    ["Enrolment","Student","Programme","Course/Class","Start","End","Weeks","Branch","Status"],
     data.map(r => {
       let course = "—";
       const d = dm[r.driving_class_id], c = cm[r.computer_course_id];
       if(d) course = [d.class_code,d.class_name].filter(Boolean).join(" — ");
       if(c) course = [c.course_code,c.course_name].filter(Boolean).join(" — ");
-      return [cell(r.enrolment_number), studentCell(sm[r.student_id]), cell(r.programme), cell(course), dateOnly(r.start_date), dateOnly(r.actual_end_date || r.expected_end_date), cell(r.training_weeks), badge(r.status)];
+      return [cell(r.enrolment_number), studentCell(sm[r.student_id]), cell(r.programme), cell(course), dateOnly(r.start_date), dateOnly(r.actual_end_date || r.expected_end_date), cell(r.training_weeks), cell(branchName(r.branch_id)), badge(r.status)];
     })
   );
 }
@@ -399,39 +464,57 @@ async function loadEnrolments(){
 async function loadPayments(){
   const target = $("paymentsTable");
   target.innerHTML = loadingHtml("Loading payments...");
-  const status = $("paymentFilter").value;
+  const status = $("paymentFilter").value, type = $("paymentType").value;
   let q = db.from("payments")
-    .select("id,payment_number,student_id,enrolment_id,amount,payment_method,transaction_reference,mpesa_receipt_number,payment_date,status,notes")
-    .order("payment_date",{ascending:false}).limit(100);
+    .select("id,payment_number,amount,payment_method,transaction_reference,mpesa_receipt_number,payment_date,status,printing_job_id,students(student_number,first_name,middle_name,last_name,branch_id),enrolments(branch_id),printing_jobs(job_number,branch_id,printing_customers(customer_name,customer_number))")
+    .order("payment_date",{ascending:false}).limit(200);
   if(status) q = q.eq("status",status);
+  if(type === "student") q = q.is("printing_job_id",null);
+  if(type === "walkin") q = q.not("printing_job_id","is",null);
   const {data,error} = await q;
   if(error) throw error;
   if(!data || !data.length){ target.innerHTML = empty("No payments found."); return; }
-  const sm = await fetchStudents(data.map(r => r.student_id));
   target.innerHTML = tableHtml(
-    ["Payment","Student","Amount","Method","Reference","Date","Status","Action"],
+    ["Payment","Client","Type","Branch","Amount","Method","Reference","Date","Status","Action"],
     data.map(p => {
-      const pending = String(p.status || "").toLowerCase() === "pending";
-      return [cell(p.payment_number), studentCell(sm[p.student_id]), money(p.amount), cell(p.payment_method),
+      const walk = !!p.printing_job_id, c = p.printing_jobs?.printing_customers;
+      const who = walk ? `${cell(c?.customer_name)}<br><small>${escapeHtml(c?.customer_number||"")}</small>` : studentCell(p.students);
+      const br = walk ? p.printing_jobs?.branch_id : (p.enrolments?.branch_id || p.students?.branch_id);
+      const pending = String(p.status||"").toUpperCase() === "PENDING";
+      const id = escapeHtml(p.id);
+      return [cell(p.payment_number), who, walk ? badge("Walk-in") : badge("Student"), cell(branchName(br)), money(p.amount), cell(p.payment_method),
         cell(p.mpesa_receipt_number || p.transaction_reference), dateOnly(p.payment_date), badge(p.status),
-        pending ? `<button class="btn btn-green" onclick="approvePayment('${escapeHtml(p.id)}')">Approve</button>` : "—"];
+        pending ? `<button class="btn btn-green" data-act="approve" data-id="${id}">Approve</button> <button class="btn btn-red" data-act="reject" data-id="${id}">Reject</button>` : "—"];
     })
   );
 }
 
-async function approvePayment(paymentId){
-  if(!paymentId || !window.confirm("Approve this payment?")) return;
+/* Approve / reject / delete actions */
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-act]"); if(!b) return;
+  const {act,id,name} = b.dataset;
   try{
-    const {error} = await db.rpc("approve_payment",{p_payment_id:paymentId});
-    if(error) throw error;
-    showAlert("Payment approved successfully.","success");
-    await loadPayments();
-    await loadDashboard();
-  }catch(e){
-    console.error(e);
-    showAlert(e.message || "Payment approval failed.");
-  }
-}
+    if(act === "approve"){
+      if(!confirm("Approve this payment?")) return;
+      const {error} = await db.rpc("approve_payment",{p_payment_id:id}); if(error) throw error;
+      showAlert("Payment approved.","success"); await loadPayments();
+    }else if(act === "reject"){
+      const reason = prompt("Reason for rejecting this payment (e.g. M-Pesa code not found):");
+      if(reason === null) return;
+      const {error} = await db.rpc("reject_payment",{p_payment_id:id,p_reason:reason}); if(error) throw error;
+      showAlert("Payment rejected.","success"); await loadPayments();
+    }else if(act === "del-student"){
+      if(prompt(`Permanently delete ${name} and their unpaid records?\nStudents with confirmed payments cannot be deleted.\n\nType DELETE to continue:`) !== "DELETE") return;
+      const {error} = await db.rpc("delete_student",{p_student_id:id}); if(error) throw error;
+      showAlert("Student deleted.","success"); await loadStudents();
+    }else if(act === "del-job"){
+      if(prompt(`Permanently delete the job for ${name} and its unpaid records?\nJobs with confirmed payments cannot be deleted.\n\nType DELETE to continue:`) !== "DELETE") return;
+      const {error} = await db.rpc("delete_printing_job",{p_job_id:id}); if(error) throw error;
+      showAlert("Walk-in job deleted.","success"); await loadClients();
+    }
+    loadDashboard().catch(console.error);
+  }catch(err){ console.error(err); showAlert(err.message || "Action failed."); }
+});
 
 /* ---------- Fees ---------- */
 async function loadFees(){
@@ -500,6 +583,7 @@ async function startDashboard(){
     $("bootScreen").style.display = "none";
     $("app").style.display = "block";
     $("connectionStatus").textContent = "Supabase connected";
+    await loadBranches();
     await loadDashboard();
   }catch(e){
     console.error("Lashawn dashboard startup error:", e);
