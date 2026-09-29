@@ -208,8 +208,8 @@ const SUPABASE_URL = "https://qjfinbftcserrjiedduf.supabase.co";
 const SUPABASE_KEY = "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
 const DB = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-/* Receipt logo: put logo.png in the same folder as admin.html (or use a full https:// URL). Set to "" to hide. */
-const LOGO_URL = "logo.png";
+/* Receipt logo: file is public/images/logo.png, served at /images/logo.png. Set to "" to hide. */
+const LOGO_URL = "/images/logo.png";
 
 /* Table / view names in one place */
 const T = {
