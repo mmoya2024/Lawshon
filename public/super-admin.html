@@ -1,3962 +1,514 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Lashawn Academy | Super Admin Dashboard</title>
-
-<meta name="description"
-      content="Lashawn Driving & Computer College Super Admin Dashboard">
-
-<!-- =========================================================
-     SUPABASE LIBRARY
-     ========================================================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-:root{
-    --navy:#071a33;
-    --navy2:#0d294d;
-    --green:#19d66b;
-    --green-dark:#0e9f50;
-    --white:#ffffff;
-    --bg:#f4f7fb;
-    --card:#ffffff;
-    --text:#172033;
-    --muted:#6b7280;
-    --border:#e3e8ef;
-    --danger:#dc3545;
-    --warning:#f59e0b;
-    --blue:#2563eb;
-    --purple:#7c3aed;
-    --shadow:0 8px 30px rgba(7,26,51,.08);
-    --radius:14px;
-}
-
-*{
-    box-sizing:border-box;
-}
-
-html,
-body{
-    margin:0;
-    padding:0;
-    min-height:100%;
-}
-
-body{
-    font-family:
-        Inter,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-    background:var(--bg);
-    color:var(--text);
-}
-
-button,
-input,
-select,
-textarea{
-    font:inherit;
-}
-
-button{
-    cursor:pointer;
-}
-
-button:disabled{
-    cursor:not-allowed;
-    opacity:.55;
-}
-
-/* =========================================================
-   LOADING SCREEN
-   ========================================================= */
-
-#bootScreen{
-    position:fixed;
-    inset:0;
-    z-index:9999;
-    background:var(--navy);
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:30px;
-}
-
-.boot-box{
-    width:min(430px,100%);
-}
-
-.boot-logo{
-    width:70px;
-    height:70px;
-    margin:0 auto 20px;
-    border-radius:18px;
-    background:var(--green);
-    color:var(--navy);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:30px;
-    font-weight:900;
-}
-
-.boot-box h1{
-    margin:0 0 8px;
-    font-size:24px;
-}
-
-.boot-box p{
-    margin:0;
-    color:#b9c7d8;
-    font-size:14px;
-}
-
-.spinner{
-    width:34px;
-    height:34px;
-    margin:25px auto 0;
-    border:4px solid rgba(255,255,255,.18);
-    border-top-color:var(--green);
-    border-radius:50%;
-    animation:spin .8s linear infinite;
-}
-
-@keyframes spin{
-    to{
-        transform:rotate(360deg);
-    }
-}
-
-/* =========================================================
-   ERROR SCREEN
-   ========================================================= */
-
-#errorScreen{
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:9998;
-    background:var(--bg);
-    align-items:center;
-    justify-content:center;
-    padding:25px;
-}
-
-.error-card{
-    width:min(620px,100%);
-    background:white;
-    border:1px solid var(--border);
-    border-radius:18px;
-    padding:30px;
-    box-shadow:var(--shadow);
-}
-
-.error-icon{
-    width:52px;
-    height:52px;
-    border-radius:50%;
-    background:#fee2e2;
-    color:#991b1b;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:25px;
-    font-weight:800;
-    margin-bottom:18px;
-}
-
-.error-card h2{
-    margin:0 0 10px;
-}
-
-.error-card p{
-    color:var(--muted);
-    line-height:1.6;
-}
-
-.error-message{
-    background:#f8fafc;
-    border:1px solid var(--border);
-    border-radius:9px;
-    padding:12px;
-    font-family:monospace;
-    font-size:12px;
-    word-break:break-word;
-    margin:15px 0;
-}
-
-/* =========================================================
-   APPLICATION
-   ========================================================= */
-
-#app{
-    display:none;
-    min-height:100vh;
-}
-
-.app{
-    min-height:100vh;
-    display:flex;
-}
-
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
-
-.sidebar{
-    width:250px;
-    background:var(--navy);
-    color:white;
-    position:fixed;
-    top:0;
-    bottom:0;
-    left:0;
-    z-index:1000;
-    display:flex;
-    flex-direction:column;
-}
-
-.brand{
-    padding:22px 20px;
-    border-bottom:1px solid rgba(255,255,255,.1);
-}
-
-.brand h1{
-    margin:0;
-    font-size:20px;
-    font-weight:800;
-}
-
-.brand p{
-    margin:5px 0 0;
-    font-size:12px;
-    color:#aebdce;
-}
-
-.nav{
-    padding:15px 10px;
-    flex:1;
-    overflow:auto;
-}
-
-.nav button{
-    width:100%;
-    border:0;
-    background:transparent;
-    color:#c9d4e2;
-    padding:12px 14px;
-    border-radius:9px;
-    text-align:left;
-    margin-bottom:4px;
-    transition:.2s;
-}
-
-.nav button:hover{
-    background:rgba(255,255,255,.07);
-    color:white;
-}
-
-.nav button.active{
-    background:rgba(25,214,107,.15);
-    color:white;
-    border-left:3px solid var(--green);
-}
-
-.sidebar-footer{
-    padding:15px;
-    border-top:1px solid rgba(255,255,255,.1);
-}
-
-.user-box{
-    margin-bottom:10px;
-    font-size:12px;
-    color:#c9d4e2;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-
-.logout{
-    width:100%;
-    border:1px solid rgba(255,255,255,.2);
-    background:transparent;
-    color:white;
-    padding:10px;
-    border-radius:8px;
-}
-
-.logout:hover{
-    background:rgba(255,255,255,.08);
-}
-
-/* =========================================================
-   MAIN
-   ========================================================= */
-
-.main{
-    margin-left:250px;
-    width:calc(100% - 250px);
-    min-height:100vh;
-}
-
-.topbar{
-    min-height:70px;
-    background:white;
-    border-bottom:1px solid var(--border);
-    padding:15px 25px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:15px;
-    position:sticky;
-    top:0;
-    z-index:900;
-}
-
-.topbar-left{
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.topbar h2{
-    margin:0;
-    font-size:21px;
-}
-
-.connection{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    color:var(--muted);
-    font-size:12px;
-}
-
-.connection-dot{
-    width:9px;
-    height:9px;
-    border-radius:50%;
-    background:var(--green);
-}
-
-.mobile-toggle{
-    display:none;
-    border:0;
-    background:var(--navy);
-    color:white;
-    border-radius:7px;
-    padding:9px 12px;
-}
-
-.content{
-    padding:25px;
-}
-
-/* =========================================================
-   ALERTS
-   ========================================================= */
-
-.alert{
-    display:none;
-    padding:14px 16px;
-    border-radius:10px;
-    margin-bottom:20px;
-}
-
-.alert.show{
-    display:block;
-}
-
-.alert.error{
-    background:#fff0f1;
-    color:#991b1b;
-    border:1px solid #fecaca;
-}
-
-.alert.success{
-    background:#ecfdf3;
-    color:#166534;
-    border:1px solid #bbf7d0;
-}
-
-.alert.warning{
-    background:#fffbeb;
-    color:#92400e;
-    border:1px solid #fde68a;
-}
-
-/* =========================================================
-   DASHBOARD CARDS
-   ========================================================= */
-
-.cards{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:16px;
-    margin-bottom:25px;
-}
-
-.card{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:20px;
-    box-shadow:var(--shadow);
-}
-
-.metric-label{
-    color:var(--muted);
-    font-size:12px;
-    margin-bottom:8px;
-}
-
-.metric-value{
-    font-size:28px;
-    font-weight:800;
-}
-
-.metric-note{
-    color:var(--muted);
-    font-size:11px;
-    margin-top:7px;
-}
-
-/* =========================================================
-   SECTIONS
-   ========================================================= */
-
-.section{
-    display:none;
-}
-
-.section.active{
-    display:block;
-}
-
-.section-title{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:15px;
-    margin-bottom:15px;
-}
-
-.section-title h3{
-    margin:0;
-    font-size:18px;
-}
-
-.toolbar{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-}
-
-/* =========================================================
-   FORM ELEMENTS
-   ========================================================= */
-
-input,
-select,
-textarea{
-    border:1px solid var(--border);
-    background:white;
-    border-radius:8px;
-    padding:10px 11px;
-    outline:none;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-    border-color:var(--green-dark);
-    box-shadow:0 0 0 3px rgba(25,214,107,.1);
-}
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
-
-.btn{
-    border:0;
-    border-radius:8px;
-    padding:10px 14px;
-    font-weight:600;
-}
-
-.btn-primary{
-    background:var(--navy);
-    color:white;
-}
-
-.btn-green{
-    background:var(--green);
-    color:#062015;
-}
-
-.btn-blue{
-    background:var(--blue);
-    color:white;
-}
-
-.btn-red{
-    background:var(--danger);
-    color:white;
-}
-
-.btn-light{
-    background:#eef2f7;
-    color:#243044;
-}
-
-.btn-purple{
-    background:var(--purple);
-    color:white;
-}
-
-/* =========================================================
-   TABLES
-   ========================================================= */
-
-.table-wrap{
-    background:white;
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    overflow:auto;
-    box-shadow:var(--shadow);
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:800px;
-}
-
-th,
-td{
-    padding:13px 14px;
-    border-bottom:1px solid var(--border);
-    text-align:left;
-    vertical-align:middle;
-    font-size:13px;
-}
-
-th{
-    background:#f8fafc;
-    color:#526071;
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:.04em;
-}
-
-tr:last-child td{
-    border-bottom:0;
-}
-
-/* =========================================================
-   BADGES
-   ========================================================= */
-
-.badge{
-    display:inline-block;
-    padding:5px 9px;
-    border-radius:999px;
-    font-size:11px;
-    font-weight:700;
-    background:#edf2f7;
-    color:#475569;
-}
-
-.badge.green{
-    background:#dcfce7;
-    color:#166534;
-}
-
-.badge.yellow{
-    background:#fef3c7;
-    color:#92400e;
-}
-
-.badge.red{
-    background:#fee2e2;
-    color:#991b1b;
-}
-
-.badge.blue{
-    background:#dbeafe;
-    color:#1e40af;
-}
-
-/* =========================================================
-   EMPTY / LOADING
-   ========================================================= */
-
-.empty{
-    padding:40px 20px;
-    text-align:center;
-    color:var(--muted);
-}
-
-.loading{
-    padding:35px;
-    text-align:center;
-    color:var(--muted);
-}
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media(max-width:1050px){
-
-    .cards{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-}
-
-@media(max-width:700px){
-
-    .sidebar{
-        transform:translateX(-100%);
-        transition:.2s;
-    }
-
-    .sidebar.open{
-        transform:translateX(0);
-    }
-
-    .main{
-        width:100%;
-        margin-left:0;
-    }
-
-    .mobile-toggle{
-        display:block;
-    }
-
-    .cards{
-        grid-template-columns:1fr;
-    }
-
-    .content{
-        padding:15px;
-    }
-
-    .topbar{
-        padding:12px 15px;
-    }
-
-    .connection{
-        display:none;
-    }
-}
+:root{--navy:#071a33;--green:#19d66b;--green-dark:#0e9f50;--bg:#f4f7fb;--text:#172033;--muted:#6b7280;--border:#e3e8ef;--danger:#dc3545;--blue:#2563eb;--shadow:0 8px 30px rgba(7,26,51,.08);--radius:14px}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%}
+body{font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}
+button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}
+#bootScreen{position:fixed;inset:0;z-index:9999;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px}
+.boot-box{width:min(430px,100%)}
+.boot-logo{width:70px;height:70px;margin:0 auto 20px;border-radius:18px;background:var(--green);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900}
+.boot-box h1{margin:0 0 8px;font-size:24px}.boot-box p{margin:0;color:#b9c7d8;font-size:14px}
+.spinner{width:34px;height:34px;margin:25px auto 0;border:4px solid rgba(255,255,255,.18);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#errorScreen{display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);align-items:center;justify-content:center;padding:25px}
+.error-card{width:min(620px,100%);background:#fff;border:1px solid var(--border);border-radius:18px;padding:30px;box-shadow:var(--shadow)}
+.error-icon{width:52px;height:52px;border-radius:50%;background:#fee2e2;color:#991b1b;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:800;margin-bottom:18px}
+.error-card h2{margin:0 0 10px}.error-card p{color:var(--muted);line-height:1.6}
+.error-message{background:#f8fafc;border:1px solid var(--border);border-radius:9px;padding:12px;font-family:monospace;font-size:12px;word-break:break-word;margin:15px 0}
+#app{display:none;min-height:100vh}
+.app{min-height:100vh;display:flex}
+.sidebar{width:250px;background:var(--navy);color:#fff;position:fixed;top:0;bottom:0;left:0;z-index:1000;display:flex;flex-direction:column}
+.brand{padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
+.brand h1{margin:0;font-size:20px;font-weight:800}.brand p{margin:5px 0 0;font-size:12px;color:#aebdce}
+.nav{padding:15px 10px;flex:1;overflow:auto}
+.nav button{width:100%;border:0;background:transparent;color:#c9d4e2;padding:12px 14px;border-radius:9px;text-align:left;margin-bottom:4px;transition:.2s}
+.nav button:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav button.active{background:rgba(25,214,107,.15);color:#fff;border-left:3px solid var(--green)}
+.sidebar-footer{padding:15px;border-top:1px solid rgba(255,255,255,.1)}
+.user-box{margin-bottom:10px;font-size:12px;color:#c9d4e2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logout{width:100%;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;padding:10px;border-radius:8px}
+.logout:hover{background:rgba(255,255,255,.08)}
+.main{margin-left:250px;width:calc(100% - 250px);min-height:100vh}
+.topbar{min-height:70px;background:#fff;border-bottom:1px solid var(--border);padding:15px 25px;display:flex;align-items:center;justify-content:space-between;gap:15px;position:sticky;top:0;z-index:900}
+.topbar-left{display:flex;align-items:center;gap:12px}.topbar h2{margin:0;font-size:21px}
+.connection{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+.connection-dot{width:9px;height:9px;border-radius:50%;background:var(--green)}
+.mobile-toggle{display:none;border:0;background:var(--navy);color:#fff;border-radius:7px;padding:9px 12px}
+.content{padding:25px}
+.alert{display:none;padding:14px 16px;border-radius:10px;margin-bottom:20px}.alert.show{display:block}
+.alert.error{background:#fff0f1;color:#991b1b;border:1px solid #fecaca}
+.alert.success{background:#ecfdf3;color:#166534;border:1px solid #bbf7d0}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:25px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.metric-label{color:var(--muted);font-size:12px;margin-bottom:8px}.metric-value{font-size:28px;font-weight:800}.metric-note{color:var(--muted);font-size:11px;margin-top:7px}
+.section{display:none}.section.active{display:block}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:15px}
+.section-title h3{margin:0;font-size:18px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px}
+input,select{border:1px solid var(--border);background:#fff;border-radius:8px;padding:10px 11px;outline:none}
+input:focus,select:focus{border-color:var(--green-dark);box-shadow:0 0 0 3px rgba(25,214,107,.1)}
+.btn{border:0;border-radius:8px;padding:10px 14px;font-weight:600}
+.btn-primary{background:var(--navy);color:#fff}.btn-green{background:var(--green);color:#062015}.btn-light{background:#eef2f7;color:#243044}
+.table-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:auto;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;min-width:800px}
+th,td{padding:13px 14px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle;font-size:13px}
+th{background:#f8fafc;color:#526071;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700;background:#edf2f7;color:#475569}
+.badge.green{background:#dcfce7;color:#166534}.badge.yellow{background:#fef3c7;color:#92400e}.badge.red{background:#fee2e2;color:#991b1b}.badge.blue{background:#dbeafe;color:#1e40af}
+.empty,.loading{padding:35px 20px;text-align:center;color:var(--muted)}
+@media(max-width:1050px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}.main{width:100%;margin-left:0}.mobile-toggle{display:block}.cards{grid-template-columns:1fr}.content{padding:15px}.topbar{padding:12px 15px}.connection{display:none}}
 </style>
 </head>
-
 <body>
 
-<!-- =========================================================
-     BOOT SCREEN
-     ========================================================= -->
+<div id="bootScreen"><div class="boot-box">
+  <div class="boot-logo">L</div><h1>Lashawn Academy</h1>
+  <p>Connecting to the administration system...</p><div class="spinner"></div>
+</div></div>
 
-<div id="bootScreen">
+<div id="errorScreen"><div class="error-card">
+  <div class="error-icon">!</div><h2>Dashboard could not start</h2>
+  <p id="errorDescription">An unexpected error occurred.</p>
+  <div class="error-message" id="errorDetails"></div>
+  <button class="btn btn-primary" onclick="window.location.reload()">Reload Dashboard</button>
+  <button class="btn btn-light" onclick="window.location.href='admin-login.html'">Return to Login</button>
+</div></div>
 
-    <div class="boot-box">
-
-        <div class="boot-logo">
-            L
-        </div>
-
-        <h1>Lashawn Academy</h1>
-
-        <p>
-            Connecting to the administration system...
-        </p>
-
-        <div class="spinner"></div>
-
-    </div>
-
-</div>
-
-
-<!-- =========================================================
-     ERROR SCREEN
-     ========================================================= -->
-
-<div id="errorScreen">
-
-    <div class="error-card">
-
-        <div class="error-icon">
-            !
-        </div>
-
-        <h2>
-            Dashboard could not start
-        </h2>
-
-        <p id="errorDescription">
-            An unexpected error occurred.
-        </p>
-
-        <div class="error-message"
-             id="errorDetails">
-        </div>
-
-        <button
-            class="btn btn-primary"
-            onclick="window.location.reload()">
-            Reload Dashboard
-        </button>
-
-        <button
-            class="btn btn-light"
-            onclick="window.location.href='admin-login.html'">
-            Return to Login
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- =========================================================
-     APPLICATION
-     ========================================================= -->
-
-<div id="app">
-
-<div class="app">
-
-<!-- =========================================================
-     SIDEBAR
-     ========================================================= -->
+<div id="app"><div class="app">
 
 <aside class="sidebar" id="sidebar">
-
-    <div class="brand">
-
-        <h1>
-            Lashawn Academy
-        </h1>
-
-        <p>
-            Super Administration
-        </p>
-
-    </div>
-
-
-    <nav class="nav">
-
-        <button
-            class="nav-btn active"
-            data-section="dashboard">
-            Dashboard
-        </button>
-
-        <button
-            class="nav-btn"
-            data-section="training">
-            6-Week Training
-        </button>
-
-        <button
-            class="nav-btn"
-            data-section="students">
-            Students
-        </button>
-
-        <button
-            class="nav-btn"
-            data-section="enrolments">
-            Enrolments
-        </button>
-
-        <button
-            class="nav-btn"
-            data-section="payments">
-            Payments
-        </button>
-
-        <button
-            class="nav-btn"
-            data-section="fees">
-            Fees & Pricing
-        </button>
-
-        <button
-            class="nav-btn"
-            data-section="staff">
-            Staff
-        </button>
-
-        <button
-            class="nav-btn"
-            data-section="audit">
-            Audit Activity
-        </button>
-
-    </nav>
-
-
-    <div class="sidebar-footer">
-
-        <div
-            class="user-box"
-            id="currentUser">
-            Loading user...
-        </div>
-
-        <button
-            class="logout"
-            id="logoutBtn">
-            Sign Out
-        </button>
-
-    </div>
-
+  <div class="brand"><h1>Lashawn Academy</h1><p>Super Administration</p></div>
+  <nav class="nav">
+    <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+    <button class="nav-btn" data-section="training">6-Week Training</button>
+    <button class="nav-btn" data-section="students">Students</button>
+    <button class="nav-btn" data-section="enrolments">Enrolments</button>
+    <button class="nav-btn" data-section="payments">Payments</button>
+    <button class="nav-btn" data-section="fees">Fees & Pricing</button>
+    <button class="nav-btn" data-section="staff">Staff</button>
+    <button class="nav-btn" data-section="audit">Audit Activity</button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-box" id="currentUser">Loading user...</div>
+    <button class="logout" id="logoutBtn">Sign Out</button>
+  </div>
 </aside>
 
-
-<!-- =========================================================
-     MAIN
-     ========================================================= -->
-
 <main class="main">
-
 <header class="topbar">
-
-    <div class="topbar-left">
-
-        <button
-            class="mobile-toggle"
-            id="mobileToggle">
-            ☰
-        </button>
-
-        <h2 id="pageTitle">
-            Dashboard
-        </h2>
-
-    </div>
-
-
-    <div class="connection">
-
-        <span
-            class="connection-dot"
-            id="connectionDot">
-        </span>
-
-        <span id="connectionStatus">
-            Connected
-        </span>
-
-    </div>
-
+  <div class="topbar-left"><button class="mobile-toggle" id="mobileToggle">☰</button><h2 id="pageTitle">Dashboard</h2></div>
+  <div class="connection"><span class="connection-dot"></span><span id="connectionStatus">Connected</span></div>
 </header>
 
-
 <div class="content">
+<div class="alert" id="alert"></div>
 
-<div
-    class="alert"
-    id="alert">
-</div>
-
-
-<!-- =========================================================
-     DASHBOARD
-     ========================================================= -->
-
-<section
-    id="dashboard"
-    class="section active">
-
-    <div class="cards">
-
-        <div class="card">
-
-            <div class="metric-label">
-                Total Students
-            </div>
-
-            <div
-                class="metric-value"
-                id="metricStudents">
-                —
-            </div>
-
-            <div class="metric-note">
-                Registered students
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="metric-label">
-                Active Enrolments
-            </div>
-
-            <div
-                class="metric-value"
-                id="metricEnrolments">
-                —
-            </div>
-
-            <div class="metric-note">
-                Current training
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="metric-label">
-                Pending Payments
-            </div>
-
-            <div
-                class="metric-value"
-                id="metricPayments">
-                —
-            </div>
-
-            <div class="metric-note">
-                Awaiting approval
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="metric-label">
-                Active Staff
-            </div>
-
-            <div
-                class="metric-value"
-                id="metricStaff">
-                —
-            </div>
-
-            <div class="metric-note">
-                Active staff records
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="section-title">
-
-        <h3>
-            Recent Enrolments
-        </h3>
-
-        <button
-            class="btn btn-light"
-            onclick="loadRecentEnrolments()">
-            Refresh
-        </button>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-        <div id="recentEnrolments">
-            <div class="loading">
-                Loading...
-            </div>
-        </div>
-
-    </div>
-
+<section id="dashboard" class="section active">
+  <div class="cards">
+    <div class="card"><div class="metric-label">Total Students</div><div class="metric-value" id="metricStudents">—</div><div class="metric-note">Registered students</div></div>
+    <div class="card"><div class="metric-label">Active Enrolments</div><div class="metric-value" id="metricEnrolments">—</div><div class="metric-note">Current training</div></div>
+    <div class="card"><div class="metric-label">Pending Payments</div><div class="metric-value" id="metricPayments">—</div><div class="metric-note">Awaiting approval</div></div>
+    <div class="card"><div class="metric-label">Active Staff</div><div class="metric-value" id="metricStaff">—</div><div class="metric-note">Active staff records</div></div>
+  </div>
+  <div class="section-title"><h3>Recent Enrolments</h3><button class="btn btn-light" onclick="run(loadRecentEnrolments)">Refresh</button></div>
+  <div class="table-wrap"><div id="recentEnrolments"><div class="loading">Loading...</div></div></div>
 </section>
 
-
-<!-- =========================================================
-     TRAINING
-     ========================================================= -->
-
-<section
-    id="training"
-    class="section">
-
-    <div class="section-title">
-
-        <h3>
-            6-Week Training Tracker
-        </h3>
-
-        <button
-            class="btn btn-light"
-            onclick="loadTraining()">
-            Refresh
-        </button>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-        <div id="trainingTable">
-            <div class="loading">
-                Loading training status...
-            </div>
-        </div>
-
-    </div>
-
+<section id="training" class="section">
+  <div class="section-title"><h3>6-Week Training Tracker</h3><button class="btn btn-light" onclick="run(loadTraining)">Refresh</button></div>
+  <div class="table-wrap"><div id="trainingTable"><div class="loading">Loading training status...</div></div></div>
 </section>
 
-
-<!-- =========================================================
-     STUDENTS
-     ========================================================= -->
-
-<section
-    id="students"
-    class="section">
-
-    <div class="section-title">
-
-        <h3>
-            Students
-        </h3>
-
-        <div class="toolbar">
-
-            <input
-                type="search"
-                id="studentSearch"
-                placeholder="Search student...">
-
-            <button
-                class="btn btn-light"
-                onclick="loadStudents()">
-                Search
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-        <div id="studentsTable">
-            <div class="loading">
-                Loading students...
-            </div>
-        </div>
-
-    </div>
-
+<section id="students" class="section">
+  <div class="section-title"><h3>Students</h3>
+    <div class="toolbar"><input type="search" id="studentSearch" placeholder="Search student..."><button class="btn btn-light" onclick="run(loadStudents)">Search</button></div></div>
+  <div class="table-wrap"><div id="studentsTable"><div class="loading">Loading students...</div></div></div>
 </section>
 
-
-<!-- =========================================================
-     ENROLMENTS
-     ========================================================= -->
-
-<section
-    id="enrolments"
-    class="section">
-
-    <div class="section-title">
-
-        <h3>
-            Enrolments
-        </h3>
-
-        <button
-            class="btn btn-light"
-            onclick="loadEnrolments()">
-            Refresh
-        </button>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-        <div id="enrolmentsTable">
-            <div class="loading">
-                Loading enrolments...
-            </div>
-        </div>
-
-    </div>
-
+<section id="enrolments" class="section">
+  <div class="section-title"><h3>Enrolments</h3><button class="btn btn-light" onclick="run(loadEnrolments)">Refresh</button></div>
+  <div class="table-wrap"><div id="enrolmentsTable"><div class="loading">Loading enrolments...</div></div></div>
 </section>
 
-
-<!-- =========================================================
-     PAYMENTS
-     ========================================================= -->
-
-<section
-    id="payments"
-    class="section">
-
-    <div class="section-title">
-
-        <h3>
-            Payments
-        </h3>
-
-        <div class="toolbar">
-
-            <select
-                id="paymentFilter"
-                onchange="loadPayments()">
-
-                <option value="">
-                    All statuses
-                </option>
-
-                <option value="pending">
-                    Pending
-                </option>
-
-                <option value="approved">
-                    Approved
-                </option>
-
-                <option value="rejected">
-                    Rejected
-                </option>
-
-            </select>
-
-
-            <button
-                class="btn btn-light"
-                onclick="loadPayments()">
-                Refresh
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-        <div id="paymentsTable">
-            <div class="loading">
-                Loading payments...
-            </div>
-        </div>
-
-    </div>
-
+<section id="payments" class="section">
+  <div class="section-title"><h3>Payments</h3>
+    <div class="toolbar">
+      <select id="paymentFilter" onchange="run(loadPayments)">
+        <option value="">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option>
+      </select>
+      <button class="btn btn-light" onclick="run(loadPayments)">Refresh</button>
+    </div></div>
+  <div class="table-wrap"><div id="paymentsTable"><div class="loading">Loading payments...</div></div></div>
 </section>
 
-
-<!-- =========================================================
-     FEES
-     ========================================================= -->
-
-<section
-    id="fees"
-    class="section">
-
-    <div class="section-title">
-
-        <h3>
-            Fees & Pricing
-        </h3>
-
-        <div class="toolbar">
-
-            <select
-                id="feeProgramme"
-                onchange="loadFees()">
-
-                <option value="">
-                    All programmes
-                </option>
-
-                <option value="Driving">
-                    Driving
-                </option>
-
-                <option value="Computer">
-                    Computer
-                </option>
-
-            </select>
-
-
-            <button
-                class="btn btn-light"
-                onclick="loadFees()">
-                Refresh
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-        <div id="feesTable">
-            <div class="loading">
-                Loading fee structures...
-            </div>
-        </div>
-
-    </div>
-
+<section id="fees" class="section">
+  <div class="section-title"><h3>Fees & Pricing</h3>
+    <div class="toolbar">
+      <select id="feeProgramme" onchange="run(loadFees)">
+        <option value="">All programmes</option><option value="Driving">Driving</option><option value="Computer">Computer</option>
+      </select>
+      <button class="btn btn-light" onclick="run(loadFees)">Refresh</button>
+    </div></div>
+  <div class="table-wrap"><div id="feesTable"><div class="loading">Loading fee structures...</div></div></div>
 </section>
 
-
-<!-- =========================================================
-     STAFF
-     ========================================================= -->
-
-<section
-    id="staff"
-    class="section">
-
-    <div class="section-title">
-
-        <h3>
-            Staff
-        </h3>
-
-        <button
-            class="btn btn-light"
-            onclick="loadStaff()">
-            Refresh
-        </button>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-        <div id="staffTable">
-            <div class="loading">
-                Loading staff...
-            </div>
-        </div>
-
-    </div>
-
+<section id="staff" class="section">
+  <div class="section-title"><h3>Staff</h3><button class="btn btn-light" onclick="run(loadStaff)">Refresh</button></div>
+  <div class="table-wrap"><div id="staffTable"><div class="loading">Loading staff...</div></div></div>
 </section>
 
-
-<!-- =========================================================
-     AUDIT
-     ========================================================= -->
-
-<section
-    id="audit"
-    class="section">
-
-    <div class="section-title">
-
-        <h3>
-            Audit Activity
-        </h3>
-
-        <button
-            class="btn btn-light"
-            onclick="loadAudit()">
-            Refresh
-        </button>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-        <div id="auditTable">
-            <div class="loading">
-                Loading audit activity...
-            </div>
-        </div>
-
-    </div>
-
+<section id="audit" class="section">
+  <div class="section-title"><h3>Audit Activity</h3><button class="btn btn-light" onclick="run(loadAudit)">Refresh</button></div>
+  <div class="table-wrap"><div id="auditTable"><div class="loading">Loading audit activity...</div></div></div>
 </section>
-
 
 </div>
 </main>
-
-</div>
-</div>
-
+</div></div>
 
 <script>
 "use strict";
 
-/* =========================================================
-   LASHAWN SUPER ADMIN
-   IMPORTANT:
-   This file creates its OWN Supabase client.
-   It does NOT use:
-       LashawnDB
-       supabaseClient
-       js/supabase.js
-   ========================================================= */
+/* Own Supabase client. Does not use LashawnDB or js/supabase.js */
+const SUPABASE_URL = "https://qjfinbftcserrjiedduf.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqZmluYmZ0Y3NlcnJqaWVkZHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzOTgzMzksImV4cCI6MjEwNTk3NDMzOX0.WHAkxqTTtzQH_za4OPMWJAILRUUHIL5Akk8900QX5c0";
 
+let db = null, currentSession = null;
 
-/* =========================================================
-   SUPABASE CONFIGURATION
-   ========================================================= */
-
-const SUPABASE_URL =
-    "https://qjfinbftcserrjiedduf.supabase.co";
-
-/*
- * PUT YOUR EXISTING SUPABASE PUBLISHABLE / ANON KEY HERE.
- *
- * Do NOT use a service_role / secret key.
- *
- * Example:
- *
- * const SUPABASE_KEY = "your-publishable-key";
- */
-const SUPABASE_KEY =
-    "PASTE_YOUR_EXISTING_SUPABASE_PUBLISHABLE_OR_ANON_KEY_HERE";
-
-
-/* =========================================================
-   GLOBAL DATABASE CLIENT
-   ========================================================= */
-
-let db = null;
-let currentSession = null;
-
-
-/* =========================================================
-   DOM HELPERS
-   ========================================================= */
-
-function $(id){
-    return document.getElementById(id);
-}
-
-
-function escapeHtml(value){
-
-    if(
-        value === null ||
-        value === undefined
-    ){
-        return "";
-    }
-
-    return String(value)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-}
-
-
-function money(value){
-
-    const number =
-        Number(value || 0);
-
-    return new Intl.NumberFormat(
-        "en-KE",
-        {
-            style:"currency",
-            currency:"KES",
-            maximumFractionDigits:2
-        }
-    ).format(number);
-}
-
-
-function dateOnly(value){
-
-    if(!value){
-        return "—";
-    }
-
-    try{
-        return new Date(value)
-            .toLocaleDateString("en-KE");
-    }catch{
-        return value;
-    }
-}
-
-
-function empty(message){
-
-    return `
-        <div class="empty">
-            ${escapeHtml(
-                message || "No records found."
-            )}
-        </div>
-    `;
-}
-
+const $ = id => document.getElementById(id);
+const escapeHtml = v => v == null ? "" : String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+const money = v => new Intl.NumberFormat("en-KE",{style:"currency",currency:"KES",maximumFractionDigits:2}).format(Number(v||0));
+const dateOnly = v => { if(!v) return "—"; try{ return new Date(v).toLocaleDateString("en-KE"); }catch{ return v; } };
+const empty = m => `<div class="empty">${escapeHtml(m||"No records found.")}</div>`;
+const loadingHtml = m => `<div class="loading">${m}</div>`;
+const fullName = s => s ? [s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ") : "—";
+const cell = v => escapeHtml(v == null ? "—" : v);
+const byId = rows => Object.fromEntries((rows||[]).map(r => [r.id,r]));
 
 function badge(status){
-
-    const value =
-        String(status || "unknown");
-
-    const lower =
-        value.toLowerCase();
-
-    let cls = "";
-
-    if(
-        lower === "approved" ||
-        lower === "active" ||
-        lower === "completed" ||
-        lower === "paid" ||
-        lower === "ready"
-    ){
-        cls = "green";
-    }
-
-    if(
-        lower === "pending" ||
-        lower === "in progress" ||
-        lower === "ongoing"
-    ){
-        cls = "yellow";
-    }
-
-    if(
-        lower === "rejected" ||
-        lower === "cancelled" ||
-        lower === "inactive"
-    ){
-        cls = "red";
-    }
-
-    if(
-        lower === "new"
-    ){
-        cls = "blue";
-    }
-
-    return `
-        <span class="badge ${cls}">
-            ${escapeHtml(value)}
-        </span>
-    `;
+  const v = String(status || "unknown"), l = v.toLowerCase();
+  let c = "";
+  if(["approved","active","completed","paid","ready"].includes(l)) c = "green";
+  else if(["pending","in progress","ongoing"].includes(l)) c = "yellow";
+  else if(["rejected","cancelled","inactive"].includes(l)) c = "red";
+  else if(l === "new") c = "blue";
+  return `<span class="badge ${c}">${escapeHtml(v)}</span>`;
 }
 
-
-function showAlert(
-    message,
-    type="error"
-){
-
-    const alert =
-        $("alert");
-
-    alert.className =
-        "alert show " + type;
-
-    alert.textContent =
-        message;
-
-    clearTimeout(
-        window.__lashawnAlertTimer
-    );
-
-    window.__lashawnAlertTimer =
-        setTimeout(()=>{
-            alert.className =
-                "alert";
-            alert.textContent =
-                "";
-        },5000);
+function showAlert(message, type="error"){
+  const a = $("alert");
+  a.className = "alert show " + type;
+  a.textContent = message;
+  clearTimeout(window.__alertTimer);
+  window.__alertTimer = setTimeout(()=>{ a.className = "alert"; a.textContent = ""; }, 5000);
 }
 
-
-/* =========================================================
-   STARTUP ERROR
-   ========================================================= */
-
-function showStartupError(
-    title,
-    message
-){
-
-    $("bootScreen").style.display =
-        "none";
-
-    $("app").style.display =
-        "none";
-
-    $("errorScreen").style.display =
-        "flex";
-
-    $("errorDescription").textContent =
-        title || "Dashboard could not start.";
-
-    $("errorDetails").textContent =
-        message || "Unknown error.";
+/* Run a loader from a button and show any error */
+async function run(fn){
+  try{ await fn(); }catch(e){ console.error(e); showAlert(e.message || "Unable to load."); }
 }
 
+function showStartupError(title, message){
+  $("bootScreen").style.display = "none";
+  $("app").style.display = "none";
+  $("errorScreen").style.display = "flex";
+  $("errorDescription").textContent = title || "Dashboard could not start.";
+  $("errorDetails").textContent = message || "Unknown error.";
+}
 
-/* =========================================================
-   CREATE SUPABASE CLIENT
-   ========================================================= */
+/* Build a table: heads = array of labels, rows = array of arrays of ready HTML */
+function tableHtml(heads, rows){
+  return `<table><thead><tr>${heads.map(h=>`<th>${escapeHtml(h)}</th>`).join("")}</tr></thead><tbody>${
+    rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
 
+/* Generic table of every column in the data */
+function autoTable(data, opts={}){
+  const cols = Object.keys(data[0]);
+  return tableHtml(cols, data.map(row => cols.map(col => {
+    let v = row[col];
+    if(opts.activeCol && col === opts.activeCol) return badge(v ? "active" : "inactive");
+    if(opts.dateSuffix && col.endsWith("_at")) v = v ? dateOnly(v) : "—";
+    if(v && typeof v === "object") v = JSON.stringify(v);
+    return cell(v);
+  })));
+}
+
+const studentCell = s => `${escapeHtml(fullName(s))}<br><small>${escapeHtml(s?.student_number||"")}</small>`;
+
+async function fetchStudents(ids){
+  ids = [...new Set(ids.filter(Boolean))];
+  if(!ids.length) return {};
+  const r = await db.from("students").select("id,student_number,first_name,middle_name,last_name").in("id",ids);
+  if(r.error) throw r.error;
+  return byId(r.data);
+}
+
+/* ---------- Setup ---------- */
 function initialiseDatabase(){
-
-    /*
-     * This is the critical fix.
-     *
-     * We directly use the Supabase library:
-     *
-     * window.supabase.createClient(...)
-     *
-     * There is NO dependency on:
-     * window.LashawnDB
-     * window.supabaseClient
-     */
-
-    if(
-        !window.supabase ||
-        typeof window.supabase.createClient !== "function"
-    ){
-
-        throw new Error(
-            "Supabase JavaScript library did not load."
-        );
-    }
-
-
-    if(
-        !SUPABASE_URL ||
-        !SUPABASE_URL.startsWith("https://")
-    ){
-
-        throw new Error(
-            "Invalid Supabase URL."
-        );
-    }
-
-
-    if(
-        !SUPABASE_KEY ||
-        SUPABASE_KEY.includes(
-            "PASTE_YOUR_EXISTING"
-        )
-    ){
-
-        throw new Error(
-            "Supabase publishable/anon key has not been configured in this file."
-        );
-    }
-
-
-    db =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY,
-            {
-                auth:{
-                    persistSession:true,
-                    autoRefreshToken:true,
-                    detectSessionInUrl:true
-                }
-            }
-        );
-
-
-    if(
-        !db ||
-        typeof db.from !== "function"
-    ){
-
-        throw new Error(
-            "Supabase client could not be created."
-        );
-    }
-
-
-    console.log(
-        "Lashawn: Supabase client initialized."
-    );
+  if(!window.supabase || typeof window.supabase.createClient !== "function")
+    throw new Error("Supabase JavaScript library did not load.");
+  if(!SUPABASE_URL || !SUPABASE_URL.startsWith("https://")) throw new Error("Invalid Supabase URL.");
+  if(!SUPABASE_KEY) throw new Error("Supabase publishable/anon key has not been configured in this file.");
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  if(!db || typeof db.from !== "function") throw new Error("Supabase client could not be created.");
 }
-
-
-/* =========================================================
-   AUTHENTICATION
-   ========================================================= */
 
 async function checkAuthentication(){
-
-    const {
-        data,
-        error
-    } =
-        await db.auth.getSession();
-
-
-    if(error){
-        throw error;
-    }
-
-
-    currentSession =
-        data.session;
-
-
-    if(!currentSession){
-
-        window.location.href =
-            "admin-login.html";
-
-        return false;
-    }
-
-
-    $("currentUser").textContent =
-        currentSession.user.email ||
-        "Authenticated user";
-
-
-    /*
-     * Optional profile lookup.
-     *
-     * The confirmed Lashawn database includes
-     * get_my_profile().
-     */
-    try{
-
-        const result =
-            await db.rpc(
-                "get_my_profile"
-            );
-
-
-        if(!result.error){
-
-            const profile =
-                Array.isArray(result.data)
-                    ? result.data[0]
-                    : result.data;
-
-            if(profile){
-                window.LashawnProfile =
-                    profile;
-            }
-        }
-
-    }catch(error){
-
-        console.warn(
-            "Profile lookup skipped:",
-            error
-        );
-    }
-
-
-    return true;
+  const {data,error} = await db.auth.getSession();
+  if(error) throw error;
+  currentSession = data.session;
+  if(!currentSession){ window.location.href = "admin-login.html"; return false; }
+  $("currentUser").textContent = currentSession.user.email || "Authenticated user";
+  try{
+    const r = await db.rpc("get_my_profile");
+    if(!r.error){ const p = Array.isArray(r.data) ? r.data[0] : r.data; if(p) window.LashawnProfile = p; }
+  }catch(e){ console.warn("Profile lookup skipped:", e); }
+  return true;
 }
 
+/* ---------- Navigation ---------- */
+const TITLES = {dashboard:"Dashboard",training:"6-Week Training",students:"Students",enrolments:"Enrolments",payments:"Payments",fees:"Fees & Pricing",staff:"Staff",audit:"Audit Activity"};
+const LOADERS = {dashboard:loadDashboard,training:loadTraining,students:loadStudents,enrolments:loadEnrolments,payments:loadPayments,fees:loadFees,staff:loadStaff,audit:loadAudit};
 
-/* =========================================================
-   NAVIGATION
-   ========================================================= */
-
-document
-.querySelectorAll(".nav-btn")
-.forEach(button => {
-
-    button.addEventListener(
-        "click",
-        async ()=>{
-
-            const target =
-                button.dataset.section;
-
-
-            document
-                .querySelectorAll(".nav-btn")
-                .forEach(btn =>
-                    btn.classList.remove(
-                        "active"
-                    )
-                );
-
-
-            document
-                .querySelectorAll(".section")
-                .forEach(section =>
-                    section.classList.remove(
-                        "active"
-                    )
-                );
-
-
-            button.classList.add(
-                "active"
-            );
-
-
-            const section =
-                $(target);
-
-            if(section){
-                section.classList.add(
-                    "active"
-                );
-            }
-
-
-            const titles = {
-
-                dashboard:
-                    "Dashboard",
-
-                training:
-                    "6-Week Training",
-
-                students:
-                    "Students",
-
-                enrolments:
-                    "Enrolments",
-
-                payments:
-                    "Payments",
-
-                fees:
-                    "Fees & Pricing",
-
-                staff:
-                    "Staff",
-
-                audit:
-                    "Audit Activity"
-            };
-
-
-            $("pageTitle").textContent =
-                titles[target] ||
-                "Super Admin";
-
-
-            if(
-                window.innerWidth <= 700
-            ){
-                $("sidebar")
-                    .classList.remove(
-                        "open"
-                    );
-            }
-
-
-            try{
-
-                if(
-                    target === "dashboard"
-                ){
-                    await loadDashboard();
-                }
-
-                if(
-                    target === "training"
-                ){
-                    await loadTraining();
-                }
-
-                if(
-                    target === "students"
-                ){
-                    await loadStudents();
-                }
-
-                if(
-                    target === "enrolments"
-                ){
-                    await loadEnrolments();
-                }
-
-                if(
-                    target === "payments"
-                ){
-                    await loadPayments();
-                }
-
-                if(
-                    target === "fees"
-                ){
-                    await loadFees();
-                }
-
-                if(
-                    target === "staff"
-                ){
-                    await loadStaff();
-                }
-
-                if(
-                    target === "audit"
-                ){
-                    await loadAudit();
-                }
-
-            }catch(error){
-
-                console.error(error);
-
-                showAlert(
-                    error.message ||
-                    "Unable to load section."
-                );
-            }
-        }
-    );
-
+document.querySelectorAll(".nav-btn").forEach(button => {
+  button.addEventListener("click", async () => {
+    const target = button.dataset.section;
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    button.classList.add("active");
+    if($(target)) $(target).classList.add("active");
+    $("pageTitle").textContent = TITLES[target] || "Super Admin";
+    if(window.innerWidth <= 700) $("sidebar").classList.remove("open");
+    run(LOADERS[target]);
+  });
 });
+$("mobileToggle").addEventListener("click", () => $("sidebar").classList.toggle("open"));
 
-
-/* =========================================================
-   MOBILE MENU
-   ========================================================= */
-
-$("mobileToggle")
-.addEventListener(
-    "click",
-    ()=>{
-        $("sidebar")
-            .classList.toggle(
-                "open"
-            );
-    }
-);
-
-
-/* =========================================================
-   TABLE COUNT
-   ========================================================= */
-
-async function countTable(
-    table,
-    filterFunction=null
-){
-
-    let query =
-        db
-        .from(table)
-        .select(
-            "*",
-            {
-                count:"exact",
-                head:true
-            }
-        );
-
-
-    if(filterFunction){
-        query =
-            filterFunction(query);
-    }
-
-
-    const {
-        count,
-        error
-    } =
-        await query;
-
-
-    if(error){
-        console.error(
-            table,
-            error
-        );
-
-        return 0;
-    }
-
-
-    return count || 0;
+/* ---------- Dashboard ---------- */
+async function countTable(table, filterFn=null){
+  let q = db.from(table).select("*",{count:"exact",head:true});
+  if(filterFn) q = filterFn(q);
+  const {count,error} = await q;
+  if(error){ console.error(table,error); return 0; }
+  return count || 0;
 }
-
-
-/* =========================================================
-   DASHBOARD
-   ========================================================= */
 
 async function loadDashboard(){
-
-    const [
-        students,
-        enrolments,
-        payments,
-        staff
-    ] =
-        await Promise.all([
-
-            countTable(
-                "students"
-            ),
-
-            countTable(
-                "enrolments",
-                query =>
-                    query.in(
-                        "status",
-                        [
-                            "active",
-                            "in_progress",
-                            "ongoing"
-                        ]
-                    )
-            ),
-
-            countTable(
-                "payments",
-                query =>
-                    query.eq(
-                        "status",
-                        "pending"
-                    )
-            ),
-
-            countTable(
-                "staff",
-                query =>
-                    query.eq(
-                        "is_active",
-                        true
-                    )
-            )
-        ]);
-
-
-    $("metricStudents")
-        .textContent =
-        students;
-
-
-    $("metricEnrolments")
-        .textContent =
-        enrolments;
-
-
-    $("metricPayments")
-        .textContent =
-        payments;
-
-
-    $("metricStaff")
-        .textContent =
-        staff;
-
-
-    await loadRecentEnrolments();
+  const [s,e,p,st] = await Promise.all([
+    countTable("students"),
+    countTable("enrolments", q => q.in("status",["active","in_progress","ongoing"])),
+    countTable("payments", q => q.eq("status","pending")),
+    countTable("staff", q => q.eq("is_active",true))
+  ]);
+  $("metricStudents").textContent = s;
+  $("metricEnrolments").textContent = e;
+  $("metricPayments").textContent = p;
+  $("metricStaff").textContent = st;
+  await loadRecentEnrolments();
 }
-
-
-/* =========================================================
-   RECENT ENROLMENTS
-   ========================================================= */
 
 async function loadRecentEnrolments(){
-
-    const target =
-        $("recentEnrolments");
-
-
-    target.innerHTML =
-        `<div class="loading">
-            Loading...
-        </div>`;
-
-
-    const {
-        data,
-        error
-    } =
-        await db
-        .from("enrolments")
-        .select(`
-            id,
-            enrolment_number,
-            student_id,
-            programme,
-            start_date,
-            expected_end_date,
-            status
-        `)
-        .order(
-            "created_at",
-            {
-                ascending:false
-            }
-        )
-        .limit(10);
-
-
-    if(error){
-        throw error;
-    }
-
-
-    if(!data || !data.length){
-
-        target.innerHTML =
-            empty(
-                "No enrolments found."
-            );
-
-        return;
-    }
-
-
-    const studentIds =
-        data
-        .map(row =>
-            row.student_id
-        )
-        .filter(Boolean);
-
-
-    let students = [];
-
-
-    if(studentIds.length){
-
-        const result =
-            await db
-            .from("students")
-            .select(`
-                id,
-                student_number,
-                first_name,
-                middle_name,
-                last_name
-            `)
-            .in(
-                "id",
-                studentIds
-            );
-
-
-        if(result.error){
-            throw result.error;
-        }
-
-
-        students =
-            result.data || [];
-    }
-
-
-    const studentMap =
-        Object.fromEntries(
-            students.map(
-                student => [
-                    student.id,
-                    student
-                ]
-            )
-        );
-
-
-    target.innerHTML = `
-
-        <table>
-
-            <thead>
-
-                <tr>
-                    <th>Enrolment</th>
-                    <th>Student</th>
-                    <th>Programme</th>
-                    <th>Start</th>
-                    <th>Expected End</th>
-                    <th>Status</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                ${data.map(row => {
-
-                    const student =
-                        studentMap[
-                            row.student_id
-                        ];
-
-
-                    const name =
-                        student
-                            ? [
-                                student.first_name,
-                                student.middle_name,
-                                student.last_name
-                              ]
-                              .filter(Boolean)
-                              .join(" ")
-                            : "—";
-
-
-                    return `
-
-                        <tr>
-
-                            <td>
-                                ${escapeHtml(
-                                    row.enrolment_number ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    name
-                                )}
-
-                                <br>
-
-                                <small>
-                                    ${escapeHtml(
-                                        student?.student_number ||
-                                        ""
-                                    )}
-                                </small>
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    row.programme ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${dateOnly(
-                                    row.start_date
-                                )}
-                            </td>
-
-                            <td>
-                                ${dateOnly(
-                                    row.expected_end_date
-                                )}
-                            </td>
-
-                            <td>
-                                ${badge(
-                                    row.status
-                                )}
-                            </td>
-
-                        </tr>
-
-                    `;
-
-                }).join("")}
-
-            </tbody>
-
-        </table>
-    `;
+  const target = $("recentEnrolments");
+  target.innerHTML = loadingHtml("Loading...");
+  const {data,error} = await db.from("enrolments")
+    .select("id,enrolment_number,student_id,programme,start_date,expected_end_date,status")
+    .order("created_at",{ascending:false}).limit(10);
+  if(error) throw error;
+  if(!data || !data.length){ target.innerHTML = empty("No enrolments found."); return; }
+  const sm = await fetchStudents(data.map(r => r.student_id));
+  target.innerHTML = tableHtml(
+    ["Enrolment","Student","Programme","Start","Expected End","Status"],
+    data.map(r => [cell(r.enrolment_number), studentCell(sm[r.student_id]), cell(r.programme), dateOnly(r.start_date), dateOnly(r.expected_end_date), badge(r.status)])
+  );
 }
 
-
-/* =========================================================
-   TRAINING
-   ========================================================= */
-
+/* ---------- Training ---------- */
 async function loadTraining(){
-
-    const target =
-        $("trainingTable");
-
-
-    target.innerHTML =
-        `<div class="loading">
-            Loading training status...
-        </div>`;
-
-
-    const {
-        data,
-        error
-    } =
-        await db
-        .from(
-            "academy_student_training_status"
-        )
-        .select("*")
-        .limit(100);
-
-
-    if(error){
-        throw error;
-    }
-
-
-    if(!data || !data.length){
-
-        target.innerHTML =
-            empty(
-                "No training records found."
-            );
-
-        return;
-    }
-
-
-    const columns =
-        Object.keys(
-            data[0]
-        );
-
-
-    target.innerHTML = `
-
-        <table>
-
-            <thead>
-                <tr>
-
-                    ${columns
-                        .map(
-                            column =>
-                            `<th>
-                                ${escapeHtml(column)}
-                            </th>`
-                        )
-                        .join("")}
-
-                </tr>
-            </thead>
-
-            <tbody>
-
-                ${data.map(row => `
-
-                    <tr>
-
-                        ${columns
-                            .map(column => `
-
-                                <td>
-                                    ${escapeHtml(
-                                        row[column] ===
-                                        null ||
-                                        row[column] ===
-                                        undefined
-                                            ? "—"
-                                            : row[column]
-                                    )}
-                                </td>
-
-                            `)
-                            .join("")}
-
-                    </tr>
-
-                `).join("")}
-
-            </tbody>
-
-        </table>
-    `;
+  const target = $("trainingTable");
+  target.innerHTML = loadingHtml("Loading training status...");
+  const {data,error} = await db.from("academy_student_training_status").select("*").limit(100);
+  if(error) throw error;
+  target.innerHTML = data && data.length ? autoTable(data) : empty("No training records found.");
 }
 
-
-/* =========================================================
-   STUDENTS
-   ========================================================= */
-
+/* ---------- Students ---------- */
 async function loadStudents(){
-
-    const target =
-        $("studentsTable");
-
-
-    target.innerHTML =
-        `<div class="loading">
-            Loading students...
-        </div>`;
-
-
-    const search =
-        $("studentSearch")
-            .value
-            .trim();
-
-
-    let query =
-        db
-        .from("students")
-        .select(`
-            id,
-            student_number,
-            first_name,
-            middle_name,
-            last_name,
-            phone,
-            email,
-            national_id,
-            gender,
-            status,
-            registration_date,
-            branch_id
-        `)
-        .order(
-            "created_at",
-            {
-                ascending:false
-            }
-        )
-        .limit(100);
-
-
-    if(search){
-
-        const safeSearch =
-            search.replaceAll(
-                ",",
-                ""
-            );
-
-
-        query =
-            query.or(
-                `student_number.ilike.%${safeSearch}%,` +
-                `first_name.ilike.%${safeSearch}%,` +
-                `middle_name.ilike.%${safeSearch}%,` +
-                `last_name.ilike.%${safeSearch}%,` +
-                `phone.ilike.%${safeSearch}%,` +
-                `national_id.ilike.%${safeSearch}%`
-            );
-    }
-
-
-    const {
-        data,
-        error
-    } =
-        await query;
-
-
-    if(error){
-        throw error;
-    }
-
-
-    if(!data || !data.length){
-
-        target.innerHTML =
-            empty(
-                "No students found."
-            );
-
-        return;
-    }
-
-
-    target.innerHTML = `
-
-        <table>
-
-            <thead>
-
-                <tr>
-                    <th>Student No.</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>ID</th>
-                    <th>Gender</th>
-                    <th>Status</th>
-                    <th>Registered</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                ${data.map(student => {
-
-                    const name =
-                        [
-                            student.first_name,
-                            student.middle_name,
-                            student.last_name
-                        ]
-                        .filter(Boolean)
-                        .join(" ");
-
-
-                    return `
-
-                        <tr>
-
-                            <td>
-                                ${escapeHtml(
-                                    student.student_number
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    name
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    student.phone ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    student.email ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    student.national_id ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    student.gender ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${badge(
-                                    student.status
-                                )}
-                            </td>
-
-                            <td>
-                                ${dateOnly(
-                                    student.registration_date
-                                )}
-                            </td>
-
-                        </tr>
-
-                    `;
-
-                }).join("")}
-
-            </tbody>
-
-        </table>
-    `;
+  const target = $("studentsTable");
+  target.innerHTML = loadingHtml("Loading students...");
+  const search = $("studentSearch").value.trim();
+  let q = db.from("students")
+    .select("id,student_number,first_name,middle_name,last_name,phone,email,national_id,gender,status,registration_date,branch_id")
+    .order("created_at",{ascending:false}).limit(100);
+  if(search){
+    const s = search.replaceAll(",","");
+    q = q.or(["student_number","first_name","middle_name","last_name","phone","national_id"].map(c => `${c}.ilike.%${s}%`).join(","));
+  }
+  const {data,error} = await q;
+  if(error) throw error;
+  if(!data || !data.length){ target.innerHTML = empty("No students found."); return; }
+  target.innerHTML = tableHtml(
+    ["Student No.","Name","Phone","Email","ID","Gender","Status","Registered"],
+    data.map(s => [cell(s.student_number), cell(fullName(s)), cell(s.phone), cell(s.email), cell(s.national_id), cell(s.gender), badge(s.status), dateOnly(s.registration_date)])
+  );
 }
 
-
-/* =========================================================
-   ENROLMENTS
-   ========================================================= */
-
+/* ---------- Enrolments ---------- */
 async function loadEnrolments(){
-
-    const target =
-        $("enrolmentsTable");
-
-
-    target.innerHTML =
-        `<div class="loading">
-            Loading enrolments...
-        </div>`;
-
-
-    const {
-        data,
-        error
-    } =
-        await db
-        .from("enrolments")
-        .select(`
-            id,
-            enrolment_number,
-            student_id,
-            programme,
-            driving_class_id,
-            computer_course_id,
-            branch_id,
-            instructor_id,
-            start_date,
-            expected_end_date,
-            actual_end_date,
-            status,
-            training_weeks,
-            notes,
-            created_at
-        `)
-        .order(
-            "created_at",
-            {
-                ascending:false
-            }
-        )
-        .limit(100);
-
-
-    if(error){
-        throw error;
-    }
-
-
-    if(!data || !data.length){
-
-        target.innerHTML =
-            empty(
-                "No enrolments found."
-            );
-
-        return;
-    }
-
-
-    const studentIds =
-        data
-        .map(row =>
-            row.student_id
-        )
-        .filter(Boolean);
-
-
-    const drivingIds =
-        data
-        .map(row =>
-            row.driving_class_id
-        )
-        .filter(Boolean);
-
-
-    const computerIds =
-        data
-        .map(row =>
-            row.computer_course_id
-        )
-        .filter(Boolean);
-
-
-    const [
-        studentsResult,
-        drivingResult,
-        computerResult
-    ] =
-        await Promise.all([
-
-            studentIds.length
-                ? db
-                    .from("students")
-                    .select(`
-                        id,
-                        student_number,
-                        first_name,
-                        middle_name,
-                        last_name
-                    `)
-                    .in(
-                        "id",
-                        studentIds
-                    )
-                : {
-                    data:[],
-                    error:null
-                },
-
-
-            drivingIds.length
-                ? db
-                    .from("driving_classes")
-                    .select(`
-                        id,
-                        class_code,
-                        class_name
-                    `)
-                    .in(
-                        "id",
-                        drivingIds
-                    )
-                : {
-                    data:[],
-                    error:null
-                },
-
-
-            computerIds.length
-                ? db
-                    .from("computer_courses")
-                    .select(`
-                        id,
-                        course_code,
-                        course_name
-                    `)
-                    .in(
-                        "id",
-                        computerIds
-                    )
-                : {
-                    data:[],
-                    error:null
-                }
-
-        ]);
-
-
-    if(
-        studentsResult.error
-    ){
-        throw studentsResult.error;
-    }
-
-
-    if(
-        drivingResult.error
-    ){
-        throw drivingResult.error;
-    }
-
-
-    if(
-        computerResult.error
-    ){
-        throw computerResult.error;
-    }
-
-
-    const studentMap =
-        Object.fromEntries(
-            (studentsResult.data || [])
-                .map(
-                    row =>
-                    [row.id,row]
-                )
-        );
-
-
-    const drivingMap =
-        Object.fromEntries(
-            (drivingResult.data || [])
-                .map(
-                    row =>
-                    [row.id,row]
-                )
-        );
-
-
-    const computerMap =
-        Object.fromEntries(
-            (computerResult.data || [])
-                .map(
-                    row =>
-                    [row.id,row]
-                )
-        );
-
-
-    target.innerHTML = `
-
-        <table>
-
-            <thead>
-
-                <tr>
-                    <th>Enrolment</th>
-                    <th>Student</th>
-                    <th>Programme</th>
-                    <th>Course/Class</th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>Weeks</th>
-                    <th>Status</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                ${data.map(row => {
-
-                    const student =
-                        studentMap[
-                            row.student_id
-                        ];
-
-
-                    const studentName =
-                        student
-                            ? [
-                                student.first_name,
-                                student.middle_name,
-                                student.last_name
-                              ]
-                              .filter(Boolean)
-                              .join(" ")
-                            : "—";
-
-
-                    let course =
-                        "—";
-
-
-                    if(
-                        row.driving_class_id
-                    ){
-
-                        const cls =
-                            drivingMap[
-                                row.driving_class_id
-                            ];
-
-
-                        if(cls){
-
-                            course =
-                                [
-                                    cls.class_code,
-                                    cls.class_name
-                                ]
-                                .filter(Boolean)
-                                .join(
-                                    " — "
-                                );
-                        }
-                    }
-
-
-                    if(
-                        row.computer_course_id
-                    ){
-
-                        const computer =
-                            computerMap[
-                                row.computer_course_id
-                            ];
-
-
-                        if(computer){
-
-                            course =
-                                [
-                                    computer.course_code,
-                                    computer.course_name
-                                ]
-                                .filter(Boolean)
-                                .join(
-                                    " — "
-                                );
-                        }
-                    }
-
-
-                    return `
-
-                        <tr>
-
-                            <td>
-                                ${escapeHtml(
-                                    row.enrolment_number ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-
-                                ${escapeHtml(
-                                    studentName
-                                )}
-
-                                <br>
-
-                                <small>
-                                    ${escapeHtml(
-                                        student?.student_number ||
-                                        ""
-                                    )}
-                                </small>
-
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    row.programme ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    course
-                                )}
-                            </td>
-
-                            <td>
-                                ${dateOnly(
-                                    row.start_date
-                                )}
-                            </td>
-
-                            <td>
-                                ${dateOnly(
-                                    row.actual_end_date ||
-                                    row.expected_end_date
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    row.training_weeks ??
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${badge(
-                                    row.status
-                                )}
-                            </td>
-
-                        </tr>
-
-                    `;
-
-                }).join("")}
-
-            </tbody>
-
-        </table>
-    `;
+  const target = $("enrolmentsTable");
+  target.innerHTML = loadingHtml("Loading enrolments...");
+  const {data,error} = await db.from("enrolments")
+    .select("id,enrolment_number,student_id,programme,driving_class_id,computer_course_id,branch_id,instructor_id,start_date,expected_end_date,actual_end_date,status,training_weeks,notes,created_at")
+    .order("created_at",{ascending:false}).limit(100);
+  if(error) throw error;
+  if(!data || !data.length){ target.innerHTML = empty("No enrolments found."); return; }
+  const dIds = data.map(r => r.driving_class_id).filter(Boolean);
+  const cIds = data.map(r => r.computer_course_id).filter(Boolean);
+  const none = {data:[],error:null};
+  const [sm, dr, cr] = await Promise.all([
+    fetchStudents(data.map(r => r.student_id)),
+    dIds.length ? db.from("driving_classes").select("id,class_code,class_name").in("id",dIds) : none,
+    cIds.length ? db.from("computer_courses").select("id,course_code,course_name").in("id",cIds) : none
+  ]);
+  if(dr.error) throw dr.error;
+  if(cr.error) throw cr.error;
+  const dm = byId(dr.data), cm = byId(cr.data);
+  target.innerHTML = tableHtml(
+    ["Enrolment","Student","Programme","Course/Class","Start","End","Weeks","Status"],
+    data.map(r => {
+      let course = "—";
+      const d = dm[r.driving_class_id], c = cm[r.computer_course_id];
+      if(d) course = [d.class_code,d.class_name].filter(Boolean).join(" — ");
+      if(c) course = [c.course_code,c.course_name].filter(Boolean).join(" — ");
+      return [cell(r.enrolment_number), studentCell(sm[r.student_id]), cell(r.programme), cell(course), dateOnly(r.start_date), dateOnly(r.actual_end_date || r.expected_end_date), cell(r.training_weeks), badge(r.status)];
+    })
+  );
 }
 
-
-/* =========================================================
-   PAYMENTS
-   ========================================================= */
-
+/* ---------- Payments ---------- */
 async function loadPayments(){
-
-    const target =
-        $("paymentsTable");
-
-
-    target.innerHTML =
-        `<div class="loading">
-            Loading payments...
-        </div>`;
-
-
-    const status =
-        $("paymentFilter")
-            .value;
-
-
-    let query =
-        db
-        .from("payments")
-        .select(`
-            id,
-            payment_number,
-            student_id,
-            enrolment_id,
-            amount,
-            payment_method,
-            transaction_reference,
-            mpesa_receipt_number,
-            payment_date,
-            status,
-            notes
-        `)
-        .order(
-            "payment_date",
-            {
-                ascending:false
-            }
-        )
-        .limit(100);
-
-
-    if(status){
-
-        query =
-            query.eq(
-                "status",
-                status
-            );
-    }
-
-
-    const {
-        data,
-        error
-    } =
-        await query;
-
-
-    if(error){
-        throw error;
-    }
-
-
-    if(!data || !data.length){
-
-        target.innerHTML =
-            empty(
-                "No payments found."
-            );
-
-        return;
-    }
-
-
-    const studentIds =
-        data
-        .map(row =>
-            row.student_id
-        )
-        .filter(Boolean);
-
-
-    let students = [];
-
-
-    if(studentIds.length){
-
-        const result =
-            await db
-            .from("students")
-            .select(`
-                id,
-                student_number,
-                first_name,
-                middle_name,
-                last_name
-            `)
-            .in(
-                "id",
-                studentIds
-            );
-
-
-        if(result.error){
-            throw result.error;
-        }
-
-
-        students =
-            result.data || [];
-    }
-
-
-    const studentMap =
-        Object.fromEntries(
-            students.map(
-                row =>
-                [row.id,row]
-            )
-        );
-
-
-    target.innerHTML = `
-
-        <table>
-
-            <thead>
-
-                <tr>
-                    <th>Payment</th>
-                    <th>Student</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Reference</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                ${data.map(payment => {
-
-                    const student =
-                        studentMap[
-                            payment.student_id
-                        ];
-
-
-                    const name =
-                        student
-                            ? [
-                                student.first_name,
-                                student.middle_name,
-                                student.last_name
-                              ]
-                              .filter(Boolean)
-                              .join(" ")
-                            : "—";
-
-
-                    const reference =
-                        payment.mpesa_receipt_number ||
-                        payment.transaction_reference ||
-                        "—";
-
-
-                    const pending =
-                        String(
-                            payment.status || ""
-                        ).toLowerCase() ===
-                        "pending";
-
-
-                    return `
-
-                        <tr>
-
-                            <td>
-                                ${escapeHtml(
-                                    payment.payment_number ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-
-                                ${escapeHtml(
-                                    name
-                                )}
-
-                                <br>
-
-                                <small>
-                                    ${escapeHtml(
-                                        student?.student_number ||
-                                        ""
-                                    )}
-                                </small>
-
-                            </td>
-
-                            <td>
-                                ${money(
-                                    payment.amount
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    payment.payment_method ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    reference
-                                )}
-                            </td>
-
-                            <td>
-                                ${dateOnly(
-                                    payment.payment_date
-                                )}
-                            </td>
-
-                            <td>
-                                ${badge(
-                                    payment.status
-                                )}
-                            </td>
-
-                            <td>
-
-                                ${
-                                    pending
-                                        ? `
-                                            <button
-                                                class="btn btn-green"
-                                                onclick="approvePayment('${payment.id}')">
-                                                Approve
-                                            </button>
-                                          `
-                                        : "—"
-                                }
-
-                            </td>
-
-                        </tr>
-
-                    `;
-
-                }).join("")}
-
-            </tbody>
-
-        </table>
-    `;
+  const target = $("paymentsTable");
+  target.innerHTML = loadingHtml("Loading payments...");
+  const status = $("paymentFilter").value;
+  let q = db.from("payments")
+    .select("id,payment_number,student_id,enrolment_id,amount,payment_method,transaction_reference,mpesa_receipt_number,payment_date,status,notes")
+    .order("payment_date",{ascending:false}).limit(100);
+  if(status) q = q.eq("status",status);
+  const {data,error} = await q;
+  if(error) throw error;
+  if(!data || !data.length){ target.innerHTML = empty("No payments found."); return; }
+  const sm = await fetchStudents(data.map(r => r.student_id));
+  target.innerHTML = tableHtml(
+    ["Payment","Student","Amount","Method","Reference","Date","Status","Action"],
+    data.map(p => {
+      const pending = String(p.status || "").toLowerCase() === "pending";
+      return [cell(p.payment_number), studentCell(sm[p.student_id]), money(p.amount), cell(p.payment_method),
+        cell(p.mpesa_receipt_number || p.transaction_reference), dateOnly(p.payment_date), badge(p.status),
+        pending ? `<button class="btn btn-green" onclick="approvePayment('${escapeHtml(p.id)}')">Approve</button>` : "—"];
+    })
+  );
 }
 
-
-/* =========================================================
-   APPROVE PAYMENT
-   ========================================================= */
-
-async function approvePayment(
-    paymentId
-){
-
-    if(!paymentId){
-        return;
-    }
-
-
-    const confirmed =
-        window.confirm(
-            "Approve this payment?"
-        );
-
-
-    if(!confirmed){
-        return;
-    }
-
-
-    try{
-
-        const {
-            error
-        } =
-            await db.rpc(
-                "approve_payment",
-                {
-                    p_payment_id:
-                        paymentId
-                }
-            );
-
-
-        if(error){
-            throw error;
-        }
-
-
-        showAlert(
-            "Payment approved successfully.",
-            "success"
-        );
-
-
-        await loadPayments();
-        await loadDashboard();
-
-    }catch(error){
-
-        console.error(error);
-
-        showAlert(
-            error.message ||
-            "Payment approval failed."
-        );
-    }
+async function approvePayment(paymentId){
+  if(!paymentId || !window.confirm("Approve this payment?")) return;
+  try{
+    const {error} = await db.rpc("approve_payment",{p_payment_id:paymentId});
+    if(error) throw error;
+    showAlert("Payment approved successfully.","success");
+    await loadPayments();
+    await loadDashboard();
+  }catch(e){
+    console.error(e);
+    showAlert(e.message || "Payment approval failed.");
+  }
 }
 
-
-/* =========================================================
-   FEES
-   ========================================================= */
-
+/* ---------- Fees ---------- */
 async function loadFees(){
-
-    const target =
-        $("feesTable");
-
-
-    target.innerHTML =
-        `<div class="loading">
-            Loading fee structures...
-        </div>`;
-
-
-    const programme =
-        $("feeProgramme")
-            .value;
-
-
-    let query =
-        db
-        .from("fee_structures")
-        .select(`
-            id,
-            name,
-            programme,
-            driving_class_id,
-            computer_course_id,
-            amount,
-            description,
-            option_code,
-            unit,
-            quantity_based,
-            course_type,
-            is_active
-        `)
-        .order(
-            "name",
-            {
-                ascending:true
-            }
-        );
-
-
-    if(programme){
-
-        query =
-            query.eq(
-                "programme",
-                programme
-            );
-    }
-
-
-    const {
-        data,
-        error
-    } =
-        await query;
-
-
-    if(error){
-        throw error;
-    }
-
-
-    if(!data || !data.length){
-
-        target.innerHTML =
-            empty(
-                "No fee structures found."
-            );
-
-        return;
-    }
-
-
-    const drivingIds =
-        data
-        .map(row =>
-            row.driving_class_id
-        )
-        .filter(Boolean);
-
-
-    const computerIds =
-        data
-        .map(row =>
-            row.computer_course_id
-        )
-        .filter(Boolean);
-
-
-    const [
-        drivingResult,
-        computerResult
-    ] =
-        await Promise.all([
-
-            drivingIds.length
-                ? db
-                    .from("driving_classes")
-                    .select(
-                        "id,class_code,class_name"
-                    )
-                    .in(
-                        "id",
-                        drivingIds
-                    )
-                : {
-                    data:[],
-                    error:null
-                },
-
-
-            computerIds.length
-                ? db
-                    .from("computer_courses")
-                    .select(
-                        "id,course_code,course_name"
-                    )
-                    .in(
-                        "id",
-                        computerIds
-                    )
-                : {
-                    data:[],
-                    error:null
-                }
-
-        ]);
-
-
-    if(drivingResult.error){
-        throw drivingResult.error;
-    }
-
-
-    if(computerResult.error){
-        throw computerResult.error;
-    }
-
-
-    const drivingMap =
-        Object.fromEntries(
-            (drivingResult.data || [])
-                .map(
-                    row =>
-                    [row.id,row]
-                )
-        );
-
-
-    const computerMap =
-        Object.fromEntries(
-            (computerResult.data || [])
-                .map(
-                    row =>
-                    [row.id,row]
-                )
-        );
-
-
-    target.innerHTML = `
-
-        <table>
-
-            <thead>
-
-                <tr>
-                    <th>Name</th>
-                    <th>Programme</th>
-                    <th>Course/Class</th>
-                    <th>Amount</th>
-                    <th>Unit</th>
-                    <th>Quantity</th>
-                    <th>Option</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                ${data.map(fee => {
-
-                    let course =
-                        "—";
-
-
-                    if(
-                        fee.driving_class_id
-                    ){
-
-                        const row =
-                            drivingMap[
-                                fee.driving_class_id
-                            ];
-
-
-                        if(row){
-
-                            course =
-                                [
-                                    row.class_code,
-                                    row.class_name
-                                ]
-                                .filter(Boolean)
-                                .join(
-                                    " — "
-                                );
-                        }
-                    }
-
-
-                    if(
-                        fee.computer_course_id
-                    ){
-
-                        const row =
-                            computerMap[
-                                fee.computer_course_id
-                            ];
-
-
-                        if(row){
-
-                            course =
-                                [
-                                    row.course_code,
-                                    row.course_name
-                                ]
-                                .filter(Boolean)
-                                .join(
-                                    " — "
-                                );
-                        }
-                    }
-
-
-                    return `
-
-                        <tr>
-
-                            <td>
-                                ${escapeHtml(
-                                    fee.name ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    fee.programme ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    course
-                                )}
-                            </td>
-
-                            <td>
-                                ${money(
-                                    fee.amount
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    fee.unit ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${
-                                    fee.quantity_based
-                                        ? "Yes"
-                                        : "No"
-                                }
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    fee.option_code ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${escapeHtml(
-                                    fee.course_type ||
-                                    "—"
-                                )}
-                            </td>
-
-                            <td>
-                                ${
-                                    fee.is_active
-                                        ? badge("active")
-                                        : badge("inactive")
-                                }
-                            </td>
-
-                        </tr>
-
-                    `;
-
-                }).join("")}
-
-            </tbody>
-
-        </table>
-    `;
+  const target = $("feesTable");
+  target.innerHTML = loadingHtml("Loading fee structures...");
+  const programme = $("feeProgramme").value;
+  let q = db.from("fee_structures")
+    .select("id,name,programme,driving_class_id,computer_course_id,amount,description,option_code,unit,quantity_based,course_type,is_active")
+    .order("name",{ascending:true});
+  if(programme) q = q.eq("programme",programme);
+  const {data,error} = await q;
+  if(error) throw error;
+  if(!data || !data.length){ target.innerHTML = empty("No fee structures found."); return; }
+  const dIds = data.map(r => r.driving_class_id).filter(Boolean);
+  const cIds = data.map(r => r.computer_course_id).filter(Boolean);
+  const none = {data:[],error:null};
+  const [dr, cr] = await Promise.all([
+    dIds.length ? db.from("driving_classes").select("id,class_code,class_name").in("id",dIds) : none,
+    cIds.length ? db.from("computer_courses").select("id,course_code,course_name").in("id",cIds) : none
+  ]);
+  if(dr.error) throw dr.error;
+  if(cr.error) throw cr.error;
+  const dm = byId(dr.data), cm = byId(cr.data);
+  target.innerHTML = tableHtml(
+    ["Name","Programme","Course/Class","Amount","Unit","Quantity","Option","Type","Status"],
+    data.map(f => {
+      let course = "—";
+      const d = dm[f.driving_class_id], c = cm[f.computer_course_id];
+      if(d) course = [d.class_code,d.class_name].filter(Boolean).join(" — ");
+      if(c) course = [c.course_code,c.course_name].filter(Boolean).join(" — ");
+      return [cell(f.name), cell(f.programme), cell(course), money(f.amount), cell(f.unit), f.quantity_based ? "Yes" : "No", cell(f.option_code), cell(f.course_type), badge(f.is_active ? "active" : "inactive")];
+    })
+  );
 }
 
-
-/* =========================================================
-   STAFF
-   ========================================================= */
-
+/* ---------- Staff ---------- */
 async function loadStaff(){
-
-    const target =
-        $("staffTable");
-
-
-    target.innerHTML =
-        `<div class="loading">
-            Loading staff...
-        </div>`;
-
-
-    const {
-        data,
-        error
-    } =
-        await db
-        .from("staff")
-        .select("*")
-        .order(
-            "created_at",
-            {
-                ascending:false
-            }
-        )
-        .limit(100);
-
-
-    if(error){
-        throw error;
-    }
-
-
-    if(!data || !data.length){
-
-        target.innerHTML =
-            empty(
-                "No staff records found."
-            );
-
-        return;
-    }
-
-
-    const columns =
-        Object.keys(
-            data[0]
-        );
-
-
-    target.innerHTML = `
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    ${columns
-                        .map(
-                            column =>
-                            `<th>
-                                ${escapeHtml(
-                                    column
-                                )}
-                            </th>`
-                        )
-                        .join("")}
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                ${data.map(row => `
-
-                    <tr>
-
-                        ${columns
-                            .map(column => {
-
-                                let value =
-                                    row[column];
-
-
-                                if(
-                                    column ===
-                                    "is_active"
-                                ){
-
-                                    return `
-                                        <td>
-                                            ${
-                                                value
-                                                    ? badge("active")
-                                                    : badge("inactive")
-                                            }
-                                        </td>
-                                    `;
-                                }
-
-
-                                if(
-                                    column.endsWith(
-                                        "_at"
-                                    )
-                                ){
-
-                                    value =
-                                        value
-                                            ? dateOnly(
-                                                value
-                                            )
-                                            : "—";
-                                }
-
-
-                                if(
-                                    typeof value ===
-                                    "object" &&
-                                    value !== null
-                                ){
-
-                                    value =
-                                        JSON.stringify(
-                                            value
-                                        );
-                                }
-
-
-                                return `
-                                    <td>
-                                        ${escapeHtml(
-                                            value ===
-                                            null ||
-                                            value ===
-                                            undefined
-                                                ? "—"
-                                                : value
-                                        )}
-                                    </td>
-                                `;
-
-                            })
-                            .join("")}
-
-                    </tr>
-
-                `).join("")}
-
-            </tbody>
-
-        </table>
-    `;
+  const target = $("staffTable");
+  target.innerHTML = loadingHtml("Loading staff...");
+  const {data,error} = await db.from("staff").select("*").order("created_at",{ascending:false}).limit(100);
+  if(error) throw error;
+  target.innerHTML = data && data.length ? autoTable(data,{activeCol:"is_active",dateSuffix:true}) : empty("No staff records found.");
 }
 
-
-/* =========================================================
-   AUDIT LOGS
-   ========================================================= */
-
+/* ---------- Audit ---------- */
 async function loadAudit(){
-
-    const target =
-        $("auditTable");
-
-
-    target.innerHTML =
-        `<div class="loading">
-            Loading audit activity...
-        </div>`;
-
-
-    const {
-        data,
-        error
-    } =
-        await db
-        .from("audit_logs")
-        .select("*")
-        .order(
-            "created_at",
-            {
-                ascending:false
-            }
-        )
-        .limit(100);
-
-
-    if(error){
-        throw error;
-    }
-
-
-    if(!data || !data.length){
-
-        target.innerHTML =
-            empty(
-                "No audit activity found."
-            );
-
-        return;
-    }
-
-
-    const columns =
-        Object.keys(
-            data[0]
-        );
-
-
-    target.innerHTML = `
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    ${columns
-                        .map(
-                            column =>
-                            `<th>
-                                ${escapeHtml(
-                                    column
-                                )}
-                            </th>`
-                        )
-                        .join("")}
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                ${data.map(row => `
-
-                    <tr>
-
-                        ${columns
-                            .map(column => {
-
-                                let value =
-                                    row[column];
-
-
-                                if(
-                                    column.endsWith(
-                                        "_at"
-                                    )
-                                ){
-
-                                    value =
-                                        value
-                                            ? dateOnly(
-                                                value
-                                            )
-                                            : "—";
-                                }
-
-
-                                if(
-                                    typeof value ===
-                                    "object" &&
-                                    value !== null
-                                ){
-
-                                    value =
-                                        JSON.stringify(
-                                            value
-                                        );
-                                }
-
-
-                                return `
-                                    <td>
-                                        ${escapeHtml(
-                                            value ===
-                                            null ||
-                                            value ===
-                                            undefined
-                                                ? "—"
-                                                : value
-                                        )}
-                                    </td>
-                                `;
-
-                            })
-                            .join("")}
-
-                    </tr>
-
-                `).join("")}
-
-            </tbody>
-
-        </table>
-    `;
+  const target = $("auditTable");
+  target.innerHTML = loadingHtml("Loading audit activity...");
+  const {data,error} = await db.from("audit_logs").select("*").order("created_at",{ascending:false}).limit(100);
+  if(error) throw error;
+  target.innerHTML = data && data.length ? autoTable(data,{dateSuffix:true}) : empty("No audit activity found.");
 }
 
+/* ---------- Logout ---------- */
+$("logoutBtn").addEventListener("click", async () => {
+  try{ if(db) await db.auth.signOut(); }
+  catch(e){ console.error("Logout:",e); }
+  finally{ window.location.href = "admin-login.html"; }
+});
 
-/* =========================================================
-   LOGOUT
-   ========================================================= */
-
-$("logoutBtn")
-.addEventListener(
-    "click",
-    async ()=>{
-
-        try{
-
-            if(db){
-
-                await db.auth.signOut();
-
-            }
-
-        }catch(error){
-
-            console.error(
-                "Logout:",
-                error
-            );
-
-        }finally{
-
-            window.location.href =
-                "admin-login.html";
-        }
-    }
-);
-
-
-/* =========================================================
-   INITIALISE DASHBOARD
-   ========================================================= */
-
+/* ---------- Start ---------- */
 async function startDashboard(){
-
-    try{
-
-        /*
-         * Step 1:
-         * Create Supabase client directly.
-         */
-        initialiseDatabase();
-
-
-        /*
-         * Step 2:
-         * Check logged-in user.
-         */
-        const authenticated =
-            await checkAuthentication();
-
-
-        if(!authenticated){
-            return;
-        }
-
-
-        /*
-         * Step 3:
-         * Hide boot screen.
-         */
-        $("bootScreen")
-            .style
-            .display =
-            "none";
-
-
-        $("app")
-            .style
-            .display =
-            "block";
-
-
-        $("connectionStatus")
-            .textContent =
-            "Supabase connected";
-
-
-        /*
-         * Step 4:
-         * Load dashboard.
-         */
-        await loadDashboard();
-
-
-    }catch(error){
-
-        console.error(
-            "Lashawn dashboard startup error:",
-            error
-        );
-
-
-        showStartupError(
-            "The Super Admin Dashboard could not connect.",
-            error.message ||
-            String(error)
-        );
-    }
+  try{
+    initialiseDatabase();
+    if(!(await checkAuthentication())) return;
+    $("bootScreen").style.display = "none";
+    $("app").style.display = "block";
+    $("connectionStatus").textContent = "Supabase connected";
+    await loadDashboard();
+  }catch(e){
+    console.error("Lashawn dashboard startup error:", e);
+    showStartupError("The Super Admin Dashboard could not connect.", e.message || String(e));
+  }
 }
 
-
-/* =========================================================
-   START
-   ========================================================= */
-
-if(
-    document.readyState ===
-    "loading"
-){
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        startDashboard
-    );
-
-}else{
-
-    startDashboard();
-
-}
+if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", startDashboard);
+else startDashboard();
 </script>
-
 </body>
 </html>
-```
