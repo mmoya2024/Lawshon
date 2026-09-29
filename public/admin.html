@@ -67,7 +67,7 @@ input[readonly]{background:#f5f7fa}
 
 <main class="main">
   <div class="topbar"><h1 id="pageTitle">Overview</h1></div>
-  <div id="dbStatus" class="db-status">Connecting...</div>
+  <div id="dbStatus" class="db-status"></div>
 
   <section class="panel active" id="panel-overview">
     <div class="grid">
@@ -80,7 +80,6 @@ input[readonly]{background:#f5f7fa}
       <div class="card stat"><div class="label">Total Revenue</div><div class="value" id="statTotalRev">—</div></div>
       <div class="card stat"><div class="label">Payments Awaiting Approval</div><div class="value" id="statPending">—</div></div>
     </div>
-    <div class="card"><h2>Status</h2><div id="recentActivity">Loading...</div></div>
   </section>
 
   <section class="panel" id="panel-enrolment">
@@ -271,7 +270,6 @@ async function guard(){
   if(!isStaff(u)){ setStatus("● Office Admin access required","bad"); return false; }
   $("adminEmail").textContent=u.email||"";
   $("adminName").textContent=u.user_metadata?.full_name||u.user_metadata?.office_role||"Office Admin";
-  setStatus("● Connected","ok");
   try{ IS_SUPER=(await DB.rpc("is_super_admin")).data===true; }catch(_){ IS_SUPER=false; }
   $("navApprovals").style.display=IS_SUPER?"":"none";
   return true;
@@ -485,7 +483,6 @@ async function loadOverview(){
   $("statPrintRev").textContent=money(prt);
   $("statTotalRev").textContent=money(stu+prt);
   $("statPending").textContent=q.count??0;
-  $("recentActivity").innerHTML='<div class="notice info">Office Admin is connected to Supabase.</div>';
 }
 
 /* ---------- Students (from training status view) ---------- */
@@ -765,7 +762,7 @@ $("logoutBtn").addEventListener("click",async()=>{await DB.auth.signOut();locati
   }catch(err){
     console.error(err);
     setStatus("● Database error","bad");
-    $("recentActivity").innerHTML=`<div class="notice err">${esc(err.message||"Unknown database error")}</div>`;
+    toast(err.message||"Unknown database error",false);
   }
 })();
 </script>
