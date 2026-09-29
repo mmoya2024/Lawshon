@@ -58,7 +58,6 @@
 <div class="page" id="page-staff"><div class="head"><div><h1>Staff</h1><p>Live staff records.</p></div></div><div class="panel"><div class="pb"><div class="table"><table><thead><tr><th>Email</th><th>Active</th><th>Created</th><th>ID</th></tr></thead><tbody id="staff"></tbody></table></div></div></div></div>
 <div class="page" id="page-activity"><div class="head"><div><h1>Realtime Activity</h1><p>Database changes received from all connected interfaces.</p></div><button class="btn secondary" onclick="activity=[];renderActivity()">Clear</button></div><div class="panel"><div class="pb"><div id="activity" class="activity"><div class="empty">Waiting for changes...</div></div></div></div></div>
 </section></main>
-</div>
 <div class="modal" id="modal"><div class="box"><div class="mh"><b id="modalTitle">Edit</b><button class="btn secondary small" onclick="closeModal()">✕</button></div><div class="mb" id="modalBody"></div><div class="mf"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn primary" id="modalSave">Save</button></div></div></div>
 <div class="toastbox" id="toastbox"></div>
 <script>
@@ -66,17 +65,34 @@
 const DB=window.LashawnDB;
 const S={students:[],enrolments:[],driving:[],computer:[],fees:[],invoices:[],payments:[],apps:[],staff:[]};
 let channel=null,activity=[];
+let overviewTimer=null; // FIX: debounce handle for renderOverview
+
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-const money=v=>'KES '+Number(v||0).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2});
-const date=v=>v?new Date(v).toLocaleDateString('en-KE',{year:'numeric',month:'short',day:'numeric'}):'—';
-const datetime=v=>v?new Date(v).toLocaleString('en-KE',{dateStyle:'medium',timeStyle:'short'}):'—';
+// FIX: guard against null/undefined money — show "—" instead of "KES 0.00"
+const money=v=>v==null?'—':'KES '+Number(v||0).toLocaleString('en-KE',{minimumFractionDigits:2,maximumFractionDigits:2});
+// FIX: guard against invalid dates
+const date=v=>{if(!v)return '—';const d=new Date(v);return isNaN(d)?'—':d.toLocaleDateString('en-KE',{year:'numeric',month:'short',day:'numeric'})};
+const datetime=v=>{if(!v)return '—';const d=new Date(v);return isNaN(d)?'—':d.toLocaleString('en-KE',{dateStyle:'medium',timeStyle:'short'})};
 const name=s=>s?[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(' ')||'—':'—';
+
 function badge(v){let s=String(v||'—').toUpperCase(),c='';if(['ACTIVE','APPROVED','PAID','VERIFIED','CONVERTED'].includes(s))c='green';else if(['PENDING','PENDING_PAYMENT','PENDING_VERIFICATION','ISSUED'].includes(s))c='amber';else if(['REJECTED','CANCELLED','FAILED'].includes(s))c='red';else if(['DRIVING','COMPUTER'].includes(s))c='blue';else if(['CYBER','PRINTING','DIGITAL'].includes(s))c='purple';return `<span class="badge ${c}">${esc(s.replaceAll('_',' '))}</span>`}
 function toast(m,good=true){let x=document.createElement('div');x.className='toast '+(good?'good':'bad');x.textContent=m;document.getElementById('toastbox').appendChild(x);setTimeout(()=>x.remove(),3500)}
 function toggleSide(){document.getElementById('sidebar').classList.toggle('open')}
 function showPage(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');document.querySelector(`[data-page="${p}"]`).classList.add('active');document.getElementById('title').textContent=p==='fees'?'Services & Pricing':p.charAt(0).toUpperCase()+p.slice(1);if(innerWidth<850)toggleSide()}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
-async function get(table,select,order='created_at',limit=2000){let q=DB.from(table).select(select);if(order)q=q.order(order,{ascending:false});q=q.limit(limit);let r=await q;if(r.error)console.error(table,r.error);return r.data||[]}
+
+// FIX: surface query errors to the user instead of only logging
+async function get(table,select,order='created_at',limit=2000){
+  let q=DB.from(table).select(select);
+  if(order)q=q.order(order,{ascending:false});
+  q=q.limit(limit);
+  let r=await q;
+  if(r.error){
+    console.error(table,r.error);
+    toast(`${table}: ${r.error.message}`,false);
+  }
+  return r.data||[];
+}
 async function refreshAll(){await Promise.all([loadStudents(),loadEnrolments(),loadDriving(),loadComputer(),loadFees(),loadInvoices(),loadPayments(),loadApps(),loadStaff()]);renderOverview()}
 async function loadStudents(){S.students=await get('students','id,student_number,first_name,middle_name,last_name,phone,email,national_id,date_of_birth,gender,address,branch_id,status,registration_date,created_at,updated_at');renderStudents()}
 async function loadEnrolments(){S.enrolments=await get('enrolments','id,enrolment_number,student_id,programme,driving_class_id,computer_course_id,branch_id,instructor_id,start_date,expected_end_date,actual_end_date,status,training_weeks,notes,created_at,updated_at,students(student_number,first_name,middle_name,last_name,phone),driving_classes(class_code,class_name),computer_courses(course_code,course_name)');renderEnrolments()}
@@ -87,10 +103,53 @@ async function loadInvoices(){S.invoices=await get('invoices','id,invoice_number
 async function loadPayments(){S.payments=await get('payments','id,payment_number,student_id,enrolment_id,invoice_id,amount,payment_method,transaction_reference,mpesa_receipt_number,payment_date,status,received_by,notes,created_at,printing_job_id,students(student_number,first_name,middle_name,last_name),enrolments(enrolment_number)');renderPayments()}
 async function loadApps(){S.apps=await get('self_enrolments','id,application_number,full_name,phone,email,national_id_passport,programme,message,status,payment_status,fee_structure_id,quoted_fee,student_id,enrolment_id,source,created_at,updated_at,fee_structures(name,amount,unit,course_type)');renderApps()}
 async function loadStaff(){S.staff=await get('staff','id,email,is_active,created_at');renderStaff()}
-function endDate(e){if(e.expected_end_date)return new Date(e.expected_end_date+'T23:59:59');if(!e.start_date)return null;let d=new Date(e.start_date+'T00:00:00');d.setDate(d.getDate()+Number(e.training_weeks||6)*7);return d}
+
+// FIX: force local-time parsing consistently; append Z so date strings are treated as UTC midnight (avoids TZ off-by-one)
+function parseDateOnly(s){if(!s)return null;const d=new Date(s.length===10?s+'T00:00:00Z':s);return isNaN(d)?null:d}
+function endDate(e){
+  if(e.expected_end_date)return parseDateOnly(e.expected_end_date+'T23:59:59Z');
+  if(!e.start_date)return null;
+  const d=parseDateOnly(e.start_date);
+  if(!d)return null;
+  d.setUTCDate(d.getUTCDate()+Number(e.training_weeks||6)*7);
+  return d;
+}
 function daysLeft(e){let d=endDate(e);return d?Math.ceil((d-new Date())/86400000):0}
-function progress(e){if(!e.start_date)return 0;let a=new Date(e.start_date+'T00:00:00'),b=endDate(e);return b?Math.max(0,Math.min(100,Math.round((new Date()-a)/(b-a)*100))):0}
-function renderOverview(){let active=S.enrolments.filter(e=>String(e.status).toUpperCase()==='ACTIVE');let rev=S.invoices.reduce((a,x)=>a+Number(x.amount_paid||0),0),bal=S.invoices.reduce((a,x)=>a+Number(x.balance||0),0),pending=S.payments.filter(x=>String(x.status).toUpperCase()==='PENDING').length,apps=S.apps.filter(x=>['PENDING_PAYMENT','PENDING_VERIFICATION'].includes(String(x.status).toUpperCase())).length,approach=active.filter(e=>daysLeft(e)>=0&&daysLeft(e)<=7).length,over=active.filter(e=>daysLeft(e)<0).length;document.getElementById('sStudents').textContent=S.students.length;document.getElementById('sEnrolments').textContent=active.length;document.getElementById('sRevenue').textContent=money(rev);document.getElementById('sBalance').textContent=money(bal);document.getElementById('sPayments').textContent=pending;document.getElementById('sApps').textContent=apps;document.getElementById('sApproach').textContent=approach;document.getElementById('sOver').textContent=over;document.getElementById('tracker').innerHTML=active.slice(0,10).map(e=>{let d=daysLeft(e),p=progress(e),cl=e.driving_classes?.class_name||e.computer_courses?.course_name||e.programme;return `<tr><td>${esc(name(e.students))}<br><small>${esc(e.students?.student_number||'')}</small></td><td>${esc(cl)}</td><td>${date(e.start_date)}</td><td>${d<0?Math.abs(d)+' overdue':d+' left'}</td><td><div class="progress"><i style="width:${p}%"></i></div></td><td>${badge(d<0?'OVER 6 WEEKS':d<=7?'APPROACHING':'ON TRACK')}</td></tr>`}).join('')||'<tr><td colspan="6" class="empty">No active enrolments.</td></tr>';document.getElementById('latest').innerHTML=S.apps.slice(0,8).map(a=>`<tr><td>${esc(a.application_number)}</td><td>${esc(a.full_name)}</td><td>${badge(a.programme)}</td><td>${badge(a.payment_status)}</td><td>${badge(a.status)}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No applications.</td></tr>'}
+// FIX: guard against b<=a (would produce Infinity / NaN)
+function progress(e){
+  if(!e.start_date)return 0;
+  const a=parseDateOnly(e.start_date),b=endDate(e);
+  if(!a||!b)return 0;
+  const span=b-a;
+  if(span<=0)return 100;
+  return Math.max(0,Math.min(100,Math.round((new Date()-a)/span*100)));
+}
+
+// FIX: schedule an overview re-render (used by realtime to avoid hammering the DB on bursts)
+function scheduleOverview(){clearTimeout(overviewTimer);overviewTimer=setTimeout(renderOverview,250)}
+
+function renderOverview(){
+  // FIX: guard each getElementById so a missing node doesn't kill the whole render
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+  const active=S.enrolments.filter(e=>String(e.status).toUpperCase()==='ACTIVE');
+  const rev=S.invoices.reduce((a,x)=>a+Number(x.amount_paid||0),0);
+  const bal=S.invoices.reduce((a,x)=>a+Number(x.balance||0),0);
+  const pending=S.payments.filter(x=>String(x.status).toUpperCase()==='PENDING').length;
+  const apps=S.apps.filter(x=>['PENDING_PAYMENT','PENDING_VERIFICATION'].includes(String(x.status).toUpperCase())).length;
+  const approach=active.filter(e=>{const d=daysLeft(e);return d>=0&&d<=7}).length;
+  const over=active.filter(e=>daysLeft(e)<0).length;
+  set('sStudents',S.students.length);set('sEnrolments',active.length);
+  set('sRevenue',money(rev));set('sBalance',money(bal));
+  set('sPayments',pending);set('sApps',apps);
+  set('sApproach',approach);set('sOver',over);
+  const tracker=document.getElementById('tracker');
+  if(tracker)tracker.innerHTML=active.slice(0,10).map(e=>{
+    const d=daysLeft(e),p=progress(e),cl=e.driving_classes?.class_name||e.computer_courses?.course_name||e.programme;
+    return `<tr><td>${esc(name(e.students))}<br><small>${esc(e.students?.student_number||'')}</small></td><td>${esc(cl)}</td><td>${date(e.start_date)}</td><td>${d<0?Math.abs(d)+' overdue':d+' left'}</td><td><div class="progress"><i style="width:${p}%"></i></div></td><td>${badge(d<0?'OVER 6 WEEKS':d<=7?'APPROACHING':'ON TRACK')}</td></tr>`
+  }).join('')||'<tr><td colspan="6" class="empty">No active enrolments.</td></tr>';
+  const latest=document.getElementById('latest');
+  if(latest)latest.innerHTML=S.apps.slice(0,8).map(a=>`<tr><td>${esc(a.application_number)}</td><td>${esc(a.full_name)}</td><td>${badge(a.programme)}</td><td>${badge(a.payment_status)}</td><td>${badge(a.status)}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No applications.</td></tr>';
+}
 function renderStudents(){let q=(document.getElementById('studentQ')?.value||'').toLowerCase();let a=S.students.filter(x=>[x.student_number,x.first_name,x.middle_name,x.last_name,x.phone,x.email].join(' ').toLowerCase().includes(q));document.getElementById('students').innerHTML=a.map(s=>`<tr><td><b>${esc(s.student_number)}</b></td><td>${esc(name(s))}</td><td>${esc(s.phone)}</td><td>${esc(s.email||'—')}</td><td>${badge(s.status)}</td><td class="actions"><button class="btn secondary small" onclick="studentModal('${s.id}')">Edit</button><button class="btn danger small" onclick="del('students','${s.id}','student')">Delete</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No students.</td></tr>'}
 function renderEnrolments(){let q=(document.getElementById('enrolQ')?.value||'').toLowerCase();let a=S.enrolments.filter(e=>[e.enrolment_number,e.programme,e.status,name(e.students),e.driving_classes?.class_name,e.computer_courses?.course_name].join(' ').toLowerCase().includes(q));document.getElementById('enrolments').innerHTML=a.map(e=>`<tr><td>${esc(e.enrolment_number)}</td><td>${esc(name(e.students))}</td><td>${badge(e.programme)}</td><td>${esc(e.driving_classes?.class_name||e.computer_courses?.course_name||'—')}</td><td>${date(e.start_date)}</td><td>${date(endDate(e))}</td><td>${badge(e.status)}</td><td><button class="btn secondary small" onclick="editEnrolment('${e.id}')">Edit</button></td></tr>`).join('')||'<tr><td colspan="8" class="empty">No enrolments.</td></tr>'}
 function renderDriving(){document.getElementById('driving').innerHTML=S.driving.map(x=>`<tr><td>${esc(x.class_code)}</td><td>${esc(x.class_name)}</td><td><button class="btn secondary small" onclick="drivingModal('${x.id}')">Edit</button> <button class="btn danger small" onclick="del('driving_classes','${x.id}','driving class')">Delete</button></td></tr>`).join('')||'<tr><td colspan="3" class="empty">No driving classes.</td></tr>'}
@@ -98,28 +157,133 @@ function renderComputer(){document.getElementById('computer').innerHTML=S.comput
 function renderFees(){let q=(document.getElementById('feeQ')?.value||'').toLowerCase(),t=document.getElementById('feeType')?.value||'';let a=S.fees.filter(f=>[f.name,f.programme,f.course_type,f.option_code,f.unit].join(' ').toLowerCase().includes(q)&&(!t||String(f.course_type||f.programme).toUpperCase()===t));document.getElementById('fees').innerHTML=a.map(f=>`<tr><td><b>${esc(f.name)}</b><br><small>${esc(f.option_code||'')}</small></td><td>${badge(f.programme)}</td><td>${badge(f.course_type||'—')}</td><td><b>${money(f.amount)}</b></td><td>${esc(f.unit||'—')}</td><td>${f.is_active?badge('ACTIVE'):badge('INACTIVE')}</td><td><button class="btn secondary small" onclick="feeModal('${f.id}')">Edit</button> <button class="btn danger small" onclick="del('fee_structures','${f.id}','fee')">Delete</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty">No fees/services.</td></tr>'}
 function renderInvoices(){let q=(document.getElementById('invoiceQ')?.value||'').toLowerCase();let a=S.invoices.filter(i=>[i.invoice_number,name(i.students),i.students?.student_number,i.status].join(' ').toLowerCase().includes(q));document.getElementById('invoices').innerHTML=a.map(i=>`<tr><td>${esc(i.invoice_number)}</td><td>${esc(name(i.students))}</td><td>${date(i.issue_date)}</td><td>${money(i.total_amount)}</td><td>${money(i.amount_paid)}</td><td><b>${money(i.balance)}</b></td><td>${badge(i.status)}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">No invoices.</td></tr>'}
 function renderPayments(){let q=(document.getElementById('paymentQ')?.value||'').toLowerCase(),t=document.getElementById('paymentStatus')?.value||'';let a=S.payments.filter(p=>[p.payment_number,name(p.students),p.transaction_reference,p.mpesa_receipt_number,p.payment_method].join(' ').toLowerCase().includes(q)&&(!t||String(p.status).toUpperCase()===t));document.getElementById('payments').innerHTML=a.map(p=>`<tr><td>${esc(p.payment_number)}</td><td>${esc(name(p.students))}</td><td><b>${money(p.amount)}</b></td><td>${esc(p.payment_method||'—')}</td><td>${esc(p.mpesa_receipt_number||p.transaction_reference||'—')}</td><td>${datetime(p.payment_date)}</td><td>${badge(p.status)}</td><td>${String(p.status).toUpperCase()==='PENDING'?`<button class="btn success small" onclick="approve('${p.id}')">Approve</button> <button class="btn danger small" onclick="reject('${p.id}')">Reject</button>`:''}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">No payments.</td></tr>'}
-function renderApps(){let q=(document.getElementById('appQ')?.value||'').toLowerCase(),t=document.getElementById('appStatus')?.value||'';let a=S.apps.filter(x=>[x.application_number,x.full_name,x.phone,x.email,x.programme,x.status].join(' ').toLowerCase().includes(q)&&(!t||x.status===t));document.getElementById('apps').innerHTML=a.map(x=>`<tr><td>${esc(x.application_number)}</td><td>${date(x.created_at)}</td><td><b>${esc(x.full_name)}</b><br><small>${esc(x.email||'')}</small></td><td>${esc(x.phone)}</td><td>${badge(x.programme)}</td><td>${x.quoted_fee==null?'—':money(x.quoted_fee)}</td><td>${badge(x.payment_status)}</td><td>${badge(x.status)}</td><td class="actions">${x.payment_status!=='PAID'&&!['REJECTED','CANCELLED','CONVERTED'].includes(x.status)?`<button class="btn success small" onclick="markPaid('${x.id}')">Mark Paid</button>`:''}${x.payment_status==='PAID'&&x.status==='PENDING_VERIFICATION'?`<button class="btn primary small" onclick="verify('${x.id}')">Verify</button>`:''}${!['REJECTED','CANCELLED','CONVERTED'].includes(x.status)?`<button class="btn danger small" onclick="appReject('${x.id}')">Reject</button>`:''}</td></tr>`).join('')||'<tr><td colspan="9" class="empty">No applications.</td></tr>'}
+// FIX: case-insensitive status filter so it matches DB values regardless of casing
+function renderApps(){let q=(document.getElementById('appQ')?.value||'').toLowerCase(),t=(document.getElementById('appStatus')?.value||'').toUpperCase();let a=S.apps.filter(x=>[x.application_number,x.full_name,x.phone,x.email,x.programme,x.status].join(' ').toLowerCase().includes(q)&&(!t||String(x.status||'').toUpperCase()===t));document.getElementById('apps').innerHTML=a.map(x=>`<tr><td>${esc(x.application_number)}</td><td>${date(x.created_at)}</td><td><b>${esc(x.full_name)}</b><br><small>${esc(x.email||'')}</small></td><td>${esc(x.phone)}</td><td>${badge(x.programme)}</td><td>${x.quoted_fee==null?'—':money(x.quoted_fee)}</td><td>${badge(x.payment_status)}</td><td>${badge(x.status)}</td><td class="actions">${x.payment_status!=='PAID'&&!['REJECTED','CANCELLED','CONVERTED'].includes(x.status)?`<button class="btn success small" onclick="markPaid('${x.id}')">Mark Paid</button>`:''}${x.payment_status==='PAID'&&x.status==='PENDING_VERIFICATION'?`<button class="btn primary small" onclick="verify('${x.id}')">Verify</button>`:''}${!['REJECTED','CANCELLED','CONVERTED'].includes(x.status)?`<button class="btn danger small" onclick="appReject('${x.id}')">Reject</button>`:''}</td></tr>`).join('')||'<tr><td colspan="9" class="empty">No applications.</td></tr>'}
 function renderStaff(){document.getElementById('staff').innerHTML=S.staff.map(x=>`<tr><td>${esc(x.email)}</td><td>${x.is_active?badge('ACTIVE'):badge('INACTIVE')}</td><td>${datetime(x.created_at)}</td><td><small>${esc(x.id)}</small></td></tr>`).join('')||'<tr><td colspan="4" class="empty">No staff records.</td></tr>'}
 function renderActivity(){document.getElementById('activity').innerHTML=activity.map(x=>`<div><b>${esc(x.title)}</b><br><span>${esc(x.detail)} · ${datetime(x.at)}</span></div>`).join('')||'<div class="empty">Waiting for changes...</div>'}
 function modal(title,html,save){document.getElementById('modalTitle').textContent=title;document.getElementById('modalBody').innerHTML=html;document.getElementById('modalSave').onclick=save;document.getElementById('modal').classList.add('open')}
 function closeModal(){document.getElementById('modal').classList.remove('open')}
 function field(label,id,value='',type='text'){return `<div class="field"><label>${esc(label)}</label><input class="input" id="f_${id}" type="${type}" value="${esc(value)}"></div>`}
-function sel(label,id,opts,value){return `<div class="field"><label>${esc(label)}</label><select class="select" id="f_${id}">${opts.map(o=>`<option value="${esc(o)}" ${String(o)===String(value)?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`}
+// FIX: if value is undefined/null, default selection to first option (browser behavior) but make it explicit
+function sel(label,id,opts,value){
+  const hasVal=value!=null&&value!=='';
+  return `<div class="field"><label>${esc(label)}</label><select class="select" id="f_${id}">${opts.map((o,i)=>`<option value="${esc(o)}" ${(hasVal?String(o)===String(value):i===0)?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`
+}
 const val=id=>document.getElementById('f_'+id)?.value?.trim()||null;
+
 function studentModal(id){let s=id?S.students.find(x=>x.id===id):{};modal(id?'Edit Student':'Add Student',`<div class="form">${field('Student Number','student_number',s.student_number)}${field('First Name','first_name',s.first_name)}${field('Middle Name','middle_name',s.middle_name)}${field('Last Name','last_name',s.last_name)}${field('Phone','phone',s.phone)}${field('Email','email',s.email,'email')}${field('National ID','national_id',s.national_id)}${field('Date of Birth','date_of_birth',s.date_of_birth,'date')}${field('Gender','gender',s.gender)}${field('Branch ID','branch_id',s.branch_id)}${sel('Status','status',['ACTIVE','INACTIVE'],s.status||'ACTIVE')}${field('Registration Date','registration_date',s.registration_date||new Date().toISOString().slice(0,10),'date')}</div>`,async()=>{let p={student_number:val('student_number'),first_name:val('first_name'),middle_name:val('middle_name'),last_name:val('last_name'),phone:val('phone'),email:val('email'),national_id:val('national_id'),date_of_birth:val('date_of_birth'),gender:val('gender'),branch_id:val('branch_id'),status:val('status'),registration_date:val('registration_date')};let r=id?await DB.from('students').update(p).eq('id',id):await DB.from('students').insert(p);if(r.error)return toast(r.error.message,false);closeModal();toast(id?'Student updated':'Student created');await loadStudents();renderOverview()})}
 function drivingModal(id){let x=id?S.driving.find(v=>v.id===id):{};modal(id?'Edit Driving Class':'Add Driving Class',`<div class="form">${field('Class Code','class_code',x.class_code)}${field('Class Name','class_name',x.class_name)}</div>`,async()=>{let p={class_code:val('class_code'),class_name:val('class_name')};let r=id?await DB.from('driving_classes').update(p).eq('id',id):await DB.from('driving_classes').insert(p);if(r.error)return toast(r.error.message,false);closeModal();toast(id?'Driving class updated':'Driving class created');loadDriving()})}
 function computerModal(id){let x=id?S.computer.find(v=>v.id===id):{};modal(id?'Edit Computer Course':'Add Computer Course',`<div class="form">${field('Course Code','course_code',x.course_code)}${field('Course Name','course_name',x.course_name)}</div>`,async()=>{let p={course_code:val('course_code'),course_name:val('course_name')};let r=id?await DB.from('computer_courses').update(p).eq('id',id):await DB.from('computer_courses').insert(p);if(r.error)return toast(r.error.message,false);closeModal();toast(id?'Computer course updated':'Computer course created');loadComputer()})}
 function feeModal(id){let f=id?S.fees.find(x=>x.id===id):{};modal(id?'Edit Fee / Service':'Add Fee / Service',`<div class="form">${field('Name','name',f.name)}${sel('Programme','programme',['DRIVING','COMPUTER','PRINTING_DIGITAL'],f.programme||'COMPUTER')}${sel('Course Type','course_type',['DRIVING','COMPUTER','CYBER','PRINTING','DIGITAL'],f.course_type||'COMPUTER')}${field('Amount','amount',f.amount||0,'number')}${field('Unit','unit',f.unit)}${field('Option Code','option_code',f.option_code)}${field('Vehicle Option','vehicle_option',f.vehicle_option)}${field('NTSA Fee','ntsa_fee',f.ntsa_fee||0,'number')}${sel('Quantity Based','quantity_based',['false','true'],String(!!f.quantity_based))}${sel('Active','is_active',['true','false'],String(f.is_active!==false))}${field('Driving Class ID','driving_class_id',f.driving_class_id)}${field('Computer Course ID','computer_course_id',f.computer_course_id)}</div>`,async()=>{let p={name:val('name'),programme:val('programme'),course_type:val('course_type'),amount:Number(val('amount')||0),unit:val('unit'),option_code:val('option_code'),vehicle_option:val('vehicle_option'),ntsa_fee:Number(val('ntsa_fee')||0),quantity_based:val('quantity_based')==='true',is_active:val('is_active')==='true',driving_class_id:val('driving_class_id'),computer_course_id:val('computer_course_id')};let r=id?await DB.from('fee_structures').update(p).eq('id',id):await DB.from('fee_structures').insert(p);if(r.error)return toast(r.error.message,false);closeModal();toast(id?'Fee updated':'Fee created');loadFees()})}
 function editEnrolment(id){let e=S.enrolments.find(x=>x.id===id);if(!e)return;modal('Edit Enrolment',`<div class="form">${field('Enrolment Number','enrolment_number',e.enrolment_number)}${sel('Programme','programme',['DRIVING','COMPUTER'],e.programme)}${field('Start Date','start_date',e.start_date,'date')}${field('Expected End','expected_end_date',e.expected_end_date,'date')}${field('Training Weeks','training_weeks',e.training_weeks||6,'number')}${sel('Status','status',['ACTIVE','COMPLETED','CANCELLED'],e.status)}</div>`,async()=>{let p={enrolment_number:val('enrolment_number'),programme:val('programme'),start_date:val('start_date'),expected_end_date:val('expected_end_date'),training_weeks:Number(val('training_weeks')||6),status:val('status')};let r=await DB.from('enrolments').update(p).eq('id',id);if(r.error)return toast(r.error.message,false);closeModal();toast('Enrolment updated');loadEnrolments();renderOverview()})}
-async function del(table,id,label){if(!confirm(`Delete this ${label}? Related records may prevent deletion.`))return;let r=await DB.from(table).delete().eq('id',id);if(r.error)return toast(r.error.message,false);toast(label+' deleted');if(table==='students')loadStudents();if(table==='driving_classes')loadDriving();if(table==='computer_courses')loadComputer();if(table==='fee_structures')loadFees()}
-async function approve(id){if(!confirm('Approve this payment?'))return;let r=await DB.rpc('approve_payment',{p_payment_id:id});if(r.error)r=await DB.from('payments').update({status:'APPROVED',received_by:(await DB.auth.getUser()).data.user?.id||null}).eq('id',id);if(r.error)return toast(r.error.message,false);toast('Payment approved');await loadPayments();await loadInvoices();renderOverview()}
-async function reject(id){if(!confirm('Reject this payment?'))return;let r=await DB.from('payments').update({status:'REJECTED'}).eq('id',id);if(r.error)return toast(r.error.message,false);toast('Payment rejected');loadPayments()}
-async function markPaid(id){let a=S.apps.find(x=>x.id===id);if(!a||!confirm('Mark application as paid?'))return;let r=await DB.from('self_enrolments').update({payment_status:'PAID',status:'PENDING_VERIFICATION'}).eq('id',id);if(r.error)return toast(r.error.message,false);toast('Application marked paid');loadApps();renderOverview()}
-async function verify(id){let r=await DB.from('self_enrolments').update({status:'VERIFIED'}).eq('id',id);if(r.error)return toast(r.error.message,false);toast('Application verified');loadApps();renderOverview()}
+
+// FIX: refresh overview + related views after deletion; also refresh other lists when a parent is deleted
+async function del(table,id,label){
+  if(!confirm(`Delete this ${label}? Related records may prevent deletion.`))return;
+  let r=await DB.from(table).delete().eq('id',id);
+  if(r.error)return toast(r.error.message,false);
+  toast(label+' deleted');
+  if(table==='students'){await loadStudents();await loadEnrolments();await loadInvoices();await loadPayments();}
+  else if(table==='driving_classes'){await loadDriving();await loadEnrolments();}
+  else if(table==='computer_courses'){await loadComputer();await loadEnrolments();}
+  else if(table==='fee_structures'){await loadFees();}
+  renderOverview();
+}
+
+// FIX: if the RPC exists but fails for a real reason (not "missing function"), don't silently overwrite payment status
+async function approve(id){
+  if(!confirm('Approve this payment?'))return;
+  const rpc=await DB.rpc('approve_payment',{p_payment_id:id});
+  if(rpc.error){
+    // Only fall back to a direct update if the RPC is genuinely missing from the DB.
+    const missing=/function .* does not exist|Could not find the function/i.test(rpc.error.message||'');
+    if(!missing)return toast(rpc.error.message,false);
+    const uid=(await DB.auth.getUser()).data.user?.id||null;
+    const u=await DB.from('payments').update({status:'APPROVED',received_by:uid}).eq('id',id);
+    if(u.error)return toast(u.error.message,false);
+    toast('Payment approved (direct)');
+  } else {
+    toast('Payment approved');
+  }
+  await loadPayments();await loadInvoices();renderOverview();
+}
+async function reject(id){if(!confirm('Reject this payment?'))return;let r=await DB.from('payments').update({status:'REJECTED'}).eq('id',id);if(r.error)return toast(r.error.message,false);toast('Payment rejected');loadPayments();scheduleOverview()}
+
+// FIX: prefer RPCs for these transitions so students/enrolments are actually created server-side.
+// Falls back to direct updates only if the RPC is missing.
+async function markPaid(id){
+  const a=S.apps.find(x=>x.id===id);
+  if(!a||!confirm('Mark application as paid?'))return;
+  const rpc=await DB.rpc('mark_self_enrolment_paid',{p_application_id:id});
+  if(!rpc.error){toast('Application marked paid');await loadApps();renderOverview();return}
+  const missing=/function .* does not exist|Could not find the function/i.test(rpc.error.message||'');
+  if(!missing)return toast(rpc.error.message,false);
+  const r=await DB.from('self_enrolments').update({payment_status:'PAID',status:'PENDING_VERIFICATION'}).eq('id',id);
+  if(r.error)return toast(r.error.message,false);
+  toast('Marked paid (direct — no RPC)');
+  await loadApps();renderOverview();
+}
+async function verify(id){
+  const rpc=await DB.rpc('verify_self_enrolment',{p_application_id:id});
+  if(!rpc.error){toast('Application verified');await loadApps();await loadStudents();await loadEnrolments();renderOverview();return}
+  const missing=/function .* does not exist|Could not find the function/i.test(rpc.error.message||'');
+  if(!missing)return toast(rpc.error.message,false);
+  const r=await DB.from('self_enrolments').update({status:'VERIFIED'}).eq('id',id);
+  if(r.error)return toast(r.error.message,false);
+  toast('Verified (direct — no RPC)');
+  await loadApps();renderOverview();
+}
 async function appReject(id){if(!confirm('Reject this application?'))return;let r=await DB.from('self_enrolments').update({status:'REJECTED'}).eq('id',id);if(r.error)return toast(r.error.message,false);toast('Application rejected');loadApps();renderOverview()}
-function startRealtime(){if(channel)DB.removeChannel(channel);channel=DB.channel('lashawn-admin-dashboard');['students','enrolments','driving_classes','computer_courses','fee_structures','invoices','payments','self_enrolments','staff'].forEach(table=>channel.on('postgres_changes',{event:'*',schema:'public',table},async p=>{activity.unshift({title:table+' '+p.eventType,detail:'A database change was received in realtime.',at:new Date()});activity=activity.slice(0,100);renderActivity();if(table==='students')await loadStudents();if(table==='enrolments')await loadEnrolments();if(table==='driving_classes')await loadDriving();if(table==='computer_courses')await loadComputer();if(table==='fee_structures')await loadFees();if(table==='invoices')await loadInvoices();if(table==='payments')await loadPayments();if(table==='self_enrolments')await loadApps();if(table==='staff')await loadStaff();renderOverview()})).subscribe(status=>{let e=document.getElementById('live');if(status==='SUBSCRIBED'){e.textContent='● Realtime Online';e.classList.add('ok')}else{e.textContent='Realtime Offline';e.classList.remove('ok')}})}
+
+// FIX: lookup table + debounced overview; also refresh related data when upstream tables change
+function startRealtime(){
+  if(channel)DB.removeChannel(channel);
+  channel=DB.channel('lashawn-admin-dashboard');
+  const reloaders={
+    students:loadStudents,
+    enrolments:loadEnrolments,
+    driving_classes:loadDriving,
+    computer_courses:loadComputer,
+    fee_structures:loadFees,
+    invoices:loadInvoices,
+    payments:loadPayments,
+    self_enrolments:loadApps,
+    staff:loadStaff
+  };
+  Object.keys(reloaders).forEach(table=>{
+    channel.on('postgres_changes',{event:'*',schema:'public',table},async p=>{
+      activity.unshift({title:table+' '+p.eventType,detail:'A database change was received in realtime.',at:new Date()});
+      activity=activity.slice(0,100);renderActivity();
+      await reloaders[table]();
+      // cross-table refreshes that affect the overview
+      if(table==='payments'){await loadInvoices();}
+      if(table==='enrolments'||table==='students'){/* overview reads S.enrolments / S.students directly */ }
+      scheduleOverview();
+    });
+  });
+  channel.subscribe(status=>{
+    let e=document.getElementById('live');
+    if(status==='SUBSCRIBED'){e.textContent='● Realtime Online';e.classList.add('ok')}
+    else{e.textContent='Realtime Offline';e.classList.remove('ok')}
+  });
+}
 async function logout(){let r=await DB.auth.signOut();if(r.error)return toast(r.error.message,false);location.href='admin-login.html'}
-async function init(){try{if(!DB)throw new Error('LashawnDB was not loaded. Check js/supabase.js.');let {data,error}=await DB.auth.getSession();if(error)throw error;if(!data.session)return location.href='admin-login.html';document.getElementById('email').textContent=data.session.user.email||'Administrator';await refreshAll();startRealtime();document.getElementById('loading').classList.add('hidden')}catch(e){console.error(e);document.getElementById('loading').innerHTML=`<div><h2>Dashboard Error</h2><p>${esc(e.message||e)}</p><button class="btn primary" onclick="location.href='admin-login.html'">Return to Login</button></div>`}}
+
+async function init(){
+  try{
+    if(!DB)throw new Error('LashawnDB was not loaded. Check js/supabase.js.');
+    let {data,error}=await DB.auth.getSession();
+    if(error)throw error;
+    if(!data.session)return location.href='admin-login.html';
+    document.getElementById('email').textContent=data.session.user.email||'Administrator';
+    await refreshAll();
+    startRealtime();
+    document.getElementById('loading').classList.add('hidden');
+  }catch(e){
+    console.error(e);
+    document.getElementById('loading').innerHTML=`<div><h2>Dashboard Error</h2><p>${esc(e.message||e)}</p><button class="btn primary" onclick="location.href='admin-login.html'">Return to Login</button></div>`;
+  }
+}
 init();
 </script>
 </body>
