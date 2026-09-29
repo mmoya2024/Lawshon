@@ -48,7 +48,7 @@ tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:#fafbfc}
 .search,.filter-select{padding:.5rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem}.search{min-width:220px}
 .btn{display:inline-block;background:var(--gold);color:#241900;border:none;padding:.55rem 1rem;border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer}
 .btn.outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-.btn.small{padding:.35rem .7rem;font-size:.78rem}.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.danger{background:#fbe7e5;color:var(--danger)}.btn.small{padding:.35rem .7rem;font-size:.78rem}.btn:disabled{opacity:.55;cursor:not-allowed}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem}
 .form-group{margin-bottom:1rem}.form-group label{display:block;font-size:.78rem;font-weight:600;margin-bottom:.3rem;color:var(--muted)}
 .form-group input,.form-group select,.form-group textarea{width:100%;padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;font-family:inherit}
@@ -84,7 +84,9 @@ tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:#fafbfc}
       <button data-panel="tracker">6-Week Tracker</button>
       <button data-panel="fees">Fees & Balances</button>
       <button data-panel="approvals">Approvals <span class="badge" id="navPending" style="display:none">0</span></button>
+      <button data-panel="selfenrol">Self-Enrolments <span class="badge" id="navSelf" style="display:none">0</span></button>
       <button data-panel="enrollments">Enrollments & Sales</button>
+      <button data-panel="activity">Activity</button>
       <button data-panel="services">Services & Pricing</button>
       <button data-panel="admins">Admin Accounts</button>
     </nav>
@@ -101,6 +103,7 @@ tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:#fafbfc}
         <div class="stat ok"><div class="num" id="stat-print">—</div><div class="label">Printing revenue</div></div>
         <div class="stat warn"><div class="num" id="stat-balance">—</div><div class="label">Outstanding balance</div></div>
         <div class="stat warn"><div class="num" id="stat-pending">—</div><div class="label">Awaiting approval</div></div>
+        <div class="stat warn"><div class="num" id="stat-self">—</div><div class="label">Self-enrolments to action</div></div>
         <div class="stat"><div class="num" id="stat-active">—</div><div class="label">Active enrolments</div></div>
         <div class="stat warn"><div class="num" id="stat-approaching">—</div><div class="label">Approaching 6 weeks</div></div>
         <div class="stat danger"><div class="num" id="stat-overdue">—</div><div class="label">Over 6 weeks</div></div>
@@ -178,9 +181,50 @@ tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:#fafbfc}
         <thead><tr><th>Programme</th><th>Option</th><th>Description</th><th>Unit</th><th>Qty Based</th><th>Amount</th></tr></thead><tbody id="price-fees"></tbody></table></div></div>
     </section>
 
+    <section class="panel" id="panel-selfenrol">
+      <h1>Self-Enrolments</h1>
+      <p class="lede">Applications submitted from the public website (index.html).</p>
+      <div class="toolbar">
+        <select class="filter-select" id="selfFilter"><option value="">All statuses</option><option value="PENDING_PAYMENT">Pending payment</option><option value="PENDING_VERIFICATION">Pending verification</option><option value="VERIFIED">Verified</option><option value="REJECTED">Rejected</option></select>
+        <button class="btn small outline" type="button" onclick="loadSelf()">Refresh</button>
+      </div>
+      <div class="card"><div class="tbl-wrap"><table>
+        <thead><tr><th>Application No.</th><th>Date</th><th>Name</th><th>Phone</th><th>Programme</th><th>Message</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="self-table"></tbody>
+      </table></div></div>
+    </section>
+
+    <section class="panel" id="panel-activity">
+      <h1>Office Activity</h1>
+      <p class="lede">Everything office staff create, change or delete, newest first.</p>
+      <div class="toolbar">
+        <input class="search" id="actSearch" placeholder="Search person, action or record...">
+        <select class="filter-select" id="actTable"><option value="">All records</option><option value="students">Students</option><option value="enrolments">Enrolments</option><option value="invoices">Invoices</option><option value="payments">Payments</option><option value="printing_jobs">Printing jobs</option></select>
+        <button class="btn small outline" type="button" onclick="loadActivity()">Refresh</button>
+      </div>
+      <div class="card"><div class="tbl-wrap"><table>
+        <thead><tr><th>Time</th><th>Who</th><th>Action</th><th>Record</th><th>Details</th></tr></thead>
+        <tbody id="act-table"></tbody>
+      </table></div></div>
+    </section>
+
     <section class="panel" id="panel-admins">
       <h1>Admin & Staff Accounts</h1>
-      <p class="lede">Manage who can access this dashboard.</p>
+      <p class="lede">Create login accounts for office staff (Office Admin access) and view all staff.</p>
+      <div class="card"><h2>New office user</h2>
+        <form id="userForm">
+          <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+            <div class="form-group"><label>First name *</label><input id="uFirst" required></div>
+            <div class="form-group"><label>Last name *</label><input id="uLast" required></div>
+            <div class="form-group"><label>Phone</label><input id="uPhone"></div>
+          </div>
+          <div class="form-row" style="grid-template-columns:1fr 1fr auto;align-items:end">
+            <div class="form-group"><label>Email *</label><input id="uEmail" type="email" required></div>
+            <div class="form-group"><label>Temporary password * (min 8)</label><input id="uPass" type="text" minlength="8" required></div>
+            <div class="form-group"><button class="btn" type="submit" id="uBtn">Create user</button></div>
+          </div>
+        </form>
+      </div>
       <div class="card"><div class="tbl-wrap"><table>
         <thead><tr><th>Staff No.</th><th>Name</th><th>Email</th><th>Role</th><th>Active</th></tr></thead>
         <tbody id="admin-table"></tbody>
@@ -278,12 +322,15 @@ function classLabel(e){
 document.addEventListener("DOMContentLoaded", async () => {
   const session = await window.getSession();
   if(!session){ window.location.href="login.html"; return; }
+  let isSuper=false; try{ isSuper=(await LashawnDB.rpc("is_super_admin")).data===true; }catch(_){}
+  if(!isSuper){ location.replace("admin.html"); return; }
 
   document.querySelectorAll("nav.tabs button").forEach(btn=>btn.addEventListener("click",()=>{
     document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
     $("panel-"+btn.dataset.panel).classList.add("active");
+    if(btn.dataset.panel==="activity") loadActivity();
   }));
   $("trackerSearch").addEventListener("input",renderTracker);
   $("trackerFilter").addEventListener("change",renderTracker);
@@ -294,12 +341,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("receiptModal").addEventListener("click",function(e){ if(e.target===this) closeReceiptModal(); });
   $("approvals-table").addEventListener("click",handleApprove);
 
+  $("self-table").addEventListener("click",onSelfClick);
+  $("selfFilter").addEventListener("change",renderSelf);
+  $("userForm").addEventListener("submit",createUser);
+  $("actSearch").addEventListener("input",renderActivity);
+  $("actTable").addEventListener("change",renderActivity);
+  document.addEventListener("click",onDeleteClick);
   await Promise.all([loadProfile(),loadServices(),loadStaff(),refreshAll()]);
   startLive();
 });
 
 function refreshAll(){
-  return Promise.all([loadTracker(),loadEnrolments(),loadInvoices(),loadApprovals(),loadStats()]);
+  return Promise.all([loadTracker(),loadEnrolments(),loadInvoices(),loadApprovals(),loadSelf(),loadStats()]);
 }
 
 /* ---------- Live updates ---------- */
@@ -308,7 +361,7 @@ function startLive(){
   const refresh=()=>{ clearTimeout(t); t=setTimeout(refreshAll,800); };
   try{
     const ch=LashawnDB.channel("live-admin");
-    ["payments","invoices","enrolments","students","printing_jobs"].forEach(tbl=>
+    ["payments","invoices","enrolments","students","printing_jobs","self_enrolments"].forEach(tbl=>
       ch.on("postgres_changes",{event:"*",schema:"public",table:tbl},refresh));
     ch.subscribe();
   }catch(e){ console.warn("Realtime unavailable",e); }
@@ -340,6 +393,8 @@ async function loadStats(){
     $("stat-balance").textContent=money(bal);
     $("stat-pending").textContent=q.count??0;
     const nb=$("navPending"); nb.textContent=q.count??0; nb.style.display=(q.count>0)?"":"none";
+    const se=await LashawnDB.from("self_enrolments").select("id",{count:"exact",head:true}).in("status",["PENDING_PAYMENT","PENDING_VERIFICATION"]);
+    $("stat-self").textContent=se.count??0; const ns=$("navSelf"); ns.textContent=se.count??0; ns.style.display=se.count>0?"":"none";
   }catch(err){ console.error("Stats error:",err); }
 }
 
@@ -454,7 +509,7 @@ async function loadApprovals(){
         <td>${esc(party(p).no)}<br><small class="text-muted">${esc(party(p).name)}</small></td>
         <td>${esc(p.invoices?.invoice_number||"—")}</td><td>${money(p.amount)}</td><td>${pct}%</td>
         <td>${esc(p.payment_method||"")} ${esc(p.transaction_reference||"")} ${esc(p.notes||"")}</td>
-        <td><button class="btn small" data-approve="${n}">Approve & Receipt</button></td></tr>`;
+        <td style="white-space:nowrap"><button class="btn small" data-approve="${n}">Approve</button> <button class="btn small danger" data-reject="${n}">Reject</button></td></tr>`;
     }).join(""):'<tr><td colspan="8" class="text-muted">No payments awaiting approval.</td></tr>';
   }catch(err){
     console.error("Approvals error:",err);
@@ -462,6 +517,16 @@ async function loadApprovals(){
   }
 }
 async function handleApprove(e){
+  const rj=e.target.closest("[data-reject]");
+  if(rj){
+    const pr=PENDING[rj.dataset.reject];
+    const reason=prompt("Reason for rejecting this payment (e.g. M-Pesa code not found):");
+    if(reason===null) return;
+    rj.disabled=true;
+    const {error}=await LashawnDB.rpc("reject_payment",{p_payment_id:pr.id,p_reason:reason});
+    if(error){ toast(error.message); rj.disabled=false; return; }
+    toast("Payment rejected"); await refreshAll(); return;
+  }
   const b=e.target.closest("[data-approve]"); if(!b) return;
   const p=PENDING[b.dataset.approve];
   if(!confirm(`Approve ${money(p.amount)} for ${party(p).name}?`)) return;
@@ -500,7 +565,7 @@ function renderEnrolments(){
       <td>${esc(e.students?.phone||"—")}</td><td>${esc(prog)}</td><td>${esc(e.enrolment_number||"—")}</td>
       <td>${fmtDate(e.start_date)}</td>
       <td><span class="tag-pill ${e.status==="ACTIVE"?"paid":"office"}">${esc(e.status)}</span></td>
-      <td><a href="student-profile.html?id=${esc(e.student_id)}" class="btn small outline">View</a></td></tr>`;
+      <td style="white-space:nowrap"><a href="student-profile.html?id=${esc(e.student_id)}" class="btn small outline">View</a> <button class="btn small danger" data-del="${esc(e.student_id)}">Delete</button></td></tr>`;
   }).join(""):'<tr><td colspan="8" class="text-muted">No enrolments yet.</td></tr>';
 }
 
@@ -632,6 +697,96 @@ window.printReceipt=function(){
   </style></head><body><div class="receipt">${html}</div><script>window.onload=function(){window.print();};<\/script></body></html>`);
   w.document.close();
 };
+
+/* ---------- Self-enrolments (fed by index.html) ---------- */
+var SELF=[];
+async function loadSelf(){
+  const {data,error}=await LashawnDB.from("self_enrolments").select("*").order("created_at",{ascending:false}).limit(300);
+  if(error){ $("self-table").innerHTML='<tr><td colspan="9" class="text-muted">Could not load: '+esc(error.message)+'</td></tr>'; return; }
+  SELF=data||[]; renderSelf();
+}
+const selfProg=v=>({DRIVING:"Driving",COMPUTER:"Computer",PRINTING_DIGITAL:"Printing / Digital"})[v]||v||"—";
+function renderSelf(){
+  const f=$("selfFilter").value, rows=SELF.filter(x=>!f||x.status===f);
+  $("self-table").innerHTML=rows.length?rows.map(x=>{
+    const paid=x.payment_status==="PAID", open=!["REJECTED","CONVERTED"].includes(x.status);
+    const cls=["VERIFIED","CONVERTED"].includes(x.status)?"paid":["REJECTED","CANCELLED"].includes(x.status)?"overdue":"partial";
+    return `<tr><td><strong>${esc(x.application_number)}</strong></td><td>${fmtDate(x.created_at)}</td>
+      <td>${esc(x.full_name)}<br><small class="text-muted">${esc(x.email||"")}</small></td><td>${esc(x.phone)}</td>
+      <td>${esc(selfProg(x.programme))}</td><td><small>${esc(x.message||"—")}</small></td>
+      <td><span class="tag-pill ${paid?"paid":"pending"}">${paid?"PAID":"UNPAID"}</span></td>
+      <td><span class="tag-pill ${cls}">${esc((x.status||"—").replaceAll("_"," "))}</span></td>
+      <td style="white-space:nowrap">${open&&!paid?`<button class="btn small outline" data-sa="paid" data-id="${esc(x.id)}">Payment Received</button> `:""}${open&&paid&&x.status==="PENDING_VERIFICATION"?`<button class="btn small" data-sa="verify" data-id="${esc(x.id)}">Verify</button> `:""}${open?`<button class="btn small danger" data-sa="reject" data-id="${esc(x.id)}">Reject</button>`:""}</td></tr>`;
+  }).join(""):'<tr><td colspan="9" class="text-muted">No applications.</td></tr>';
+}
+async function onSelfClick(e){
+  const b=e.target.closest("[data-sa]"); if(!b) return;
+  const x=SELF.find(r=>r.id===b.dataset.id); if(!x) return;
+  const a=b.dataset.sa;
+  const patch=a==="paid"?{payment_status:"PAID",status:"PENDING_VERIFICATION"}:a==="verify"?{status:"VERIFIED"}:{status:"REJECTED"};
+  const txt=a==="paid"?"Confirm payment received from ":a==="verify"?"Verify application for ":"Reject application for ";
+  if(!confirm(txt+x.full_name+"?")) return;
+  b.disabled=true;
+  const {data:u,error}=await LashawnDB.from("self_enrolments").update(patch).eq("id",x.id).select("id");
+  if(error||!u||!u.length){ toast(error?error.message:"Update blocked: check the UPDATE policy on self_enrolments."); b.disabled=false; return; }
+  toast("Application updated"); await Promise.all([loadSelf(),loadStats()]);
+}
+
+/* ---------- Delete student ---------- */
+async function onDeleteClick(e){
+  const b=e.target.closest("[data-del]"); if(!b) return;
+  const name=b.closest("tr").children[1].textContent;
+  const t=prompt("Permanently delete "+name+" and their unpaid records?\nStudents with confirmed payments cannot be deleted.\n\nType DELETE to continue:");
+  if(t!=="DELETE") return;
+  const {error}=await LashawnDB.rpc("delete_student",{p_student_id:b.dataset.del});
+  if(error){ toast(error.message); return; }
+  toast("Student deleted"); await refreshAll();
+}
+
+/* ---------- Activity log ---------- */
+var ACT=[], STAFF_BY_UID={};
+async function loadActivity(){
+  const [a,st]=await Promise.all([
+    LashawnDB.from("audit_logs").select("created_at,user_id,action,table_name,record_id,old_data,new_data").order("created_at",{ascending:false}).limit(300),
+    LashawnDB.from("staff").select("auth_user_id,first_name,last_name,email,role")
+  ]);
+  if(a.error){ toast(a.error.message); return; }
+  STAFF_BY_UID={}; (st.data||[]).forEach(x=>STAFF_BY_UID[x.auth_user_id]=x);
+  ACT=a.data||[]; renderActivity();
+}
+function actWho(r){ const s=STAFF_BY_UID[r.user_id]; return s?s.first_name+" "+s.last_name+" ("+s.role+")":(r.user_id?"Unknown user":"System"); }
+function actDetail(r){
+  const d=r.new_data||r.old_data||{};
+  if(r.action==="UPDATE"&&r.old_data&&r.new_data){
+    const ch=Object.keys(r.new_data).filter(k=>k!=="updated_at"&&JSON.stringify(r.new_data[k])!==JSON.stringify(r.old_data[k]));
+    if(ch.length) return ch.map(k=>k+": "+(r.old_data[k]??"—")+" → "+(r.new_data[k]??"—")).join("; ");
+  }
+  const ref=d.payment_number||d.invoice_number||d.enrolment_number||d.job_number||d.student_number||d.customer_number||"";
+  return [ref,d.first_name?fullName(d):"",d.amount!=null?money(d.amount):"",d.total_amount!=null?"Total "+money(d.total_amount):"",d.status||"",d.payment_method||"",d.notes||""].filter(Boolean).join(" · ");
+}
+function renderActivity(){
+  const q=$("actSearch").value.toLowerCase(), t=$("actTable").value;
+  const rows=ACT.filter(r=>(!t||r.table_name===t)&&(!q||(actWho(r)+" "+r.action+" "+r.table_name+" "+actDetail(r)).toLowerCase().includes(q)));
+  $("act-table").innerHTML=rows.map(r=>`<tr><td style="white-space:nowrap">${new Date(r.created_at).toLocaleString("en-KE",{dateStyle:"medium",timeStyle:"short"})}</td>
+    <td>${esc(actWho(r))}</td><td>${esc(r.action)}</td><td>${esc(r.table_name)}</td><td><small>${esc(actDetail(r)).slice(0,220)}</small></td></tr>`).join("")
+    ||'<tr><td colspan="5" class="text-muted">No activity recorded yet.</td></tr>';
+}
+
+/* ---------- Create office user ---------- */
+async function createUser(e){
+  e.preventDefault();
+  const btn=$("uBtn"); btn.disabled=true; btn.textContent="Creating...";
+  try{
+    const {data,error}=await LashawnDB.functions.invoke("create-office-user",{body:{
+      first_name:$("uFirst").value.trim(), last_name:$("uLast").value.trim(), phone:$("uPhone").value.trim()||null,
+      email:$("uEmail").value.trim().toLowerCase(), password:$("uPass").value}});
+    if(error){ let m=error.message; try{ m=(await error.context.json()).error||m; }catch(_){} throw new Error(m); }
+    if(data?.error) throw new Error(data.error);
+    toast("User created: "+data.email+" ("+data.staff_number+")");
+    $("userForm").reset(); loadStaff();
+  }catch(err){ toast(err.message||"Could not create user"); }
+  finally{ btn.disabled=false; btn.textContent="Create user"; }
+}
 </script>
 </body>
 </html>
