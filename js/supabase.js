@@ -3,19 +3,18 @@
 
   const SUPABASE_URL = "https://qjfinbftcserrjiedduf.supabase.co";
   const SUPABASE_ANON_KEY =
-    "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqZmluYmZ0Y3NlcnJqaWVkZHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzOTgzMzksImV4cCI6MjEwNTk3NDMzOX0.WHAkxqTTtzQH_za4OPMWJAILRUUHIL5Akk8900QX5c0";
 
-  if (window.LashawnDB) {
+  if (window.LashawnDB) return;
+
+  if (!window.supabase || typeof window.supabase.createClient !== "function") {
+    console.error("Supabase library was not loaded before js/supabase.js.");
+    window.LashawnDB = null;
     return;
   }
 
-  if (
-    !window.supabase ||
-    typeof window.supabase.createClient !== "function"
-  ) {
-    console.error(
-      "Supabase library was not loaded before js/supabase.js."
-    );
+  if (!SUPABASE_URL.includes(".supabase.co") || SUPABASE_ANON_KEY.length < 100) {
+    console.error("Supabase URL or key looks invalid.");
     window.LashawnDB = null;
     return;
   }
@@ -32,8 +31,7 @@
         }
       }
     );
-
-    console.log("LashawnDB initialized successfully.");
+    console.log("LashawnDB initialized.");
   } catch (error) {
     console.error("Failed to initialize LashawnDB:", error);
     window.LashawnDB = null;
