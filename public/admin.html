@@ -83,28 +83,31 @@ input[readonly]{background:#f5f7fa}
     <p class="lede">Register a student, create the enrolment and invoice. Prices come from Supabase.</p>
     <div id="enrolNotice"></div>
     <form id="enrolForm">
-      <div class="card"><h2>Student Details</h2>
+      <div class="card"><h2>Select Service</h2>
+        <div class="form-grid"><div class="form-group"><label>Service *</label>
+          <select id="programme" required><option value="">Select Service</option><option value="DRIVING">Driving School (student enrolment)</option><option value="COMPUTER">Computer Training (student enrolment)</option><option value="PRINTING_DIGITAL">Printing / Digital (walk-in client)</option></select>
+        </div></div>
+        <div class="hint">Driving and Computer register a student with next of kin. Printing / Digital registers a client with basic details only.</div>
+      </div>
+      <div class="card" id="detailsCard" style="display:none"><h2 id="detailsTitle">Student Details</h2>
         <div class="form-grid">
           <div class="form-group"><label>First Name *</label><input id="firstName" required></div>
-          <div class="form-group"><label>Middle Name</label><input id="middleName"></div>
+          <div class="form-group student-only"><label>Middle Name</label><input id="middleName"></div>
           <div class="form-group"><label>Last Name *</label><input id="lastName" required></div>
           <div class="form-group"><label>Phone *</label><input id="phone" required></div>
           <div class="form-group"><label>Email</label><input id="email" type="email"></div>
-          <div class="form-group"><label>National ID</label><input id="idNumber"></div>
-          <div class="form-group"><label>Next of Kin Name *</label><input id="nokName" required></div>
-          <div class="form-group"><label>Relationship *</label><select id="nokRelation" required><option value="">Select</option><option>Parent</option><option>Spouse</option><option>Sibling</option><option>Guardian</option><option>Relative</option><option>Friend</option><option>Other</option></select></div>
-          <div class="form-group"><label>Next of Kin Phone *</label><input id="nokPhone" required></div>
-          <div class="form-group"><label>Date of Birth</label><input id="dob" type="date"></div>
-          <div class="form-group"><label>Gender</label>
+          <div class="form-group student-only"><label>National ID</label><input id="idNumber"></div>
+          <div class="form-group student-only"><label>Next of Kin Name *</label><input id="nokName" required></div>
+          <div class="form-group student-only"><label>Relationship *</label><select id="nokRelation" required><option value="">Select</option><option>Parent</option><option>Spouse</option><option>Sibling</option><option>Guardian</option><option>Relative</option><option>Friend</option><option>Other</option></select></div>
+          <div class="form-group student-only"><label>Next of Kin Phone *</label><input id="nokPhone" required></div>
+          <div class="form-group student-only"><label>Date of Birth</label><input id="dob" type="date"></div>
+          <div class="form-group student-only"><label>Gender</label>
             <select id="gender"><option value="">Select</option><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select>
           </div>
         </div>
       </div>
-      <div class="card"><h2>Training / Service</h2>
+      <div class="card" id="trainingCard" style="display:none"><h2>Service &amp; Payment</h2>
         <div class="form-grid">
-          <div class="form-group"><label>Programme *</label>
-            <select id="programme" required><option value="">Select Programme</option><option value="DRIVING">Driving</option><option value="COMPUTER">Computer</option><option value="PRINTING_DIGITAL">Printing / Digital</option></select>
-          </div>
           <div class="form-group" id="drivingGroup"><label>Driving Class</label><select id="drivingClass"><option value="">Select Class</option></select></div>
           <div class="form-group" id="computerGroup"><label>Computer Course</label><select id="computerCourse"><option value="">Select Course</option></select></div>
           <div class="form-group"><label>Fee Option *</label><select id="feeOption" required><option value="">Select Programme First</option></select></div>
@@ -276,7 +279,12 @@ async function loadReference(){
 
 /* ---------- Enrolment form ---------- */
 function programmeChanged(){
-  const p=$("programme").value;
+  const p=$("programme").value, student=p==="DRIVING"||p==="COMPUTER";
+  $("detailsCard").style.display=p?"":"none";
+  $("trainingCard").style.display=p?"":"none";
+  $("detailsTitle").textContent=student?"Student Details":"Client Details";
+  document.querySelectorAll(".student-only").forEach(g=>g.style.display=student?"flex":"none");
+  ["nokName","nokRelation","nokPhone"].forEach(id=>$(id).required=student);
   $("drivingGroup").style.display = p==="DRIVING" ? "flex":"none";
   $("computerGroup").style.display = p==="COMPUTER" ? "flex":"none";
   refreshFeeOptions();
@@ -338,6 +346,7 @@ async function saveEnrolment(e){
 
   const total=CALC.total, paid=CALC.paid;
   const pending=paid>0 && paid<total*0.5-0.005;
+  const isStudent=programme==="DRIVING"||programme==="COMPUTER";
   const payerText=$("payer").value+($("payer").value!=="Self"&&$("payerName").value.trim()?` (${$("payerName").value.trim()})`:"");
   const modeText=$("payMode").value==="INSTALMENTS"?"Instalments 50/30/20":"Full payment";
   $("saveBtn").disabled=true; $("saveBtn").textContent="Saving...";
@@ -359,7 +368,7 @@ async function saveEnrolment(e){
     const r=Array.isArray(data)?data[0]:data;
     if(!r?.student_id||!r?.enrolment_id) throw new Error("register_student did not return student_id and enrolment_id.");
 
-    {
+    if(isStudent){
       const {error:upErr}=await DB.from(T.students).update({
         middle_name:$("middleName").value.trim()||null,
         date_of_birth:$("dob").value||null,
@@ -377,7 +386,7 @@ async function saveEnrolment(e){
       total_amount:total,
       amount_paid:pending?0:paid,
       balance:pending?total:total-paid,
-      status:pending?"PENDING":paid>=total?"PAID":paid>0?"PARTIAL":"PENDING",
+      status:pending?"ISSUED":paid>=total?"PAID":paid>0?"PARTIAL":"ISSUED",
       notes:`${fee.name} x ${CALC.qty} | Payer: ${payerText} | Mode: ${modeText}`
     }).select("id,invoice_number").single();
     if(invErr) throw new Error("Student saved (No. "+r.student_number+") but invoice failed: "+invErr.message);
@@ -503,7 +512,7 @@ function showReceipt(d){
   $("receiptContent").innerHTML=`${LOGO_URL?`<div style="text-align:center;margin-bottom:8px"><img src="${esc(LOGO_URL)}" alt="Lashawn Academy" style="max-height:70px;max-width:220px" onerror="this.style.display='none'"></div>`:""}<h2>Lashawn Academy</h2><p style="text-align:center">Payment Receipt</p><hr>
     ${row("Payment No.",d.payment?.payment_number||"—")}${row("Date",fmtDate(d.payment?.payment_date))}
     ${row("Student No.",d.student?.student_number||"—")}${row("Enrolment No.",d.enrolment?.enrolment_number||"—")}
-    ${row("Student",fullName(d.student))}${row("Programme",d.enrolment?.programme||"—")}<hr>
+    ${row(d.enrolment?.programme==="PRINTING_DIGITAL"?"Client":"Student",fullName(d.student))}${row("Programme",d.enrolment?.programme||"—")}<hr>
     ${d.payer?row("Paid By",d.payer):""}${d.invoice?.invoice_number?row("Invoice No.",d.invoice.invoice_number):""}${row("Amount Received",money(d.paid))}${d.balance!=null?row("Balance Remaining",money(d.balance)):""}${row("Method",d.method)}${row("Reference",d.reference||"—")}<hr>
     <p style="text-align:center;font-size:12px">Thank you for choosing Lashawn Academy.</p>`;
   $("receiptModal").classList.add("open");
