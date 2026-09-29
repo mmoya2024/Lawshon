@@ -1,792 +1,4926 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Super Admin Dashboard — Lashawn Driving & Computer College</title>
+
 <link rel="stylesheet" href="css/style.css">
+
 <style>
-:root{--navy:#0f2d52;--gold:#d4a017;--bg:#f6f7f9;--card:#fff;--text:#1a1e24;--muted:#5b6472;--border:#e2e6eb;--danger:#b3261e;--ok:#1a7a4c}
+:root{
+  --navy:#0f2d52;
+  --gold:#d4a017;
+  --bg:#f6f7f9;
+  --card:#fff;
+  --text:#1a1e24;
+  --muted:#5b6472;
+  --border:#e2e6eb;
+  --danger:#b3261e;
+  --ok:#1a7a4c;
+  --blue:#24547d;
+}
+
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
-a{color:inherit;text-decoration:none}
-.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
-@media(max-width:820px){.shell{grid-template-columns:1fr}}
-aside{background:var(--navy);color:#fff;padding:1.4rem 1rem;display:flex;flex-direction:column;gap:.3rem}
-.brand{font-weight:700;font-size:1rem;padding:0 .5rem 1.2rem}.brand .dot{color:var(--gold)}
-.role-tag{font-size:.72rem;color:#cfd9e8;padding:0 .5rem 1rem;text-transform:uppercase;letter-spacing:.04em}
-nav.tabs{display:flex;flex-direction:column;gap:.2rem}
-nav.tabs button{all:unset;cursor:pointer;padding:.65rem .8rem;border-radius:8px;font-size:.9rem;color:#dbe3ee;display:flex;justify-content:space-between;align-items:center}
-nav.tabs button:hover{background:rgba(255,255,255,.08)}
-nav.tabs button.active{background:var(--gold);color:#241900;font-weight:700}
-.badge{background:var(--danger);color:#fff;border-radius:999px;font-size:.7rem;padding:0 .45rem;font-weight:700}
-.side-foot{margin-top:auto;font-size:.78rem;color:#9fb0c8;padding:.5rem}.side-foot a{color:#fff;text-decoration:underline}
-main{padding:1.8rem 2rem;max-width:1280px}
-@media(max-width:600px){main{padding:1.2rem 1rem}}
-h1{font-size:1.5rem;color:var(--navy);margin:0 0 .2rem}
-.lede{color:var(--muted);font-size:.92rem;margin:0 0 1.6rem}
-.panel{display:none}.panel.active{display:block}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.8rem}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.2rem}
-.stat .num{font-size:1.45rem;font-weight:800;color:var(--navy)}.stat .label{color:var(--muted);font-size:.82rem;margin-top:.2rem}
-.stat.warn .num{color:#8a5a00}.stat.danger .num{color:var(--danger)}.stat.ok .num{color:var(--ok)}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1.5rem}
-.card h2{font-size:1.05rem;color:var(--navy);margin:0 0 1rem}
-table{border-collapse:collapse;width:100%;font-size:.85rem}
-thead th{background:#eef2f7;color:var(--navy);text-align:left;padding:.6rem .7rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.02em;border-bottom:1px solid var(--border);white-space:nowrap}
-tbody td{padding:.6rem .7rem;border-bottom:1px solid var(--border);vertical-align:middle}
-tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:#fafbfc}
-.tbl-wrap{overflow-x:auto}.text-muted{color:var(--muted)}
-.tag-pill{display:inline-block;padding:.15rem .55rem;border-radius:999px;font-size:.72rem;font-weight:600;white-space:nowrap}
-.tag-pill.paid,.tag-pill.on-track{background:#e4f5ec;color:var(--ok)}
-.tag-pill.partial,.tag-pill.approaching{background:#fdf1d8;color:#8a5a00}
-.tag-pill.pending,.tag-pill.overdue{background:#fbe7e5;color:var(--danger)}
-.tag-pill.super{background:#e8ecf5;color:var(--navy)}.tag-pill.office{background:#f1f1f4;color:var(--muted)}
-.progress{background:#eef2f7;border-radius:999px;height:8px;overflow:hidden;min-width:80px}
-.progress>div{height:100%;background:var(--gold)}.progress.ok>div{background:var(--ok)}.progress.warn>div{background:#d49a17}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
-.search,.filter-select{padding:.5rem .8rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem}.search{min-width:220px}
-.btn{display:inline-block;background:var(--gold);color:#241900;border:none;padding:.55rem 1rem;border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer}
-.btn.outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-.btn.danger{background:#fbe7e5;color:var(--danger)}.btn.small{padding:.35rem .7rem;font-size:.78rem}.btn:disabled{opacity:.55;cursor:not-allowed}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem}
-.form-group{margin-bottom:1rem}.form-group label{display:block;font-size:.78rem;font-weight:600;margin-bottom:.3rem;color:var(--muted)}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:.55rem .7rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;font-family:inherit}
-.alert{padding:.7rem .9rem;border-radius:8px;font-size:.85rem;margin-bottom:.8rem}
-.alert-danger{background:#fbe7e5;color:var(--danger)}.alert-success{background:#e4f5ec;color:var(--ok)}
-.toast{position:fixed;bottom:1.2rem;right:1.2rem;background:var(--navy);color:#fff;padding:.8rem 1.1rem;border-radius:8px;font-size:.85rem;box-shadow:0 6px 20px rgba(0,0,0,.18);display:none;z-index:2000}
-.toast.show{display:block}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:1rem}
-.modal-overlay.active{display:flex}
-.modal{background:#fff;border-radius:12px;padding:1.5rem;max-width:560px;width:100%;max-height:90vh;overflow-y:auto}
-.modal h3{margin:0 0 1rem;color:var(--navy)}
-.fee-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.8rem;margin:.8rem 0;font-size:.82rem}
-.fee-summary .item{padding:.6rem;background:#f8f9fb;border-radius:8px}
-.fee-summary .k{color:var(--muted)}.fee-summary .v{font-weight:700;color:var(--navy);font-size:1rem;margin-top:.15rem}
-.receipt-modal{max-width:720px}
-.receipt-head{text-align:center;border-bottom:2px solid var(--navy);padding-bottom:1rem;margin-bottom:1rem}
-.receipt-head h2{margin:0;color:var(--navy);font-size:1.25rem}.receipt-head .sub{font-size:.78rem;color:var(--muted);margin-top:.25rem}
-.receipt-meta{display:flex;justify-content:space-between;gap:1rem;margin-bottom:1rem}
-.receipt-box{background:#f8f9fb;border:1px solid var(--border);border-radius:8px;padding:.75rem}
-.receipt-label{font-size:.72rem;color:var(--muted)}.receipt-value{font-weight:700;color:var(--navy);margin-top:.15rem}
-.receipt-total{margin-top:1rem;background:#f8f9fb;border-radius:8px;padding:1rem;text-align:center}
-.receipt-total .label{font-size:.75rem;color:var(--muted)}.receipt-total .amount{font-size:1.6rem;font-weight:900;color:var(--navy)}
-@media print{.no-print{display:none!important}body{background:#fff!important}}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.5;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.shell{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  min-height:100vh;
+}
+
+@media(max-width:820px){
+  .shell{grid-template-columns:1fr}
+
+  aside{
+    position:relative!important;
+    width:100%!important;
+  }
+
+  nav.tabs{
+    display:grid!important;
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+aside{
+  background:var(--navy);
+  color:#fff;
+  padding:1.4rem 1rem;
+  display:flex;
+  flex-direction:column;
+  gap:.3rem;
+}
+
+.brand{
+  font-weight:700;
+  font-size:1rem;
+  padding:0 .5rem 1.2rem;
+}
+
+.brand .dot{
+  color:var(--gold);
+}
+
+.role-tag{
+  font-size:.72rem;
+  color:#cfd9e8;
+  padding:0 .5rem 1rem;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+
+nav.tabs{
+  display:flex;
+  flex-direction:column;
+  gap:.2rem;
+}
+
+nav.tabs button{
+  all:unset;
+  cursor:pointer;
+  padding:.65rem .8rem;
+  border-radius:8px;
+  font-size:.9rem;
+  color:#dbe3ee;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+nav.tabs button:hover{
+  background:rgba(255,255,255,.08);
+}
+
+nav.tabs button.active{
+  background:var(--gold);
+  color:#241900;
+  font-weight:700;
+}
+
+.badge{
+  background:var(--danger);
+  color:#fff;
+  border-radius:999px;
+  font-size:.7rem;
+  padding:0 .45rem;
+  font-weight:700;
+}
+
+.side-foot{
+  margin-top:auto;
+  font-size:.78rem;
+  color:#9fb0c8;
+  padding:.5rem;
+}
+
+.side-foot a{
+  color:#fff;
+  text-decoration:underline;
+}
+
+main{
+  padding:1.8rem 2rem;
+  max-width:1400px;
+  width:100%;
+}
+
+@media(max-width:600px){
+  main{padding:1.2rem 1rem}
+}
+
+h1{
+  font-size:1.5rem;
+  color:var(--navy);
+  margin:0 0 .2rem;
+}
+
+.lede{
+  color:var(--muted);
+  font-size:.92rem;
+  margin:0 0 1.6rem;
+}
+
+.panel{
+  display:none;
+}
+
+.panel.active{
+  display:block;
+}
+
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:1rem;
+  margin-bottom:1.8rem;
+}
+
+.stat{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:1.1rem 1.2rem;
+}
+
+.stat .num{
+  font-size:1.45rem;
+  font-weight:800;
+  color:var(--navy);
+}
+
+.stat .label{
+  color:var(--muted);
+  font-size:.82rem;
+  margin-top:.2rem;
+}
+
+.stat.warn .num{color:#8a5a00}
+.stat.danger .num{color:var(--danger)}
+.stat.ok .num{color:var(--ok)}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:1.4rem;
+  margin-bottom:1.5rem;
+}
+
+.card h2{
+  font-size:1.05rem;
+  color:var(--navy);
+  margin:0 0 1rem;
+}
+
+table{
+  border-collapse:collapse;
+  width:100%;
+  font-size:.85rem;
+}
+
+thead th{
+  background:#eef2f7;
+  color:var(--navy);
+  text-align:left;
+  padding:.6rem .7rem;
+  font-size:.72rem;
+  text-transform:uppercase;
+  letter-spacing:.02em;
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+
+tbody td{
+  padding:.6rem .7rem;
+  border-bottom:1px solid var(--border);
+  vertical-align:middle;
+}
+
+tbody tr:last-child td{
+  border-bottom:none;
+}
+
+tbody tr:hover td{
+  background:#fafbfc;
+}
+
+.tbl-wrap{
+  overflow-x:auto;
+}
+
+.text-muted{
+  color:var(--muted);
+}
+
+.tag-pill{
+  display:inline-block;
+  padding:.15rem .55rem;
+  border-radius:999px;
+  font-size:.72rem;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.tag-pill.paid,
+.tag-pill.on-track{
+  background:#e4f5ec;
+  color:var(--ok);
+}
+
+.tag-pill.partial,
+.tag-pill.approaching{
+  background:#fdf1d8;
+  color:#8a5a00;
+}
+
+.tag-pill.pending,
+.tag-pill.overdue{
+  background:#fbe7e5;
+  color:var(--danger);
+}
+
+.tag-pill.super{
+  background:#e8ecf5;
+  color:var(--navy);
+}
+
+.tag-pill.office{
+  background:#f1f1f4;
+  color:var(--muted);
+}
+
+.progress{
+  background:#eef2f7;
+  border-radius:999px;
+  height:8px;
+  overflow:hidden;
+  min-width:80px;
+}
+
+.progress>div{
+  height:100%;
+  background:var(--gold);
+}
+
+.progress.ok>div{
+  background:var(--ok);
+}
+
+.progress.warn>div{
+  background:#d49a17;
+}
+
+.toolbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  flex-wrap:wrap;
+  margin-bottom:1rem;
+}
+
+.search,
+.filter-select{
+  padding:.5rem .8rem;
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-size:.88rem;
+  background:#fff;
+}
+
+.search{
+  min-width:220px;
+}
+
+.btn{
+  display:inline-block;
+  background:var(--gold);
+  color:#241900;
+  border:none;
+  padding:.55rem 1rem;
+  border-radius:8px;
+  font-weight:700;
+  font-size:.85rem;
+  cursor:pointer;
+}
+
+.btn.outline{
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--text);
+}
+
+.btn.danger{
+  background:#fbe7e5;
+  color:var(--danger);
+}
+
+.btn.small{
+  padding:.35rem .7rem;
+  font-size:.78rem;
+}
+
+.btn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.6rem;
+  margin-bottom:1rem;
+}
+
+.form-group{
+  margin-bottom:1rem;
+}
+
+.form-group label{
+  display:block;
+  font-size:.78rem;
+  font-weight:600;
+  margin-bottom:.3rem;
+  color:var(--muted);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+  width:100%;
+  padding:.55rem .7rem;
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-size:.88rem;
+  font-family:inherit;
+}
+
+.alert{
+  padding:.7rem .9rem;
+  border-radius:8px;
+  font-size:.85rem;
+  margin-bottom:.8rem;
+}
+
+.alert-danger{
+  background:#fbe7e5;
+  color:var(--danger);
+}
+
+.alert-success{
+  background:#e4f5ec;
+  color:var(--ok);
+}
+
+.alert-info{
+  background:#eef6ff;
+  color:var(--blue);
+}
+
+.toast{
+  position:fixed;
+  bottom:1.2rem;
+  right:1.2rem;
+  background:var(--navy);
+  color:#fff;
+  padding:.8rem 1.1rem;
+  border-radius:8px;
+  font-size:.85rem;
+  box-shadow:0 6px 20px rgba(0,0,0,.18);
+  display:none;
+  z-index:2000;
+}
+
+.toast.show{
+  display:block;
+}
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+  padding:1rem;
+}
+
+.modal-overlay.active{
+  display:flex;
+}
+
+.modal{
+  background:#fff;
+  border-radius:12px;
+  padding:1.5rem;
+  max-width:560px;
+  width:100%;
+  max-height:90vh;
+  overflow-y:auto;
+}
+
+.modal h3{
+  margin:0 0 1rem;
+  color:var(--navy);
+}
+
+.fee-summary{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:.8rem;
+  margin:.8rem 0;
+  font-size:.82rem;
+}
+
+.fee-summary .item{
+  padding:.6rem;
+  background:#f8f9fb;
+  border-radius:8px;
+}
+
+.fee-summary .k{
+  color:var(--muted);
+}
+
+.fee-summary .v{
+  font-weight:700;
+  color:var(--navy);
+  font-size:1rem;
+  margin-top:.15rem;
+}
+
+.receipt-modal{
+  max-width:720px;
+}
+
+.receipt-head{
+  text-align:center;
+  border-bottom:2px solid var(--navy);
+  padding-bottom:1rem;
+  margin-bottom:1rem;
+}
+
+.receipt-head h2{
+  margin:0;
+  color:var(--navy);
+  font-size:1.25rem;
+}
+
+.receipt-head .sub{
+  font-size:.78rem;
+  color:var(--muted);
+  margin-top:.25rem;
+}
+
+.receipt-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  margin-bottom:1rem;
+}
+
+.receipt-box{
+  background:#f8f9fb;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:.75rem;
+}
+
+.receipt-label{
+  font-size:.72rem;
+  color:var(--muted);
+}
+
+.receipt-value{
+  font-weight:700;
+  color:var(--navy);
+  margin-top:.15rem;
+}
+
+.receipt-total{
+  margin-top:1rem;
+  background:#f8f9fb;
+  border-radius:8px;
+  padding:1rem;
+  text-align:center;
+}
+
+.receipt-total .label{
+  font-size:.75rem;
+  color:var(--muted);
+}
+
+.receipt-total .amount{
+  font-size:1.6rem;
+  font-weight:900;
+  color:var(--navy);
+}
+
+@media print{
+  .no-print{
+    display:none!important;
+  }
+
+  body{
+    background:#fff!important;
+  }
+}
 </style>
+
 </head>
+
 <body>
+
 <div class="shell">
-  <aside>
-    <div class="brand">🎓 <span>Lashawn <span class="dot">Admin</span></span></div>
-    <div class="role-tag">Super Admin Dashboard</div>
-    <nav class="tabs">
-      <button data-panel="overview" class="active">Overview</button>
-      <button data-panel="tracker">6-Week Tracker</button>
-      <button data-panel="fees">Fees & Balances</button>
-      <button data-panel="approvals">Approvals <span class="badge" id="navPending" style="display:none">0</span></button>
-      <button data-panel="selfenrol">Self-Enrolments <span class="badge" id="navSelf" style="display:none">0</span></button>
-      <button data-panel="enrollments">Enrollments & Sales</button>
-      <button data-panel="activity">Activity</button>
-      <button data-panel="services">Services & Pricing</button>
-      <button data-panel="admins">Admin Accounts</button>
-    </nav>
-    <div class="side-foot">Signed in as <strong id="sideName">Admin</strong><br><a href="index.html">← Back to site</a> · <a href="#" onclick="window.signOut();return false;">Logout</a></div>
-  </aside>
 
-  <main>
-    <section class="panel active" id="panel-overview">
-      <h1>Overview</h1>
-      <p class="lede">Snapshot of students, revenue, fees, and training progress across all services.</p>
-      <div class="stat-grid">
-        <div class="stat"><div class="num" id="stat-students">—</div><div class="label">Total students</div></div>
-        <div class="stat ok"><div class="num" id="stat-revenue">—</div><div class="label">Total revenue (confirmed)</div></div>
-        <div class="stat ok"><div class="num" id="stat-print">—</div><div class="label">Printing revenue</div></div>
-        <div class="stat warn"><div class="num" id="stat-balance">—</div><div class="label">Outstanding balance</div></div>
-        <div class="stat warn"><div class="num" id="stat-pending">—</div><div class="label">Awaiting approval</div></div>
-        <div class="stat warn"><div class="num" id="stat-self">—</div><div class="label">Self-enrolments to action</div></div>
-        <div class="stat"><div class="num" id="stat-active">—</div><div class="label">Active enrolments</div></div>
-        <div class="stat warn"><div class="num" id="stat-approaching">—</div><div class="label">Approaching 6 weeks</div></div>
-        <div class="stat danger"><div class="num" id="stat-overdue">—</div><div class="label">Over 6 weeks</div></div>
-        <div class="stat ok"><div class="num" id="stat-ready">—</div><div class="label">Test ready</div></div>
-        <div class="stat"><div class="num" id="stat-admins">—</div><div class="label">Active staff</div></div>
-      </div>
-      <div class="card">
-        <h2>Training status (driving students)</h2>
-        <div class="tbl-wrap"><table>
-          <thead><tr><th>Student</th><th>Class</th><th>Start</th><th>Expected Test Date</th><th>Days Left</th><th>Progress</th><th>Fee Balance</th><th>Status</th></tr></thead>
-          <tbody id="overview-tracker"></tbody>
-        </table></div>
-      </div>
-    </section>
+<aside>
 
-    <section class="panel" id="panel-tracker">
-      <h1>6-Week Training Tracker</h1>
-      <p class="lede">Automatic tracking of every active driving enrolment. Expected test date = start date + 42 days.</p>
-      <div class="toolbar">
-        <input type="text" class="search" id="trackerSearch" placeholder="Search student or class...">
-        <select class="filter-select" id="trackerFilter">
-          <option value="">All statuses</option><option value="ON_TRACK">On Track</option>
-          <option value="APPROACHING_6_WEEKS">Approaching 6 Weeks</option><option value="OVER_6_WEEKS">Over 6 Weeks</option>
-        </select>
-      </div>
-      <div class="card"><div class="tbl-wrap"><table>
-        <thead><tr><th>Student</th><th>Class</th><th>Start</th><th>Expected Test Date</th><th>Days Left</th><th>Progress</th><th>Fee Balance</th><th>Status</th><th></th></tr></thead>
-        <tbody id="tracker-table"></tbody>
-      </table></div></div>
-    </section>
+  <div class="brand">
+    🎓 <span>Lashawn <span class="dot">Admin</span></span>
+  </div>
 
-    <section class="panel" id="panel-fees">
-      <h1>Fees & Balances</h1>
-      <p class="lede">Every invoice: students (driving and computer) and printing clients.</p>
-      <div class="toolbar">
-        <input type="text" class="search" id="feeSearch" placeholder="Search name, number or class...">
-        <select class="filter-select" id="feeFilter">
-          <option value="">All fee statuses</option><option value="PAID">Paid in full</option>
-          <option value="PARTIAL">Partial payment</option><option value="UNPAID">Unpaid</option>
-        </select>
-      </div>
-      <div class="card"><div class="tbl-wrap"><table>
-        <thead><tr><th>Student / Client</th><th>Invoice</th><th>Class / Course</th><th>Total</th><th>Paid</th><th>Balance</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody id="fee-table"></tbody>
-      </table></div></div>
-    </section>
+  <div class="role-tag">
+    Super Admin Dashboard
+  </div>
 
-    <section class="panel" id="panel-approvals">
-      <h1>Payment Approvals</h1>
-      <p class="lede">Payments that bring an invoice below 50%. No receipt is issued until you approve.</p>
-      <div class="card"><div class="tbl-wrap"><table>
-        <thead><tr><th>Payment No.</th><th>Date</th><th>Student / Client</th><th>Invoice</th><th>Amount</th><th>% of Fee</th><th>Details</th><th></th></tr></thead>
-        <tbody id="approvals-table"></tbody>
-      </table></div></div>
-    </section>
+  <nav class="tabs">
 
-    <section class="panel" id="panel-enrollments">
-      <h1>Enrollments & Sales</h1>
-      <p class="lede">Every enrollment recorded in the system.</p>
-      <div class="toolbar"><input type="text" class="search" id="enrollSearch" placeholder="Search by name or programme..."></div>
-      <div class="card"><div class="tbl-wrap"><table>
-        <thead><tr><th>Student No.</th><th>Name</th><th>Phone</th><th>Programme</th><th>Enrolment No.</th><th>Start Date</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody id="enroll-table"></tbody>
-      </table></div></div>
-    </section>
+```
+<button data-panel="overview" class="active">
+  Overview
+</button>
 
-    <section class="panel" id="panel-services">
-      <h1>Services & Pricing</h1>
-      <p class="lede">Prices come from the same fee structures Office Admin uses when enrolling.</p>
-      <div class="card"><h2>Driving classes</h2><div class="tbl-wrap"><table>
-        <thead><tr><th>Code</th><th>Class</th><th>Min Age</th><th>Weeks</th><th>Description</th></tr></thead><tbody id="price-driving"></tbody></table></div></div>
-      <div class="card"><h2>Computer courses</h2><div class="tbl-wrap"><table>
-        <thead><tr><th>Code</th><th>Course</th><th>Duration</th></tr></thead><tbody id="price-computer"></tbody></table></div></div>
-      <div class="card"><h2>Fee structures (all prices)</h2><div class="tbl-wrap"><table>
-        <thead><tr><th>Programme</th><th>Option</th><th>Description</th><th>Unit</th><th>Qty Based</th><th>Amount</th></tr></thead><tbody id="price-fees"></tbody></table></div></div>
-    </section>
+<button data-panel="tracker">
+  6-Week Tracker
+</button>
 
-    <section class="panel" id="panel-selfenrol">
-      <h1>Self-Enrolments</h1>
-      <p class="lede">Applications submitted from the public website (index.html).</p>
-      <div class="toolbar">
-        <select class="filter-select" id="selfFilter"><option value="">All statuses</option><option value="PENDING_PAYMENT">Pending payment</option><option value="PENDING_VERIFICATION">Pending verification</option><option value="VERIFIED">Verified</option><option value="REJECTED">Rejected</option></select>
-        <button class="btn small outline" type="button" onclick="loadSelf()">Refresh</button>
-      </div>
-      <div class="card"><div class="tbl-wrap"><table>
-        <thead><tr><th>Application No.</th><th>Date</th><th>Name</th><th>Phone</th><th>Programme</th><th>Message</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody id="self-table"></tbody>
-      </table></div></div>
-    </section>
+<button data-panel="fees">
+  Fees & Balances
+</button>
 
-    <section class="panel" id="panel-activity">
-      <h1>Office Activity</h1>
-      <p class="lede">Everything office staff create, change or delete, newest first.</p>
-      <div class="toolbar">
-        <input class="search" id="actSearch" placeholder="Search person, action or record...">
-        <select class="filter-select" id="actTable"><option value="">All records</option><option value="students">Students</option><option value="enrolments">Enrolments</option><option value="invoices">Invoices</option><option value="payments">Payments</option><option value="printing_jobs">Printing jobs</option></select>
-        <button class="btn small outline" type="button" onclick="loadActivity()">Refresh</button>
-      </div>
-      <div class="card"><div class="tbl-wrap"><table>
-        <thead><tr><th>Time</th><th>Who</th><th>Action</th><th>Record</th><th>Details</th></tr></thead>
-        <tbody id="act-table"></tbody>
-      </table></div></div>
-    </section>
+<button data-panel="approvals">
+  Approvals
+  <span class="badge" id="navPending" style="display:none">0</span>
+</button>
 
-    <section class="panel" id="panel-admins">
-      <h1>Admin & Staff Accounts</h1>
-      <p class="lede">Create login accounts for office staff (Office Admin access) and view all staff.</p>
-      <div class="card"><h2>New office user</h2>
-        <form id="userForm">
-          <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-            <div class="form-group"><label>First name *</label><input id="uFirst" required></div>
-            <div class="form-group"><label>Last name *</label><input id="uLast" required></div>
-            <div class="form-group"><label>Phone</label><input id="uPhone"></div>
-          </div>
-          <div class="form-row" style="grid-template-columns:1fr 1fr auto;align-items:end">
-            <div class="form-group"><label>Email *</label><input id="uEmail" type="email" required></div>
-            <div class="form-group"><label>Temporary password * (min 8)</label><input id="uPass" type="text" minlength="8" required></div>
-            <div class="form-group"><button class="btn" type="submit" id="uBtn">Create user</button></div>
-          </div>
-        </form>
-      </div>
-      <div class="card"><div class="tbl-wrap"><table>
-        <thead><tr><th>Staff No.</th><th>Name</th><th>Email</th><th>Role</th><th>Active</th></tr></thead>
-        <tbody id="admin-table"></tbody>
-      </table></div></div>
-    </section>
-  </main>
+<button data-panel="enrollments">
+  Enrolments & Sales
+</button>
+
+<button data-panel="services">
+  Services & Pricing
+</button>
+
+<button data-panel="activity">
+  Activity
+</button>
+
+<button data-panel="admins">
+  Admin Accounts
+</button>
+```
+
+  </nav>
+
+  <div class="side-foot">
+    Signed in as
+    <strong id="sideName">Admin</strong>
+    <br>
+    <a href="index.html">← Back to site</a>
+    ·
+    <a href="#" onclick="window.signOut();return false;">Logout</a>
+  </div>
+
+</aside>
+
+<main>
+
+<!-- =========================================================
+     OVERVIEW
+========================================================= -->
+
+<section class="panel active" id="panel-overview">
+
+  <h1>Overview</h1>
+
+  <p class="lede">
+    Super Admin view of students, enrolments, fees, payments and training progress.
+  </p>
+
+  <div class="stat-grid">
+
+```
+<div class="stat">
+  <div class="num" id="stat-students">—</div>
+  <div class="label">Total students</div>
 </div>
+
+<div class="stat ok">
+  <div class="num" id="stat-revenue">—</div>
+  <div class="label">Confirmed revenue</div>
+</div>
+
+<div class="stat warn">
+  <div class="num" id="stat-balance">—</div>
+  <div class="label">Outstanding balance</div>
+</div>
+
+<div class="stat warn">
+  <div class="num" id="stat-pending">—</div>
+  <div class="label">Pending payments</div>
+</div>
+
+<div class="stat">
+  <div class="num" id="stat-active">—</div>
+  <div class="label">Active enrolments</div>
+</div>
+
+<div class="stat warn">
+  <div class="num" id="stat-approaching">—</div>
+  <div class="label">Approaching 6 weeks</div>
+</div>
+
+<div class="stat danger">
+  <div class="num" id="stat-overdue">—</div>
+  <div class="label">Over 6 weeks</div>
+</div>
+
+<div class="stat ok">
+  <div class="num" id="stat-ready">—</div>
+  <div class="label">Test ready</div>
+</div>
+
+<div class="stat">
+  <div class="num" id="stat-admins">—</div>
+  <div class="label">Active staff</div>
+</div>
+```
+
+  </div>
+
+  <div class="card">
+
+```
+<h2>Training Status</h2>
+
+<div class="tbl-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Class</th>
+        <th>Start</th>
+        <th>Expected Test</th>
+        <th>Days Left</th>
+        <th>Progress</th>
+        <th>Balance</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+
+    <tbody id="overview-tracker"></tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================================================
+     TRACKER
+========================================================= -->
+
+<section class="panel" id="panel-tracker">
+
+  <h1>6-Week Training Tracker</h1>
+
+  <p class="lede">
+    Driving training progress based on the confirmed academy training-status view.
+  </p>
+
+  <div class="toolbar">
+
+```
+<input
+  type="text"
+  class="search"
+  id="trackerSearch"
+  placeholder="Search student or class..."
+>
+
+<select class="filter-select" id="trackerFilter">
+  <option value="">All statuses</option>
+  <option value="ON_TRACK">On Track</option>
+  <option value="APPROACHING_6_WEEKS">Approaching 6 Weeks</option>
+  <option value="OVER_6_WEEKS">Over 6 Weeks</option>
+</select>
+```
+
+  </div>
+
+  <div class="card">
+
+```
+<div class="tbl-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Class</th>
+        <th>Start</th>
+        <th>Expected Test</th>
+        <th>Days Left</th>
+        <th>Progress</th>
+        <th>Fee Balance</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+
+    <tbody id="tracker-table"></tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================================================
+     FEES
+========================================================= -->
+
+<section class="panel" id="panel-fees">
+
+  <h1>Fees & Balances</h1>
+
+  <p class="lede">
+    Invoice records linked to students and enrolments.
+  </p>
+
+  <div class="toolbar">
+
+```
+<input
+  type="text"
+  class="search"
+  id="feeSearch"
+  placeholder="Search student, invoice or programme..."
+>
+
+<select class="filter-select" id="feeFilter">
+  <option value="">All statuses</option>
+  <option value="PAID">Paid</option>
+  <option value="PARTIAL">Partial</option>
+  <option value="UNPAID">Unpaid</option>
+</select>
+```
+
+  </div>
+
+  <div class="card">
+
+```
+<div class="tbl-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Invoice</th>
+        <th>Programme</th>
+        <th>Total</th>
+        <th>Paid</th>
+        <th>Balance</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody id="fee-table"></tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================================================
+     APPROVALS
+========================================================= -->
+
+<section class="panel" id="panel-approvals">
+
+  <h1>Payment Approvals</h1>
+
+  <p class="lede">
+    Payments currently marked PENDING. Super Admin approval is required before confirmation.
+  </p>
+
+  <div class="card">
+
+```
+<div class="tbl-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Payment No.</th>
+        <th>Date</th>
+        <th>Student</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Reference</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody id="approvals-table"></tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================================================
+     ENROLMENTS
+========================================================= -->
+
+<section class="panel" id="panel-enrollments">
+
+  <h1>Enrolments & Sales</h1>
+
+  <p class="lede">
+    Records from the confirmed <strong>enrolments</strong> table.
+  </p>
+
+  <div class="toolbar">
+
+```
+<input
+  type="text"
+  class="search"
+  id="enrollSearch"
+  placeholder="Search student, programme or enrolment number..."
+>
+```
+
+  </div>
+
+  <div class="card">
+
+```
+<div class="tbl-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Student No.</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Programme</th>
+        <th>Enrolment No.</th>
+        <th>Start</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody id="enroll-table"></tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================================================
+     SERVICES
+========================================================= -->
+
+<section class="panel" id="panel-services">
+
+  <h1>Services & Pricing</h1>
+
+  <p class="lede">
+    All displayed prices are read directly from Supabase. No service price is hard-coded.
+  </p>
+
+  <div class="card">
+
+```
+<h2>Driving Classes</h2>
+
+<div class="tbl-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Class</th>
+        <th>Minimum Age</th>
+        <th>Weeks</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+
+    <tbody id="price-driving"></tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+  <div class="card">
+
+```
+<h2>Computer Courses</h2>
+
+<div class="tbl-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Course</th>
+        <th>Duration</th>
+        <th>Hours</th>
+        <th>Fee</th>
+      </tr>
+    </thead>
+
+    <tbody id="price-computer"></tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+  <div class="card">
+
+```
+<h2>Fee Structures</h2>
+
+<div class="tbl-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Programme</th>
+        <th>Name</th>
+        <th>Option</th>
+        <th>Description</th>
+        <th>Unit</th>
+        <th>Quantity Based</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+
+    <tbody id="price-fees"></tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================================================
+     ACTIVITY
+========================================================= -->
+
+<section class="panel" id="panel-activity">
+
+  <h1>Office Activity</h1>
+
+  <p class="lede">
+    Recent activity recorded in the confirmed audit log.
+  </p>
+
+  <div class="toolbar">
+
+```
+<input
+  class="search"
+  id="actSearch"
+  placeholder="Search action or record..."
+>
+
+<select class="filter-select" id="actTable">
+
+  <option value="">All records</option>
+  <option value="students">Students</option>
+  <option value="enrolments">Enrolments</option>
+  <option value="invoices">Invoices</option>
+  <option value="payments">Payments</option>
+
+</select>
+
+<button
+  class="btn small outline"
+  type="button"
+  onclick="loadActivity()"
+>
+  Refresh
+</button>
+```
+
+  </div>
+
+  <div class="card">
+
+```
+<div class="tbl-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Who</th>
+        <th>Action</th>
+        <th>Record</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+
+    <tbody id="act-table"></tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================================================
+     ADMIN ACCOUNTS
+========================================================= -->
+
+<section class="panel" id="panel-admins">
+
+  <h1>Admin & Staff Accounts</h1>
+
+  <p class="lede">
+    Super Admin can create Office Admin accounts and view staff records.
+  </p>
+
+  <div class="card">
+
+```
+<h2>Create Office User</h2>
+
+<form id="userForm">
+
+  <div class="form-row">
+
+    <div class="form-group">
+      <label>First name *</label>
+      <input id="uFirst" required>
+    </div>
+
+    <div class="form-group">
+      <label>Last name *</label>
+      <input id="uLast" required>
+    </div>
+
+  </div>
+
+  <div class="form-row">
+
+    <div class="form-group">
+      <label>Phone</label>
+      <input id="uPhone">
+    </div>
+
+    <div class="form-group">
+      <label>Email *</label>
+      <input
+        id="uEmail"
+        type="email"
+        required
+      >
+    </div>
+
+  </div>
+
+  <div class="form-row">
+
+    <div class="form-group">
+
+      <label>
+        Temporary password * (minimum 8 characters)
+      </label>
+
+      <input
+        id="uPass"
+        type="password"
+        minlength="8"
+        required
+      >
+
+    </div>
+
+    <div class="form-group" style="display:flex;align-items:end">
+
+      <button
+        class="btn"
+        type="submit"
+        id="uBtn"
+      >
+        Create Office User
+      </button>
+
+    </div>
+
+  </div>
+
+</form>
+```
+
+  </div>
+
+  <div class="card">
+
+```
+<h2>Staff</h2>
+
+<div class="tbl-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Staff No.</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Active</th>
+      </tr>
+    </thead>
+
+    <tbody id="admin-table"></tbody>
+
+  </table>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+</main>
+
+</div>
+
+<!-- =========================================================
+     PAYMENT MODAL
+========================================================= -->
 
 <div class="modal-overlay" id="paymentModal">
+
   <div class="modal">
-    <h3>Record Payment</h3>
-    <div id="paymentAlert"></div>
-    <div id="paymentStudentInfo" class="fee-summary"></div>
-    <form id="paymentForm">
-      <input type="hidden" id="payInvoiceId">
-      <div class="form-row">
-        <div class="form-group"><label for="payAmount">Amount *</label><input type="number" id="payAmount" min="0.01" step="0.01" required></div>
-        <div class="form-group"><label for="payMethod">Method *</label>
-          <select id="payMethod" required><option value="CASH">Cash</option><option value="MPESA">M-Pesa</option><option value="BANK">Bank Transfer</option><option value="CARD">Card</option><option value="CHEQUE">Cheque</option><option value="OTHER">Other</option></select></div>
-      </div>
-      <div class="form-group"><label for="payReference">Reference (M-Pesa code, cheque no., etc.)</label><input type="text" id="payReference" placeholder="Optional"></div>
-      <div class="form-group"><label for="payNotes">Notes</label><textarea id="payNotes" rows="2"></textarea></div>
-      <div style="display:flex;gap:.6rem;justify-content:flex-end">
-        <button type="button" class="btn outline" onclick="closePaymentModal()">Cancel</button>
-        <button type="submit" class="btn" id="paySubmitBtn">Record Payment</button>
-      </div>
-    </form>
+
+```
+<h3>Record Payment</h3>
+
+<div id="paymentAlert"></div>
+
+<div
+  id="paymentStudentInfo"
+  class="fee-summary"
+></div>
+
+<form id="paymentForm">
+
+  <input
+    type="hidden"
+    id="payInvoiceId"
+  >
+
+  <div class="form-row">
+
+    <div class="form-group">
+
+      <label for="payAmount">
+        Amount *
+      </label>
+
+      <input
+        type="number"
+        id="payAmount"
+        min="0.01"
+        step="0.01"
+        required
+      >
+
+    </div>
+
+    <div class="form-group">
+
+      <label for="payMethod">
+        Method *
+      </label>
+
+      <select id="payMethod" required>
+
+        <option value="CASH">Cash</option>
+        <option value="MPESA">M-Pesa</option>
+        <option value="BANK">Bank Transfer</option>
+        <option value="CARD">Card</option>
+        <option value="CHEQUE">Cheque</option>
+        <option value="OTHER">Other</option>
+
+      </select>
+
+    </div>
+
   </div>
+
+  <div class="form-group">
+
+    <label for="payReference">
+      Transaction Reference
+    </label>
+
+    <input
+      type="text"
+      id="payReference"
+      placeholder="M-Pesa code, cheque number, etc."
+    >
+
+  </div>
+
+  <div class="form-group">
+
+    <label for="payNotes">
+      Notes
+    </label>
+
+    <textarea
+      id="payNotes"
+      rows="2"
+    ></textarea>
+
+  </div>
+
+  <div
+    style="display:flex;gap:.6rem;justify-content:flex-end"
+  >
+
+    <button
+      type="button"
+      class="btn outline"
+      onclick="closePaymentModal()"
+    >
+      Cancel
+    </button>
+
+    <button
+      type="submit"
+      class="btn"
+      id="paySubmitBtn"
+    >
+      Record Payment
+    </button>
+
+  </div>
+
+</form>
+```
+
+  </div>
+
 </div>
+
+<!-- =========================================================
+     RECEIPT MODAL
+========================================================= -->
 
 <div class="modal-overlay" id="receiptModal">
+
   <div class="modal receipt-modal">
-    <div id="receiptContent">
-      <div class="receipt-head"><h2>LASHAWN DRIVING & COMPUTER COLLEGE</h2><div class="sub">OFFICIAL PAYMENT RECEIPT</div></div>
-      <div class="receipt-meta">
-        <div><div class="receipt-label">Receipt No.</div><div class="receipt-value" id="receiptNumber">—</div></div>
-        <div style="text-align:right"><div class="receipt-label">Date</div><div class="receipt-value" id="receiptDate">—</div></div>
-      </div>
-      <div class="fee-summary">
-        <div class="receipt-box"><div class="receipt-label">Student / Customer No.</div><div class="receipt-value" id="receiptStudentNumber">—</div></div>
-        <div class="receipt-box"><div class="receipt-label">Name</div><div class="receipt-value" id="receiptStudentName">—</div></div>
-        <div class="receipt-box"><div class="receipt-label">Enrolment / Job No.</div><div class="receipt-value" id="receiptEnrolmentNumber">—</div></div>
-        <div class="receipt-box"><div class="receipt-label">Programme</div><div class="receipt-value" id="receiptProgramme">—</div></div>
-      </div>
-      <table style="margin-top:1rem">
-        <thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead>
-        <tbody><tr><td id="receiptDescription">Payment</td><td id="receiptAmount" style="text-align:right;font-weight:800">KSh 0</td></tr></tbody>
-      </table>
-      <div style="margin-top:1rem">
-        <div class="receipt-meta" style="margin:.35rem 0;border-bottom:1px solid var(--border);padding:.45rem 0"><span class="receipt-label">Payment Method</span><strong id="receiptPaymentMethod">—</strong></div>
-        <div class="receipt-meta" style="margin:.35rem 0;border-bottom:1px solid var(--border);padding:.45rem 0"><span class="receipt-label">Reference</span><strong id="receiptReference">—</strong></div>
-      </div>
-      <div class="receipt-total"><div class="label">AMOUNT PAID</div><div class="amount" id="receiptTotal">KSh 0</div></div>
-      <div style="text-align:center;margin-top:1.2rem;font-size:.75rem;color:var(--muted)">Thank you for choosing Lashawn Driving & Computer College.<br>Please retain this receipt for your records.</div>
+
+```
+<div id="receiptContent">
+
+  <div class="receipt-head">
+
+    <h2>
+      LASHAWN DRIVING & COMPUTER COLLEGE
+    </h2>
+
+    <div class="sub">
+      OFFICIAL PAYMENT RECEIPT
     </div>
-    <div class="no-print" style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.4rem">
-      <button type="button" class="btn outline" onclick="closeReceiptModal()">Close</button>
-      <button type="button" class="btn" onclick="printReceipt()">🖨 Print Receipt</button>
-    </div>
+
   </div>
+
+  <div class="receipt-meta">
+
+    <div>
+      <div class="receipt-label">
+        Receipt / Payment No.
+      </div>
+
+      <div
+        class="receipt-value"
+        id="receiptNumber"
+      >
+        —
+      </div>
+    </div>
+
+    <div style="text-align:right">
+
+      <div class="receipt-label">
+        Date
+      </div>
+
+      <div
+        class="receipt-value"
+        id="receiptDate"
+      >
+        —
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="fee-summary">
+
+    <div class="receipt-box">
+
+      <div class="receipt-label">
+        Student No.
+      </div>
+
+      <div
+        class="receipt-value"
+        id="receiptStudentNumber"
+      >
+        —
+      </div>
+
+    </div>
+
+    <div class="receipt-box">
+
+      <div class="receipt-label">
+        Name
+      </div>
+
+      <div
+        class="receipt-value"
+        id="receiptStudentName"
+      >
+        —
+      </div>
+
+    </div>
+
+    <div class="receipt-box">
+
+      <div class="receipt-label">
+        Enrolment No.
+      </div>
+
+      <div
+        class="receipt-value"
+        id="receiptEnrolmentNumber"
+      >
+        —
+      </div>
+
+    </div>
+
+    <div class="receipt-box">
+
+      <div class="receipt-label">
+        Programme
+      </div>
+
+      <div
+        class="receipt-value"
+        id="receiptProgramme"
+      >
+        —
+      </div>
+
+    </div>
+
+  </div>
+
+  <table style="margin-top:1rem">
+
+    <thead>
+
+      <tr>
+        <th>Description</th>
+        <th style="text-align:right">
+          Amount
+        </th>
+      </tr>
+
+    </thead>
+
+    <tbody>
+
+      <tr>
+
+        <td id="receiptDescription">
+          Fee payment
+        </td>
+
+        <td
+          id="receiptAmount"
+          style="text-align:right;font-weight:800"
+        >
+          KSh 0
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+  <div style="margin-top:1rem">
+
+    <div
+      class="receipt-meta"
+      style="margin:.35rem 0;border-bottom:1px solid var(--border);padding:.45rem 0"
+    >
+
+      <span class="receipt-label">
+        Payment Method
+      </span>
+
+      <strong id="receiptPaymentMethod">
+        —
+      </strong>
+
+    </div>
+
+    <div
+      class="receipt-meta"
+      style="margin:.35rem 0;border-bottom:1px solid var(--border);padding:.45rem 0"
+    >
+
+      <span class="receipt-label">
+        Reference
+      </span>
+
+      <strong id="receiptReference">
+        —
+      </strong>
+
+    </div>
+
+  </div>
+
+  <div class="receipt-total">
+
+    <div class="label">
+      AMOUNT PAID
+    </div>
+
+    <div
+      class="amount"
+      id="receiptTotal"
+    >
+      KSh 0
+    </div>
+
+  </div>
+
+  <div
+    style="text-align:center;margin-top:1.2rem;font-size:.75rem;color:var(--muted)"
+  >
+    Thank you for choosing Lashawn Driving & Computer College.
+    <br>
+    Please retain this receipt for your records.
+  </div>
+
 </div>
 
-<div class="toast" id="toast"></div>
+<div
+  class="no-print"
+  style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.4rem"
+>
+
+  <button
+    type="button"
+    class="btn outline"
+    onclick="closeReceiptModal()"
+  >
+    Close
+  </button>
+
+  <button
+    type="button"
+    class="btn"
+    onclick="printReceipt()"
+  >
+    🖨 Print Receipt
+  </button>
+
+</div>
+```
+
+  </div>
+
+</div>
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
+<!-- =========================================================
+     SCRIPTS
+========================================================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="js/supabase.js"></script>
+
 <script>
-var ALL_ENROLMENTS=[], ALL_TRACKER=[], ALL_INVOICES=[], ALL_STAFF=[], PENDING=[];
+
+"use strict";
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+let ALL_TRACKER = [];
+let ALL_ENROLMENTS = [];
+let ALL_INVOICES = [];
+let ALL_STAFF = [];
+let PENDING = [];
+let ACTIVITY = [];
+
 const $ = id => document.getElementById(id);
 
-/* ---------- Helpers ---------- */
-const money = n => "KSh " + Number(n||0).toLocaleString("en-KE",{minimumFractionDigits:0,maximumFractionDigits:2});
-const fmtDate = d => { if(!d) return "—"; try{ return new Date(d).toLocaleDateString("en-KE"); }catch{ return d; } };
-const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fullName = s => [s?.first_name,s?.middle_name,s?.last_name].filter(Boolean).join(" ");
-function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(window.__tt); window.__tt=setTimeout(()=>t.classList.remove("show"),2600); }
-function addDays(d,n){ if(!d) return null; const x=new Date(d); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); }
-function party(r){
-  if(r?.students) return {no:r.students.student_number,name:fullName(r.students),phone:r.students.phone};
-  const c=r?.printing_jobs?.printing_customers;
-  return {no:c?.customer_number||"—",name:c?.customer_name||"—",phone:""};
-}
-function enr(r){
-  if(r?.enrolments) return r.enrolments;
-  return r?.printing_jobs?{enrolment_number:r.printing_jobs.job_number,programme:"PRINTING_DIGITAL"}:null;
-}
-function classLabel(e){
-  if(!e) return "—";
-  if(e.driving_classes) return `${e.driving_classes.class_code} — ${e.driving_classes.class_name}`;
-  if(e.computer_courses) return e.computer_courses.course_name;
-  return e.programme==="PRINTING_DIGITAL"?"Printing / Digital":(e.programme||"—");
-}
 
-/* ---------- Init ---------- */
-document.addEventListener("DOMContentLoaded", async () => {
-  const session = await window.getSession();
-  if(!session){ window.location.href="login.html"; return; }
-  let isSuper=false; try{ isSuper=(await LashawnDB.rpc("is_super_admin")).data===true; }catch(_){}
-  if(!isSuper){ location.replace("admin.html"); return; }
+/* =========================================================
+   HELPERS
+========================================================= */
 
-  document.querySelectorAll("nav.tabs button").forEach(btn=>btn.addEventListener("click",()=>{
-    document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-    $("panel-"+btn.dataset.panel).classList.add("active");
-    if(btn.dataset.panel==="activity") loadActivity();
-  }));
-  $("trackerSearch").addEventListener("input",renderTracker);
-  $("trackerFilter").addEventListener("change",renderTracker);
-  $("feeSearch").addEventListener("input",renderFees);
-  $("feeFilter").addEventListener("change",renderFees);
-  $("enrollSearch").addEventListener("input",renderEnrolments);
-  $("paymentForm").addEventListener("submit",handlePaymentSubmit);
-  $("receiptModal").addEventListener("click",function(e){ if(e.target===this) closeReceiptModal(); });
-  $("approvals-table").addEventListener("click",handleApprove);
-
-  $("self-table").addEventListener("click",onSelfClick);
-  $("selfFilter").addEventListener("change",renderSelf);
-  $("userForm").addEventListener("submit",createUser);
-  $("actSearch").addEventListener("input",renderActivity);
-  $("actTable").addEventListener("change",renderActivity);
-  document.addEventListener("click",onDeleteClick);
-  await Promise.all([loadProfile(),loadServices(),loadStaff(),refreshAll()]);
-  startLive();
-});
-
-function refreshAll(){
-  return Promise.all([loadTracker(),loadEnrolments(),loadInvoices(),loadApprovals(),loadSelf(),loadStats()]);
-}
-
-/* ---------- Live updates ---------- */
-function startLive(){
-  let t;
-  const refresh=()=>{ clearTimeout(t); t=setTimeout(refreshAll,800); };
-  try{
-    const ch=LashawnDB.channel("live-admin");
-    ["payments","invoices","enrolments","students","printing_jobs","self_enrolments"].forEach(tbl=>
-      ch.on("postgres_changes",{event:"*",schema:"public",table:tbl},refresh));
-    ch.subscribe();
-  }catch(e){ console.warn("Realtime unavailable",e); }
-  document.addEventListener("visibilitychange",()=>{ if(!document.hidden) refresh(); });
-  setInterval(()=>{ if(!document.hidden) refresh(); },60000);
-}
-
-/* ---------- Profile ---------- */
-async function loadProfile(){
-  try{ const {data}=await LashawnDB.rpc("get_my_profile"); if(data&&data.first_name) $("sideName").textContent=data.first_name; }catch(e){}
-}
-
-/* ---------- Overview stats (all services) ---------- */
-async function loadStats(){
-  try{
-    const [s,p,i,q]=await Promise.all([
-      LashawnDB.from("students").select("id",{count:"exact",head:true}),
-      LashawnDB.from("payments").select("amount,printing_job_id").eq("status","CONFIRMED").limit(10000),
-      LashawnDB.from("invoices").select("balance").limit(10000),
-      LashawnDB.from("payments").select("id",{count:"exact",head:true}).eq("status","PENDING")
-    ]);
-    for(const x of [s,p,i,q]) if(x.error) throw x.error;
-    let total=0, print=0;
-    (p.data||[]).forEach(r=>{ const a=Number(r.amount||0); total+=a; if(r.printing_job_id) print+=a; });
-    const bal=(i.data||[]).reduce((n,r)=>n+Number(r.balance||0),0);
-    $("stat-students").textContent=s.count??0;
-    $("stat-revenue").textContent=money(total);
-    $("stat-print").textContent=money(print);
-    $("stat-balance").textContent=money(bal);
-    $("stat-pending").textContent=q.count??0;
-    const nb=$("navPending"); nb.textContent=q.count??0; nb.style.display=(q.count>0)?"":"none";
-    const se=await LashawnDB.from("self_enrolments").select("id",{count:"exact",head:true}).in("status",["PENDING_PAYMENT","PENDING_VERIFICATION"]);
-    $("stat-self").textContent=se.count??0; const ns=$("navSelf"); ns.textContent=se.count??0; ns.style.display=se.count>0?"":"none";
-  }catch(err){ console.error("Stats error:",err); }
-}
-
-/* ---------- Tracker ---------- */
-async function loadTracker(){
-  try{
-    const {data,error}=await LashawnDB.from("academy_student_training_status").select("*").order("days_remaining",{ascending:true});
-    if(error) throw error;
-    ALL_TRACKER=data||[];
-    await attachFeeData(ALL_TRACKER);
-    renderOverview(); renderTracker();
-  }catch(err){
-    console.error("Tracker load error:",err);
-    $("tracker-table").innerHTML='<tr><td colspan="9" class="text-muted">Could not load tracker.</td></tr>';
-  }
-}
-async function attachFeeData(rows){
-  try{
-    const {data:b}=await LashawnDB.from("student_balances").select("*");
-    const map={}; (b||[]).forEach(x=>map[x.student_id]=x);
-    rows.forEach(r=>{ const x=map[r.student_id]||{}; r.fee_invoiced=x.invoiced||0; r.fee_paid=x.paid||0; r.fee_balance=x.balance||0; });
-  }catch(e){ rows.forEach(r=>{ r.fee_balance=0; r.fee_paid=0; r.fee_invoiced=0; }); }
-}
-function isReady(t){ return t.training_alert==="TEST_READY" || (t.days_remaining!=null && t.days_remaining<=0 && Number(t.fee_balance||0)<=0); }
-function trackerRow(t,withPay){
-  const expected=t.expected_end_date||addDays(t.start_date,42);
-  return `<tr>
-    <td>${esc(t.student_number)}<br><small class="text-muted">${esc(t.student_name)}</small></td>
-    <td>${esc(t.class_name||"—")}</td><td>${fmtDate(t.start_date)}</td>
-    <td>${withPay?"<strong>"+fmtDate(expected)+"</strong>":fmtDate(expected)}</td>
-    <td>${t.days_remaining??"—"}</td><td>${progressBar(computeProgress(t))}</td>
-    <td>${money(t.fee_balance)}</td><td>${alertBadge(t.training_alert)}</td>
-    ${withPay?`<td><button class="btn small outline" onclick="openPayByEnrolment('${esc(t.enrolment_id)}')">Pay</button></td>`:""}</tr>`;
-}
-function renderOverview(){
-  $("stat-active").textContent=ALL_TRACKER.length;
-  $("stat-approaching").textContent=ALL_TRACKER.filter(t=>t.training_alert==="APPROACHING_6_WEEKS").length;
-  $("stat-overdue").textContent=ALL_TRACKER.filter(t=>t.training_alert==="OVER_6_WEEKS").length;
-  $("stat-ready").textContent=ALL_TRACKER.filter(isReady).length;
-  $("overview-tracker").innerHTML=ALL_TRACKER.length?ALL_TRACKER.slice(0,10).map(t=>trackerRow(t,false)).join(""):'<tr><td colspan="8" class="text-muted">No active enrolments.</td></tr>';
-}
-function renderTracker(){
-  const q=$("trackerSearch").value.toLowerCase(), f=$("trackerFilter").value;
-  let rows=ALL_TRACKER;
-  if(q) rows=rows.filter(t=>[t.student_name,t.student_number,t.class_name].filter(Boolean).join(" ").toLowerCase().includes(q));
-  if(f) rows=rows.filter(t=>t.training_alert===f);
-  $("tracker-table").innerHTML=rows.length?rows.map(t=>trackerRow(t,true)).join(""):'<tr><td colspan="9" class="text-muted">No matching students.</td></tr>';
-}
-function computeProgress(t){
-  if(!t.start_date) return 0;
-  const days=Math.floor((Date.now()-new Date(t.start_date))/86400000);
-  return Math.min(100,Math.max(0,Math.round(days/42*100)));
-}
-function progressBar(p){
-  const c=p>=80?"ok":p>=50?"warn":"";
-  return `<div style="display:flex;align-items:center;gap:.5rem"><div class="progress ${c}"><div style="width:${p}%"></div></div><small>${p}%</small></div>`;
-}
-function alertBadge(a){
-  if(a==="OVER_6_WEEKS") return '<span class="tag-pill overdue">Over 6 Weeks</span>';
-  if(a==="APPROACHING_6_WEEKS") return '<span class="tag-pill approaching">Approaching</span>';
-  return '<span class="tag-pill on-track">On Track</span>';
-}
-
-/* ---------- Fees (invoice based: students and printing) ---------- */
-async function loadInvoices(){
-  try{
-    const {data,error}=await LashawnDB.from("invoices")
-      .select("id,invoice_number,student_id,enrolment_id,printing_job_id,total_amount,amount_paid,balance,status,students(student_number,first_name,middle_name,last_name,phone),enrolments(enrolment_number,programme,start_date,expected_end_date,driving_classes(class_code,class_name),computer_courses(course_name)),printing_jobs(job_number,printing_customers(customer_name,customer_number))")
-      .order("created_at",{ascending:false}).limit(1000);
-    if(error) throw error;
-    ALL_INVOICES=data||[];
-    renderFees();
-  }catch(err){
-    console.error("Fees load error:",err);
-    $("fee-table").innerHTML='<tr><td colspan="9" class="text-muted">Could not load fees: '+esc(err.message||"")+'</td></tr>';
-  }
-}
-function renderFees(){
-  const q=$("feeSearch").value.toLowerCase(), f=$("feeFilter").value;
-  let rows=ALL_INVOICES;
-  if(q) rows=rows.filter(i=>[party(i).name,party(i).no,i.invoice_number,classLabel(enr(i))].join(" ").toLowerCase().includes(q));
-  const paid=i=>Number(i.amount_paid||0), bal=i=>Number(i.balance||0);
-  if(f==="PAID") rows=rows.filter(i=>bal(i)<=0);
-  if(f==="PARTIAL") rows=rows.filter(i=>bal(i)>0&&paid(i)>0);
-  if(f==="UNPAID") rows=rows.filter(i=>paid(i)===0);
-  $("fee-table").innerHTML=rows.length?rows.map(i=>{
-    const e=enr(i), b=bal(i), p=paid(i);
-    const due=i.printing_job_id?"—":fmtDate(e?.expected_end_date||addDays(e?.start_date,42));
-    const badge=b<=0?'<span class="tag-pill paid">Paid</span>':p>0?'<span class="tag-pill partial">Partial</span>':'<span class="tag-pill pending">Unpaid</span>';
-    return `<tr>
-      <td>${esc(party(i).no)}<br><small class="text-muted">${esc(party(i).name)}</small></td>
-      <td>${esc(i.invoice_number||"—")}</td><td>${esc(classLabel(e))}</td>
-      <td>${money(i.total_amount)}</td><td>${money(p)}</td>
-      <td><strong style="color:${b>0?"#b3261e":"#1a7a4c"}">${money(b)}</strong></td>
-      <td>${due}</td><td>${badge}</td>
-      <td>${b>0?`<button class="btn small" onclick="openPay('${esc(i.id)}')">Record Payment</button>`:""}</td></tr>`;
-  }).join(""):'<tr><td colspan="9" class="text-muted">No matching fee records.</td></tr>';
-}
-
-/* ---------- Approvals ---------- */
-async function loadApprovals(){
-  try{
-    const {data,error}=await LashawnDB.from("payments")
-      .select("id,payment_number,payment_date,amount,payment_method,transaction_reference,notes,students(student_number,first_name,middle_name,last_name),enrolments(enrolment_number,programme),printing_jobs(job_number,printing_customers(customer_name,customer_number)),invoices(invoice_number,total_amount,amount_paid)")
-      .eq("status","PENDING").order("created_at",{ascending:false});
-    if(error) throw error;
-    PENDING=data||[];
-    $("approvals-table").innerHTML=PENDING.length?PENDING.map((p,n)=>{
-      const t=Number(p.invoices?.total_amount||0);
-      const pct=t?Math.round((Number(p.invoices?.amount_paid||0)+Number(p.amount))/t*100):"—";
-      return `<tr><td>${esc(p.payment_number||"—")}</td><td>${fmtDate(p.payment_date)}</td>
-        <td>${esc(party(p).no)}<br><small class="text-muted">${esc(party(p).name)}</small></td>
-        <td>${esc(p.invoices?.invoice_number||"—")}</td><td>${money(p.amount)}</td><td>${pct}%</td>
-        <td>${esc(p.payment_method||"")} ${esc(p.transaction_reference||"")} ${esc(p.notes||"")}</td>
-        <td style="white-space:nowrap"><button class="btn small" data-approve="${n}">Approve</button> <button class="btn small danger" data-reject="${n}">Reject</button></td></tr>`;
-    }).join(""):'<tr><td colspan="8" class="text-muted">No payments awaiting approval.</td></tr>';
-  }catch(err){
-    console.error("Approvals error:",err);
-    $("approvals-table").innerHTML='<tr><td colspan="8" class="text-muted">Could not load approvals.</td></tr>';
-  }
-}
-async function handleApprove(e){
-  const rj=e.target.closest("[data-reject]");
-  if(rj){
-    const pr=PENDING[rj.dataset.reject];
-    const reason=prompt("Reason for rejecting this payment (e.g. M-Pesa code not found):");
-    if(reason===null) return;
-    rj.disabled=true;
-    const {error}=await LashawnDB.rpc("reject_payment",{p_payment_id:pr.id,p_reason:reason});
-    if(error){ toast(error.message); rj.disabled=false; return; }
-    toast("Payment rejected"); await refreshAll(); return;
-  }
-  const b=e.target.closest("[data-approve]"); if(!b) return;
-  const p=PENDING[b.dataset.approve];
-  if(!confirm(`Approve ${money(p.amount)} for ${party(p).name}?`)) return;
-  b.disabled=true;
-  try{
-    const {error}=await LashawnDB.rpc("approve_payment",{p_payment_id:p.id});
-    if(error) throw error;
-    showReceipt({receiptNumber:p.payment_number,receiptDate:p.payment_date,studentNumber:party(p).no,studentName:party(p).name,
-      enrolmentNumber:enr(p)?.enrolment_number,programme:enr(p)?.programme,description:"Fee payment",amount:p.amount,
-      paymentMethod:p.payment_method,reference:p.transaction_reference});
-    toast("Payment approved");
-    await refreshAll();
-  }catch(err){ console.error(err); toast(err.message||"Approval failed"); b.disabled=false; }
-}
-
-/* ---------- Enrolments ---------- */
-async function loadEnrolments(){
-  try{
-    const {data,error}=await LashawnDB.from("enrolments")
-      .select("id,enrolment_number,student_id,programme,start_date,expected_end_date,status,students:student_id(student_number,first_name,last_name,phone),driving_classes:driving_class_id(class_code,class_name)")
-      .order("created_at",{ascending:false}).limit(200);
-    if(error) throw error;
-    ALL_ENROLMENTS=data||[]; renderEnrolments();
-  }catch(err){
-    console.error("Enrolments error:",err);
-    $("enroll-table").innerHTML='<tr><td colspan="8" class="text-muted">Could not load enrolments.</td></tr>';
-  }
-}
-function renderEnrolments(){
-  const q=$("enrollSearch").value.toLowerCase();
-  let rows=ALL_ENROLMENTS;
-  if(q) rows=rows.filter(e=>((e.students?fullName(e.students):"")+" "+(e.programme||"")).toLowerCase().includes(q));
-  $("enroll-table").innerHTML=rows.length?rows.map(e=>{
-    const prog=e.driving_classes?`${e.programme} · ${e.driving_classes.class_code}`:e.programme;
-    return `<tr><td>${esc(e.students?.student_number||"—")}</td><td>${esc(e.students?fullName(e.students):"—")}</td>
-      <td>${esc(e.students?.phone||"—")}</td><td>${esc(prog)}</td><td>${esc(e.enrolment_number||"—")}</td>
-      <td>${fmtDate(e.start_date)}</td>
-      <td><span class="tag-pill ${e.status==="ACTIVE"?"paid":"office"}">${esc(e.status)}</span></td>
-      <td style="white-space:nowrap"><a href="student-profile.html?id=${esc(e.student_id)}" class="btn small outline">View</a> <button class="btn small danger" data-del="${esc(e.student_id)}">Delete</button></td></tr>`;
-  }).join(""):'<tr><td colspan="8" class="text-muted">No enrolments yet.</td></tr>';
-}
-
-/* ---------- Services (fee_structures = same source as Office Admin) ---------- */
-async function loadServices(){
-  try{
-    const [dc,cc,fs]=await Promise.all([
-      LashawnDB.from("driving_classes").select("*").eq("is_active",true).order("class_code"),
-      LashawnDB.from("computer_courses").select("*").eq("is_active",true).order("course_code"),
-      LashawnDB.from("fee_structures").select("*").eq("is_active",true).order("programme").order("name")
-    ]);
-    $("price-driving").innerHTML=(dc.data||[]).map(c=>`<tr><td><strong>${esc(c.class_code)}</strong></td><td>${esc(c.class_name)}</td><td>${c.minimum_age||"—"}</td><td>${c.training_weeks||6}</td><td>${esc(c.description||"—")}</td></tr>`).join("")||'<tr><td colspan="5" class="text-muted">No classes.</td></tr>';
-    $("price-computer").innerHTML=(cc.data||[]).map(c=>`<tr><td><strong>${esc(c.course_code)}</strong></td><td>${esc(c.course_name)}</td><td>${c.duration_weeks?c.duration_weeks+" weeks":"—"}</td></tr>`).join("")||'<tr><td colspan="3" class="text-muted">No courses.</td></tr>';
-    $("price-fees").innerHTML=(fs.data||[]).map(f=>`<tr><td>${esc(f.programme)}</td><td>${esc(f.name)}${f.option_code?" · "+esc(f.option_code):""}</td><td>${esc(f.description||"—")}</td><td>${esc(f.unit||"—")}</td><td>${f.quantity_based?"Yes":"No"}</td><td>${money(f.amount)}</td></tr>`).join("")||'<tr><td colspan="6" class="text-muted">No active fee structures.</td></tr>';
-  }catch(err){ console.error("Services load error:",err); }
-}
-
-/* ---------- Staff ---------- */
-async function loadStaff(){
-  try{
-    const {data,error}=await LashawnDB.from("staff").select("*").order("created_at");
-    if(error) throw error;
-    ALL_STAFF=data||[];
-    $("stat-admins").textContent=ALL_STAFF.filter(s=>s.is_active).length;
-    $("admin-table").innerHTML=ALL_STAFF.map(s=>`<tr><td>${esc(s.staff_number)}</td><td>${esc(s.first_name+" "+s.last_name)}</td><td>${esc(s.email||"—")}</td>
-      <td><span class="tag-pill ${s.role==="SUPER_ADMIN"?"super":"office"}">${esc(s.role)}</span></td><td>${s.is_active?"✅ Active":"❌ Inactive"}</td></tr>`).join("")||'<tr><td colspan="5" class="text-muted">No staff records.</td></tr>';
-  }catch(err){ console.error("Staff load error:",err); }
-}
-
-/* ---------- Payments ---------- */
-window.openPayByEnrolment=function(enrolmentId){
-  const inv=ALL_INVOICES.find(i=>i.enrolment_id===enrolmentId);
-  if(!inv){ toast("No invoice found for this enrolment."); return; }
-  openPay(inv.id);
-};
-window.openPay=function(invoiceId){
-  const inv=ALL_INVOICES.find(i=>i.id===invoiceId);
-  if(!inv){ toast("Invoice not found."); return; }
-  const b=Number(inv.balance||0);
-  $("payInvoiceId").value=inv.id;
-  $("payAmount").value=b>0?b:"";
-  $("paymentForm").reset && (function(){ $("payReference").value=""; $("payNotes").value=""; })();
-  $("paymentStudentInfo").innerHTML=`
-    <div class="item"><div class="k">Name</div><div class="v">${esc(party(inv).name)}</div></div>
-    <div class="item"><div class="k">Invoice</div><div class="v">${esc(inv.invoice_number||"—")}</div></div>
-    <div class="item"><div class="k">Total</div><div class="v">${money(inv.total_amount)}</div></div>
-    <div class="item"><div class="k">Paid</div><div class="v">${money(inv.amount_paid)}</div></div>
-    <div class="item"><div class="k">Balance</div><div class="v" style="color:${b>0?"#b3261e":"#1a7a4c"}">${money(b)}</div></div>`;
-  $("paymentAlert").innerHTML='<div class="alert" style="background:#eef6ff;color:#24547d">Cumulative payments under 50% of the fee are held for approval and get no receipt.</div>';
-  $("paymentModal").classList.add("active");
-};
-window.closePaymentModal=function(){ $("paymentModal").classList.remove("active"); };
-
-async function handlePaymentSubmit(e){
-  e.preventDefault();
-  const btn=$("paySubmitBtn"), box=$("paymentAlert");
-  const inv=ALL_INVOICES.find(i=>i.id===$("payInvoiceId").value); if(!inv) return;
-  const amt=Number($("payAmount").value||0), bal=Number(inv.balance||0);
-  const total=Number(inv.total_amount||0), expected=Number(inv.amount_paid||0)+amt;
-  const method=$("payMethod").value, reference=$("payReference").value.trim()||null;
-  if(!amt||amt<=0){ box.innerHTML='<div class="alert alert-danger">Enter a valid amount.</div>'; return; }
-  if(amt>bal){ box.innerHTML='<div class="alert alert-danger">Amount exceeds the balance of '+money(bal)+'.</div>'; return; }
-  const pend=expected<total*0.5-0.005;
-  btn.disabled=true; btn.textContent="Recording...";
-  try{
-    const {data:p,error}=await LashawnDB.from("payments").insert({
-      student_id:inv.student_id, enrolment_id:inv.enrolment_id, printing_job_id:inv.printing_job_id, invoice_id:inv.id,
-      amount:amt, payment_method:method, transaction_reference:reference,
-      status:pend?"PENDING":"CONFIRMED",
-      notes:($("payNotes").value.trim()||"Payment received")+(pend?" | Awaiting Super Admin approval (below 50%)":"")
-    }).select("id,payment_number,payment_date").single();
-    if(error) throw error;
-    if(pend){
-      closePaymentModal();
-      toast("Below 50%: held in Approvals. No receipt issued.");
-      await refreshAll(); return;
+function money(value){
+  return "KSh " + Number(value || 0).toLocaleString(
+    "en-KE",
+    {
+      minimumFractionDigits:0,
+      maximumFractionDigits:2
     }
-    /* Only update the invoice if no database trigger already did (prevents double counting) */
-    const {data:cur}=await LashawnDB.from("invoices").select("amount_paid").eq("id",inv.id).single();
-    if(Number(cur?.amount_paid||0)<expected){
-      const {error:ue}=await LashawnDB.from("invoices").update({
-        amount_paid:expected, balance:Math.max(0,total-expected), status:expected>=total?"PAID":"PARTIAL"
-      }).eq("id",inv.id);
-      if(ue) throw new Error("Payment "+p.payment_number+" saved but invoice update failed: "+ue.message);
+  );
+}
+
+
+function fmtDate(value){
+
+  if(!value) return "—";
+
+  const d = new Date(value);
+
+  if(Number.isNaN(d.getTime())) return "—";
+
+  return d.toLocaleDateString("en-KE");
+
+}
+
+
+function esc(value){
+
+  return String(value == null ? "" : value)
+    .replace(/[&<>"']/g, char => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[char]));
+
+}
+
+
+function fullName(student){
+
+  if(!student) return "—";
+
+  return [
+    student.first_name,
+    student.middle_name,
+    student.last_name
+  ]
+  .filter(Boolean)
+  .join(" ");
+
+}
+
+
+function toast(message){
+
+  const el = $("toast");
+
+  if(!el) return;
+
+  el.textContent = message;
+  el.classList.add("show");
+
+  clearTimeout(window.__toastTimer);
+
+  window.__toastTimer = setTimeout(
+    () => el.classList.remove("show"),
+    3000
+  );
+
+}
+
+
+function addDays(date, days){
+
+  if(!date) return null;
+
+  const d = new Date(date);
+
+  d.setDate(d.getDate() + Number(days || 0));
+
+  return d.toISOString().slice(0,10);
+
+}
+
+
+function safeError(error){
+
+  return error?.message ||
+         error?.error_description ||
+         "An unexpected error occurred.";
+
+}
+
+
+/* =========================================================
+   PROGRAMME / CLASS HELPERS
+========================================================= */
+
+function programmeLabel(enrolment){
+
+  if(!enrolment) return "—";
+
+  if(enrolment.driving_classes){
+
+    return [
+      enrolment.programme || "DRIVING",
+      enrolment.driving_classes.class_code,
+      enrolment.driving_classes.class_name
+    ]
+    .filter(Boolean)
+    .join(" · ");
+
+  }
+
+  if(enrolment.computer_courses){
+
+    return [
+      enrolment.programme || "COMPUTER",
+      enrolment.computer_courses.course_code,
+      enrolment.computer_courses.course_name
+    ]
+    .filter(Boolean)
+    .join(" · ");
+
+  }
+
+  return enrolment.programme || "—";
+
+}
+
+
+function partyFromInvoice(invoice){
+
+  const student = invoice?.students;
+
+  return {
+    number:student?.student_number || "—",
+    name:fullName(student),
+    phone:student?.phone || ""
+  };
+
+}
+
+
+function enrolmentFromInvoice(invoice){
+
+  return invoice?.enrolments || null;
+
+}
+
+
+/* =========================================================
+   INITIALISATION
+========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initialise
+);
+
+
+async function initialise(){
+
+  try{
+
+    const session =
+      await window.getSession();
+
+    if(!session){
+
+      window.location.href = "login.html";
+      return;
+
     }
-    closePaymentModal();
-    showReceipt({receiptNumber:p.payment_number,receiptDate:p.payment_date,studentNumber:party(inv).no,studentName:party(inv).name,
-      enrolmentNumber:enr(inv)?.enrolment_number,programme:enr(inv)?.programme,description:"Fee payment",amount:amt,paymentMethod:method,reference});
-    toast("Payment recorded: "+money(amt));
-    await refreshAll();
-  }catch(err){
-    console.error(err);
-    box.innerHTML='<div class="alert alert-danger">'+esc(err.message||"Could not record payment.")+'</div>';
-  }finally{ btn.disabled=false; btn.textContent="Record Payment"; }
+
+
+    let isSuperAdmin = false;
+
+    try{
+
+      const result =
+        await LashawnDB.rpc("is_super_admin");
+
+      isSuperAdmin =
+        result?.data === true;
+
+    }catch(error){
+
+      console.error(
+        "Super Admin verification failed:",
+        error
+      );
+
+    }
+
+
+    if(!isSuperAdmin){
+
+      window.location.replace("admin.html");
+      return;
+
+    }
+
+
+    setupNavigation();
+    setupEvents();
+
+    await Promise.all([
+      loadProfile(),
+      loadServices(),
+      loadStaff(),
+      refreshDashboard()
+    ]);
+
+    startLiveUpdates();
+
+  }catch(error){
+
+    console.error(
+      "Super Admin initialisation error:",
+      error
+    );
+
+    toast(
+      safeError(error)
+    );
+
+  }
+
 }
 
-/* ---------- Receipts ---------- */
-function paymentMethodLabel(m){ return ({CASH:"Cash",MPESA:"M-Pesa",BANK:"Bank Transfer",CARD:"Card",CHEQUE:"Cheque",OTHER:"Other"})[m]||m||"—"; }
-window.showReceipt=function(d){
-  $("receiptNumber").textContent=d.receiptNumber||"—";
-  $("receiptDate").textContent=new Date(d.receiptDate||Date.now()).toLocaleString("en-KE",{dateStyle:"medium",timeStyle:"short"});
-  $("receiptStudentNumber").textContent=d.studentNumber||"—";
-  $("receiptStudentName").textContent=d.studentName||"—";
-  $("receiptEnrolmentNumber").textContent=d.enrolmentNumber||"—";
-  $("receiptProgramme").textContent=d.programme||"—";
-  $("receiptDescription").textContent=d.description||"Payment";
-  $("receiptAmount").textContent=money(d.amount);
-  $("receiptTotal").textContent=money(d.amount);
-  $("receiptPaymentMethod").textContent=paymentMethodLabel(d.paymentMethod);
-  $("receiptReference").textContent=d.reference||"—";
-  $("receiptModal").classList.add("active");
-};
-window.closeReceiptModal=function(){ $("receiptModal").classList.remove("active"); };
-window.printReceipt=function(){
-  const html=$("receiptContent").innerHTML;
-  const w=window.open("","_blank","width=850,height=900");
-  if(!w){ toast("Please allow pop-ups to print the receipt."); return; }
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Lashawn Payment Receipt</title><style>
-    *{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:30px;color:#1a1e24}
-    .receipt{max-width:700px;margin:auto}.receipt-head{text-align:center;border-bottom:2px solid #0f2d52;padding-bottom:16px;margin-bottom:16px}
-    .receipt-head h2{margin:0;color:#0f2d52;font-size:20px}.sub{font-size:12px;color:#5b6472;margin-top:4px}
-    .receipt-meta{display:flex;justify-content:space-between;gap:16px}.fee-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .receipt-box{background:#f8f9fb;border:1px solid #e2e6eb;border-radius:8px;padding:10px}.receipt-label{font-size:11px;color:#5b6472}
-    .receipt-value{font-weight:700;color:#0f2d52;margin-top:2px}table{width:100%;border-collapse:collapse;margin-top:16px}
-    th{background:#eef2f7;color:#0f2d52;text-align:left;padding:10px;border-bottom:1px solid #ddd}td{padding:10px;border-bottom:1px solid #ddd}
-    .receipt-total{margin-top:16px;background:#f8f9fb;border-radius:8px;padding:16px;text-align:center}
-    .receipt-total .label{font-size:11px;color:#5b6472}.receipt-total .amount{font-size:24px;font-weight:900;color:#0f2d52}
-    @media print{body{padding:0}}
-  </style></head><body><div class="receipt">${html}</div><script>window.onload=function(){window.print();};<\/script></body></html>`);
-  w.document.close();
-};
 
-/* ---------- Self-enrolments (fed by index.html) ---------- */
-var SELF=[];
-async function loadSelf(){
-  const {data,error}=await LashawnDB.from("self_enrolments").select("*").order("created_at",{ascending:false}).limit(300);
-  if(error){ $("self-table").innerHTML='<tr><td colspan="9" class="text-muted">Could not load: '+esc(error.message)+'</td></tr>'; return; }
-  SELF=data||[]; renderSelf();
-}
-const selfProg=v=>({DRIVING:"Driving",COMPUTER:"Computer",PRINTING_DIGITAL:"Printing / Digital"})[v]||v||"—";
-function renderSelf(){
-  const f=$("selfFilter").value, rows=SELF.filter(x=>!f||x.status===f);
-  $("self-table").innerHTML=rows.length?rows.map(x=>{
-    const paid=x.payment_status==="PAID", open=!["REJECTED","CONVERTED"].includes(x.status);
-    const cls=["VERIFIED","CONVERTED"].includes(x.status)?"paid":["REJECTED","CANCELLED"].includes(x.status)?"overdue":"partial";
-    return `<tr><td><strong>${esc(x.application_number)}</strong></td><td>${fmtDate(x.created_at)}</td>
-      <td>${esc(x.full_name)}<br><small class="text-muted">${esc(x.email||"")}</small></td><td>${esc(x.phone)}</td>
-      <td>${esc(selfProg(x.programme))}</td><td><small>${esc(x.message||"—")}</small></td>
-      <td><span class="tag-pill ${paid?"paid":"pending"}">${paid?"PAID":"UNPAID"}</span></td>
-      <td><span class="tag-pill ${cls}">${esc((x.status||"—").replaceAll("_"," "))}</span></td>
-      <td style="white-space:nowrap">${open&&!paid?`<button class="btn small outline" data-sa="paid" data-id="${esc(x.id)}">Payment Received</button> `:""}${open&&paid&&x.status==="PENDING_VERIFICATION"?`<button class="btn small" data-sa="verify" data-id="${esc(x.id)}">Verify</button> `:""}${open?`<button class="btn small danger" data-sa="reject" data-id="${esc(x.id)}">Reject</button>`:""}</td></tr>`;
-  }).join(""):'<tr><td colspan="9" class="text-muted">No applications.</td></tr>';
-}
-async function onSelfClick(e){
-  const b=e.target.closest("[data-sa]"); if(!b) return;
-  const x=SELF.find(r=>r.id===b.dataset.id); if(!x) return;
-  const a=b.dataset.sa;
-  const patch=a==="paid"?{payment_status:"PAID",status:"PENDING_VERIFICATION"}:a==="verify"?{status:"VERIFIED"}:{status:"REJECTED"};
-  const txt=a==="paid"?"Confirm payment received from ":a==="verify"?"Verify application for ":"Reject application for ";
-  if(!confirm(txt+x.full_name+"?")) return;
-  b.disabled=true;
-  const {data:u,error}=await LashawnDB.from("self_enrolments").update(patch).eq("id",x.id).select("id");
-  if(error||!u||!u.length){ toast(error?error.message:"Update blocked: check the UPDATE policy on self_enrolments."); b.disabled=false; return; }
-  toast("Application updated"); await Promise.all([loadSelf(),loadStats()]);
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function setupNavigation(){
+
+  document
+    .querySelectorAll("nav.tabs button")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll("nav.tabs button")
+            .forEach(item =>
+              item.classList.remove("active")
+            );
+
+          button.classList.add("active");
+
+          document
+            .querySelectorAll(".panel")
+            .forEach(panel =>
+              panel.classList.remove("active")
+            );
+
+          const panel =
+            $("panel-" + button.dataset.panel);
+
+          if(panel){
+            panel.classList.add("active");
+          }
+
+          if(button.dataset.panel === "activity"){
+            loadActivity();
+          }
+
+        }
+      );
+
+    });
+
 }
 
-/* ---------- Delete student ---------- */
-async function onDeleteClick(e){
-  const b=e.target.closest("[data-del]"); if(!b) return;
-  const name=b.closest("tr").children[1].textContent;
-  const t=prompt("Permanently delete "+name+" and their unpaid records?\nStudents with confirmed payments cannot be deleted.\n\nType DELETE to continue:");
-  if(t!=="DELETE") return;
-  const {error}=await LashawnDB.rpc("delete_student",{p_student_id:b.dataset.del});
-  if(error){ toast(error.message); return; }
-  toast("Student deleted"); await refreshAll();
+
+/* =========================================================
+   EVENT HANDLERS
+========================================================= */
+
+function setupEvents(){
+
+  $("trackerSearch")
+    .addEventListener("input", renderTracker);
+
+  $("trackerFilter")
+    .addEventListener("change", renderTracker);
+
+  $("feeSearch")
+    .addEventListener("input", renderFees);
+
+  $("feeFilter")
+    .addEventListener("change", renderFees);
+
+  $("enrollSearch")
+    .addEventListener("input", renderEnrolments);
+
+  $("paymentForm")
+    .addEventListener("submit", handlePaymentSubmit);
+
+  $("approvals-table")
+    .addEventListener("click", handleApprovalClick);
+
+  $("userForm")
+    .addEventListener("submit", createUser);
+
+  $("actSearch")
+    .addEventListener("input", renderActivity);
+
+  $("actTable")
+    .addEventListener("change", renderActivity);
+
+  $("receiptModal")
+    .addEventListener(
+      "click",
+      event => {
+
+        if(event.target === $("receiptModal")){
+          closeReceiptModal();
+        }
+
+      }
+    );
+
 }
 
-/* ---------- Activity log ---------- */
-var ACT=[], STAFF_BY_UID={};
-async function loadActivity(){
-  const [a,st]=await Promise.all([
-    LashawnDB.from("audit_logs").select("created_at,user_id,action,table_name,record_id,old_data,new_data").order("created_at",{ascending:false}).limit(300),
-    LashawnDB.from("staff").select("auth_user_id,first_name,last_name,email,role")
+
+/* =========================================================
+   DASHBOARD REFRESH
+========================================================= */
+
+async function refreshDashboard(){
+
+  await Promise.all([
+    loadTracker(),
+    loadEnrolments(),
+    loadInvoices(),
+    loadApprovals(),
+    loadStats()
   ]);
-  if(a.error){ toast(a.error.message); return; }
-  STAFF_BY_UID={}; (st.data||[]).forEach(x=>STAFF_BY_UID[x.auth_user_id]=x);
-  ACT=a.data||[]; renderActivity();
-}
-function actWho(r){ const s=STAFF_BY_UID[r.user_id]; return s?s.first_name+" "+s.last_name+" ("+s.role+")":(r.user_id?"Unknown user":"System"); }
-function actDetail(r){
-  const d=r.new_data||r.old_data||{};
-  if(r.action==="UPDATE"&&r.old_data&&r.new_data){
-    const ch=Object.keys(r.new_data).filter(k=>k!=="updated_at"&&JSON.stringify(r.new_data[k])!==JSON.stringify(r.old_data[k]));
-    if(ch.length) return ch.map(k=>k+": "+(r.old_data[k]??"—")+" → "+(r.new_data[k]??"—")).join("; ");
-  }
-  const ref=d.payment_number||d.invoice_number||d.enrolment_number||d.job_number||d.student_number||d.customer_number||"";
-  return [ref,d.first_name?fullName(d):"",d.amount!=null?money(d.amount):"",d.total_amount!=null?"Total "+money(d.total_amount):"",d.status||"",d.payment_method||"",d.notes||""].filter(Boolean).join(" · ");
-}
-function renderActivity(){
-  const q=$("actSearch").value.toLowerCase(), t=$("actTable").value;
-  const rows=ACT.filter(r=>(!t||r.table_name===t)&&(!q||(actWho(r)+" "+r.action+" "+r.table_name+" "+actDetail(r)).toLowerCase().includes(q)));
-  $("act-table").innerHTML=rows.map(r=>`<tr><td style="white-space:nowrap">${new Date(r.created_at).toLocaleString("en-KE",{dateStyle:"medium",timeStyle:"short"})}</td>
-    <td>${esc(actWho(r))}</td><td>${esc(r.action)}</td><td>${esc(r.table_name)}</td><td><small>${esc(actDetail(r)).slice(0,220)}</small></td></tr>`).join("")
-    ||'<tr><td colspan="5" class="text-muted">No activity recorded yet.</td></tr>';
+
 }
 
-/* ---------- Create office user ---------- */
-async function createUser(e){
-  e.preventDefault();
-  const btn=$("uBtn"); btn.disabled=true; btn.textContent="Creating...";
+
+/* =========================================================
+   REALTIME
+========================================================= */
+
+function startLiveUpdates(){
+
+  let timer;
+
+  const refresh = () => {
+
+    clearTimeout(timer);
+
+    timer = setTimeout(
+      refreshDashboard,
+      800
+    );
+
+  };
+
+
   try{
-    const {data,error}=await LashawnDB.functions.invoke("create-office-user",{body:{
-      first_name:$("uFirst").value.trim(), last_name:$("uLast").value.trim(), phone:$("uPhone").value.trim()||null,
-      email:$("uEmail").value.trim().toLowerCase(), password:$("uPass").value}});
-    if(error){ let m=error.message; try{ m=(await error.context.json()).error||m; }catch(_){} throw new Error(m); }
-    if(data?.error) throw new Error(data.error);
-    toast("User created: "+data.email+" ("+data.staff_number+")");
-    $("userForm").reset(); loadStaff();
-  }catch(err){ toast(err.message||"Could not create user"); }
-  finally{ btn.disabled=false; btn.textContent="Create user"; }
+
+    const channel =
+      LashawnDB.channel(
+        "super-admin-live"
+      );
+
+
+    [
+      "students",
+      "enrolments",
+      "invoices",
+      "payments"
+    ]
+    .forEach(table => {
+
+      channel.on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table
+        },
+        refresh
+      );
+
+    });
+
+
+    channel.subscribe();
+
+  }catch(error){
+
+    console.warn(
+      "Realtime unavailable:",
+      error
+    );
+
+  }
+
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+
+      if(!document.hidden){
+        refresh();
+      }
+
+    }
+  );
+
+
+  setInterval(
+    () => {
+
+      if(!document.hidden){
+        refresh();
+      }
+
+    },
+    60000
+  );
+
 }
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+async function loadProfile(){
+
+  try{
+
+    const {data,error} =
+      await LashawnDB.rpc(
+        "get_my_profile"
+      );
+
+    if(error) throw error;
+
+    if(data?.first_name){
+
+      $("sideName").textContent =
+        data.first_name;
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Profile could not be loaded:",
+      safeError(error)
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   DASHBOARD STATS
+========================================================= */
+
+async function loadStats(){
+
+  try{
+
+    const [
+      studentsResult,
+      paymentsResult,
+      invoicesResult,
+      pendingResult,
+      staffResult
+    ] = await Promise.all([
+
+      LashawnDB
+        .from("students")
+        .select("id",{count:"exact",head:true}),
+
+      LashawnDB
+        .from("payments")
+        .select("amount,status")
+        .eq("status","CONFIRMED"),
+
+      LashawnDB
+        .from("invoices")
+        .select("balance"),
+
+      LashawnDB
+        .from("payments")
+        .select("id",{count:"exact",head:true})
+        .eq("status","PENDING"),
+
+      LashawnDB
+        .from("staff")
+        .select("id,is_active")
+
+    ]);
+
+
+    const results = [
+      studentsResult,
+      paymentsResult,
+      invoicesResult,
+      pendingResult,
+      staffResult
+    ];
+
+
+    for(const result of results){
+
+      if(result.error){
+        throw result.error;
+      }
+
+    }
+
+
+    const revenue =
+      (paymentsResult.data || [])
+      .reduce(
+        (sum,row) =>
+          sum + Number(row.amount || 0),
+        0
+      );
+
+
+    const balance =
+      (invoicesResult.data || [])
+      .reduce(
+        (sum,row) =>
+          sum + Number(row.balance || 0),
+        0
+      );
+
+
+    const activeStaff =
+      (staffResult.data || [])
+      .filter(row => row.is_active === true)
+      .length;
+
+
+    $("stat-students").textContent =
+      studentsResult.count ?? 0;
+
+    $("stat-revenue").textContent =
+      money(revenue);
+
+    $("stat-balance").textContent =
+      money(balance);
+
+    $("stat-pending").textContent =
+      pendingResult.count ?? 0;
+
+    $("stat-admins").textContent =
+      activeStaff;
+
+
+    const badge =
+      $("navPending");
+
+    badge.textContent =
+      pendingResult.count ?? 0;
+
+    badge.style.display =
+      Number(pendingResult.count || 0) > 0
+      ? ""
+      : "none";
+
+
+  }catch(error){
+
+    console.error(
+      "Stats error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   TRAINING TRACKER
+   CONFIRMED VIEW:
+   academy_student_training_status
+========================================================= */
+
+async function loadTracker(){
+
+  try{
+
+    const {
+      data,
+      error
+    } = await LashawnDB
+      .from("academy_student_training_status")
+      .select("*")
+      .order(
+        "days_remaining",
+        {ascending:true}
+      );
+
+
+    if(error) throw error;
+
+    ALL_TRACKER =
+      data || [];
+
+
+    await attachStudentBalances(
+      ALL_TRACKER
+    );
+
+
+    renderOverview();
+    renderTracker();
+
+  }catch(error){
+
+    console.error(
+      "Tracker error:",
+      error
+    );
+
+    $("tracker-table").innerHTML =
+      `<tr>
+        <td colspan="8" class="text-muted">
+          Could not load training tracker:
+          ${esc(safeError(error))}
+        </td>
+      </tr>`;
+
+  }
+
+}
+
+
+async function attachStudentBalances(rows){
+
+  try{
+
+    const {
+      data,
+      error
+    } = await LashawnDB
+      .from("student_balances")
+      .select("*");
+
+
+    if(error) throw error;
+
+
+    const map = {};
+
+
+    (data || []).forEach(row => {
+
+      if(row.student_id){
+        map[row.student_id] = row;
+      }
+
+    });
+
+
+    rows.forEach(row => {
+
+      const balance =
+        map[row.student_id] || {};
+
+
+      row.fee_invoiced =
+        Number(balance.invoiced || 0);
+
+      row.fee_paid =
+        Number(balance.paid || 0);
+
+      row.fee_balance =
+        Number(balance.balance || 0);
+
+    });
+
+
+  }catch(error){
+
+    console.warn(
+      "Student balances unavailable:",
+      safeError(error)
+    );
+
+
+    rows.forEach(row => {
+
+      row.fee_invoiced = 0;
+      row.fee_paid = 0;
+      row.fee_balance = 0;
+
+    });
+
+  }
+
+}
+
+
+function computeProgress(row){
+
+  if(row.readiness_percentage != null){
+
+    return Math.max(
+      0,
+      Math.min(
+        100,
+        Number(row.readiness_percentage)
+      )
+    );
+
+  }
+
+
+  if(!row.start_date){
+    return 0;
+  }
+
+
+  const days =
+    Math.floor(
+      (
+        Date.now() -
+        new Date(row.start_date).getTime()
+      ) / 86400000
+    );
+
+
+  return Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(days / 42 * 100)
+    )
+  );
+
+}
+
+
+function progressBar(percent){
+
+  const p =
+    Math.round(
+      Math.max(
+        0,
+        Math.min(100,Number(percent || 0))
+      )
+    );
+
+
+  const cls =
+    p >= 80
+      ? "ok"
+      : p >= 50
+        ? "warn"
+        : "";
+
+
+  return `
+    <div style="display:flex;align-items:center;gap:.5rem">
+      <div class="progress ${cls}">
+        <div style="width:${p}%"></div>
+      </div>
+      <small>${p}%</small>
+    </div>
+  `;
+
+}
+
+
+function trainingStatus(row){
+
+  const status =
+    row.training_alert ||
+    row.status ||
+    "ON_TRACK";
+
+
+  if(status === "OVER_6_WEEKS"){
+
+    return `
+      <span class="tag-pill overdue">
+        Over 6 Weeks
+      </span>
+    `;
+
+  }
+
+
+  if(status === "APPROACHING_6_WEEKS"){
+
+    return `
+      <span class="tag-pill approaching">
+        Approaching
+      </span>
+    `;
+
+  }
+
+
+  return `
+    <span class="tag-pill on-track">
+      On Track
+    </span>
+  `;
+
+}
+
+
+function isTestReady(row){
+
+  if(row.training_alert === "TEST_READY"){
+    return true;
+  }
+
+
+  if(
+    row.days_remaining != null &&
+    Number(row.days_remaining) <= 0 &&
+    Number(row.fee_balance || 0) <= 0
+  ){
+
+    return true;
+
+  }
+
+
+  return false;
+
+}
+
+
+function trackerRow(row){
+
+  const expected =
+    row.expected_end_date ||
+    addDays(row.start_date,42);
+
+
+  return `
+    <tr>
+
+      <td>
+        <strong>${esc(row.student_number || "—")}</strong>
+        <br>
+        <small class="text-muted">
+          ${esc(row.student_name || "—")}
+        </small>
+      </td>
+
+      <td>
+        ${esc(row.class_name || "—")}
+      </td>
+
+      <td>
+        ${fmtDate(row.start_date)}
+      </td>
+
+      <td>
+        <strong>
+          ${fmtDate(expected)}
+        </strong>
+      </td>
+
+      <td>
+        ${row.days_remaining ?? "—"}
+      </td>
+
+      <td>
+        ${progressBar(
+          computeProgress(row)
+        )}
+      </td>
+
+      <td>
+        ${money(row.fee_balance)}
+      </td>
+
+      <td>
+        ${trainingStatus(row)}
+      </td>
+
+    </tr>
+  `;
+
+}
+
+
+function renderOverview(){
+
+  $("stat-active").textContent =
+    ALL_TRACKER.length;
+
+
+  $("stat-approaching").textContent =
+    ALL_TRACKER.filter(
+      row =>
+        row.training_alert ===
+        "APPROACHING_6_WEEKS"
+    ).length;
+
+
+  $("stat-overdue").textContent =
+    ALL_TRACKER.filter(
+      row =>
+        row.training_alert ===
+        "OVER_6_WEEKS"
+    ).length;
+
+
+  $("stat-ready").textContent =
+    ALL_TRACKER.filter(
+      isTestReady
+    ).length;
+
+
+  $("overview-tracker").innerHTML =
+    ALL_TRACKER.length
+      ? ALL_TRACKER
+          .slice(0,10)
+          .map(trackerRow)
+          .join("")
+      : `
+        <tr>
+          <td colspan="8" class="text-muted">
+            No active driving training records.
+          </td>
+        </tr>
+      `;
+
+}
+
+
+function renderTracker(){
+
+  const query =
+    $("trackerSearch")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const filter =
+    $("trackerFilter").value;
+
+
+  let rows =
+    ALL_TRACKER.slice();
+
+
+  if(query){
+
+    rows =
+      rows.filter(row =>
+        [
+          row.student_name,
+          row.student_number,
+          row.class_name
+        ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
+      );
+
+  }
+
+
+  if(filter){
+
+    rows =
+      rows.filter(
+        row =>
+          row.training_alert === filter
+      );
+
+  }
+
+
+  $("tracker-table").innerHTML =
+    rows.length
+      ? rows.map(trackerRow).join("")
+      : `
+        <tr>
+          <td colspan="8" class="text-muted">
+            No matching training records.
+          </td>
+        </tr>
+      `;
+
+}
+
+
+/* =========================================================
+   INVOICES
+   Uses only confirmed core relationships
+========================================================= */
+
+async function loadInvoices(){
+
+  try{
+
+    const {
+      data,
+      error
+    } = await LashawnDB
+      .from("invoices")
+      .select(`
+        id,
+        invoice_number,
+        student_id,
+        enrolment_id,
+        total_amount,
+        amount_paid,
+        balance,
+        status,
+        students(
+          student_number,
+          first_name,
+          middle_name,
+          last_name,
+          phone
+        ),
+        enrolments(
+          enrolment_number,
+          programme,
+          start_date,
+          expected_end_date,
+          driving_classes(
+            class_code,
+            class_name
+          ),
+          computer_courses(
+            course_code,
+            course_name
+          )
+        )
+      `)
+      .order(
+        "created_at",
+        {ascending:false}
+      )
+      .limit(1000);
+
+
+    if(error) throw error;
+
+
+    ALL_INVOICES =
+      data || [];
+
+
+    renderFees();
+
+
+  }catch(error){
+
+    console.error(
+      "Invoice load error:",
+      error
+    );
+
+
+    $("fee-table").innerHTML =
+      `
+      <tr>
+        <td colspan="8" class="text-muted">
+          Could not load invoices:
+          ${esc(safeError(error))}
+        </td>
+      </tr>
+      `;
+
+  }
+
+}
+
+
+function renderFees(){
+
+  const query =
+    $("feeSearch")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const filter =
+    $("feeFilter").value;
+
+
+  let rows =
+    ALL_INVOICES.slice();
+
+
+  if(query){
+
+    rows =
+      rows.filter(invoice => {
+
+        const party =
+          partyFromInvoice(invoice);
+
+        const enrolment =
+          enrolmentFromInvoice(invoice);
+
+
+        return [
+          party.number,
+          party.name,
+          invoice.invoice_number,
+          enrolment?.programme,
+          enrolment?.enrolment_number
+        ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query);
+
+      });
+
+  }
+
+
+  rows =
+    rows.filter(invoice => {
+
+      const total =
+        Number(invoice.total_amount || 0);
+
+      const paid =
+        Number(invoice.amount_paid || 0);
+
+      const balance =
+        Number(
+          invoice.balance != null
+            ? invoice.balance
+            : Math.max(0,total-paid)
+        );
+
+
+      if(filter === "PAID"){
+        return balance <= 0;
+      }
+
+      if(filter === "PARTIAL"){
+        return paid > 0 && balance > 0;
+      }
+
+      if(filter === "UNPAID"){
+        return paid <= 0;
+      }
+
+      return true;
+
+    });
+
+
+  $("fee-table").innerHTML =
+    rows.length
+      ? rows.map(renderInvoiceRow).join("")
+      : `
+        <tr>
+          <td colspan="8" class="text-muted">
+            No matching invoices.
+          </td>
+        </tr>
+      `;
+
+}
+
+
+function renderInvoiceRow(invoice){
+
+  const party =
+    partyFromInvoice(invoice);
+
+
+  const enrolment =
+    enrolmentFromInvoice(invoice);
+
+
+  const total =
+    Number(invoice.total_amount || 0);
+
+
+  const paid =
+    Number(invoice.amount_paid || 0);
+
+
+  const balance =
+    Number(
+      invoice.balance != null
+        ? invoice.balance
+        : Math.max(0,total-paid)
+    );
+
+
+  const badge =
+    balance <= 0
+      ? `<span class="tag-pill paid">Paid</span>`
+      : paid > 0
+        ? `<span class="tag-pill partial">Partial</span>`
+        : `<span class="tag-pill pending">Unpaid</span>`;
+
+
+  return `
+    <tr>
+
+      <td>
+        <strong>
+          ${esc(party.number)}
+        </strong>
+        <br>
+        <small class="text-muted">
+          ${esc(party.name)}
+        </small>
+      </td>
+
+      <td>
+        ${esc(invoice.invoice_number || "—")}
+      </td>
+
+      <td>
+        ${esc(
+          programmeLabel(enrolment)
+        )}
+      </td>
+
+      <td>
+        ${money(total)}
+      </td>
+
+      <td>
+        ${money(paid)}
+      </td>
+
+      <td>
+        <strong>
+          ${money(balance)}
+        </strong>
+      </td>
+
+      <td>
+        ${badge}
+      </td>
+
+      <td>
+        ${
+          balance > 0
+            ? `
+              <button
+                class="btn small"
+                onclick="openPay('${esc(invoice.id)}')"
+              >
+                Record Payment
+              </button>
+            `
+            : "—"
+        }
+      </td>
+
+    </tr>
+  `;
+
+}
+
+
+/* =========================================================
+   PAYMENTS / APPROVALS
+========================================================= */
+
+async function loadApprovals(){
+
+  try{
+
+    const {
+      data,
+      error
+    } = await LashawnDB
+      .from("payments")
+      .select(`
+        id,
+        payment_number,
+        student_id,
+        enrolment_id,
+        invoice_id,
+        amount,
+        payment_method,
+        transaction_reference,
+        mpesa_receipt_number,
+        payment_date,
+        status,
+        notes,
+        students(
+          student_number,
+          first_name,
+          middle_name,
+          last_name
+        ),
+        enrolments(
+          enrolment_number,
+          programme
+        )
+      `)
+      .eq(
+        "status",
+        "PENDING"
+      )
+      .order(
+        "payment_date",
+        {ascending:false}
+      );
+
+
+    if(error) throw error;
+
+
+    PENDING =
+      data || [];
+
+
+    renderApprovals();
+
+
+  }catch(error){
+
+    console.error(
+      "Approval load error:",
+      error
+    );
+
+
+    $("approvals-table").innerHTML =
+      `
+      <tr>
+        <td colspan="8" class="text-muted">
+          Could not load pending payments:
+          ${esc(safeError(error))}
+        </td>
+      </tr>
+      `;
+
+  }
+
+}
+
+
+function renderApprovals(){
+
+  $("approvals-table").innerHTML =
+    PENDING.length
+      ? PENDING
+          .map((payment,index) => {
+
+            const student =
+              payment.students;
+
+
+            const reference =
+              payment.transaction_reference ||
+              payment.mpesa_receipt_number ||
+              "—";
+
+
+            return `
+              <tr>
+
+                <td>
+                  ${esc(
+                    payment.payment_number || "—"
+                  )}
+                </td>
+
+                <td>
+                  ${fmtDate(
+                    payment.payment_date
+                  )}
+                </td>
+
+                <td>
+                  ${esc(
+                    student?.student_number || "—"
+                  )}
+                  <br>
+                  <small class="text-muted">
+                    ${esc(
+                      fullName(student)
+                    )}
+                  </small>
+                </td>
+
+                <td>
+                  ${money(payment.amount)}
+                </td>
+
+                <td>
+                  ${esc(
+                    payment.payment_method || "—"
+                  )}
+                </td>
+
+                <td>
+                  ${esc(reference)}
+                </td>
+
+                <td>
+                  <span class="tag-pill partial">
+                    PENDING
+                  </span>
+                </td>
+
+                <td style="white-space:nowrap">
+
+                  <button
+                    class="btn small"
+                    data-approve="${index}"
+                  >
+                    Approve
+                  </button>
+
+                  <button
+                    class="btn small danger"
+                    data-reject="${index}"
+                  >
+                    Reject
+                  </button>
+
+                </td>
+
+              </tr>
+            `;
+
+          })
+          .join("")
+      : `
+        <tr>
+          <td colspan="8" class="text-muted">
+            No payments awaiting approval.
+          </td>
+        </tr>
+      `;
+
+
+}
+
+
+async function handleApprovalClick(event){
+
+  const rejectButton =
+    event.target.closest(
+      "[data-reject]"
+    );
+
+
+  if(rejectButton){
+
+    const payment =
+      PENDING[
+        Number(
+          rejectButton.dataset.reject
+        )
+      ];
+
+
+    if(!payment) return;
+
+
+    const reason =
+      prompt(
+        "Reason for rejecting this payment:"
+      );
+
+
+    if(reason === null) return;
+
+
+    rejectButton.disabled = true;
+
+
+    try{
+
+      const {
+        error
+      } = await LashawnDB.rpc(
+        "reject_payment",
+        {
+          p_payment_id:payment.id,
+          p_reason:reason
+        }
+      );
+
+
+      if(error) throw error;
+
+
+      toast(
+        "Payment rejected."
+      );
+
+
+      await refreshDashboard();
+
+
+    }catch(error){
+
+      toast(
+        safeError(error)
+      );
+
+      rejectButton.disabled = false;
+
+    }
+
+
+    return;
+
+  }
+
+
+  const approveButton =
+    event.target.closest(
+      "[data-approve]"
+    );
+
+
+  if(!approveButton) return;
+
+
+  const payment =
+    PENDING[
+      Number(
+        approveButton.dataset.approve
+      )
+    ];
+
+
+  if(!payment) return;
+
+
+  const student =
+    payment.students;
+
+
+  if(
+    !confirm(
+      `Approve ${money(payment.amount)} for ${fullName(student)}?`
+    )
+  ){
+
+    return;
+
+  }
+
+
+  approveButton.disabled = true;
+
+
+  try{
+
+    const {
+      error
+    } = await LashawnDB.rpc(
+      "approve_payment",
+      {
+        p_payment_id:payment.id
+      }
+    );
+
+
+    if(error) throw error;
+
+
+    showReceipt({
+
+      receiptNumber:
+        payment.payment_number,
+
+      receiptDate:
+        payment.payment_date,
+
+      studentNumber:
+        student?.student_number,
+
+      studentName:
+        fullName(student),
+
+      enrolmentNumber:
+        payment.enrolments?.enrolment_number,
+
+      programme:
+        payment.enrolments?.programme,
+
+      description:
+        "Fee payment",
+
+      amount:
+        payment.amount,
+
+      paymentMethod:
+        payment.payment_method,
+
+      reference:
+        payment.transaction_reference ||
+        payment.mpesa_receipt_number
+
+    });
+
+
+    toast(
+      "Payment approved."
+    );
+
+
+    await refreshDashboard();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      safeError(error)
+    );
+
+    approveButton.disabled = false;
+
+  }
+
+}
+
+
+/* =========================================================
+   ENROLMENTS
+   CONFIRMED TABLE: enrolments
+========================================================= */
+
+async function loadEnrolments(){
+
+  try{
+
+    const {
+      data,
+      error
+    } = await LashawnDB
+      .from("enrolments")
+      .select(`
+        id,
+        enrolment_number,
+        student_id,
+        programme,
+        driving_class_id,
+        computer_course_id,
+        start_date,
+        expected_end_date,
+        actual_end_date,
+        status,
+        training_weeks,
+        students(
+          student_number,
+          first_name,
+          middle_name,
+          last_name,
+          phone
+        ),
+        driving_classes(
+          class_code,
+          class_name
+        ),
+        computer_courses(
+          course_code,
+          course_name
+        )
+      `)
+      .order(
+        "created_at",
+        {ascending:false}
+      )
+      .limit(500);
+
+
+    if(error) throw error;
+
+
+    ALL_ENROLMENTS =
+      data || [];
+
+
+    renderEnrolments();
+
+
+  }catch(error){
+
+    console.error(
+      "Enrolment error:",
+      error
+    );
+
+
+    $("enroll-table").innerHTML =
+      `
+      <tr>
+        <td colspan="8" class="text-muted">
+          Could not load enrolments:
+          ${esc(safeError(error))}
+        </td>
+      </tr>
+      `;
+
+  }
+
+}
+
+
+function renderEnrolments(){
+
+  const query =
+    $("enrollSearch")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  let rows =
+    ALL_ENROLMENTS.slice();
+
+
+  if(query){
+
+    rows =
+      rows.filter(enrolment => {
+
+        const student =
+          enrolment.students;
+
+
+        return [
+
+          student?.student_number,
+
+          fullName(student),
+
+          student?.phone,
+
+          enrolment.programme,
+
+          enrolment.enrolment_number,
+
+          enrolment.driving_classes?.class_code,
+
+          enrolment.driving_classes?.class_name,
+
+          enrolment.computer_courses?.course_code,
+
+          enrolment.computer_courses?.course_name
+
+        ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query);
+
+      });
+
+  }
+
+
+  $("enroll-table").innerHTML =
+    rows.length
+      ? rows
+          .map(renderEnrolmentRow)
+          .join("")
+      : `
+        <tr>
+          <td colspan="8" class="text-muted">
+            No enrolments found.
+          </td>
+        </tr>
+      `;
+
+}
+
+
+function renderEnrolmentRow(enrolment){
+
+  const student =
+    enrolment.students;
+
+
+  const programme =
+    programmeLabel(
+      enrolment
+    );
+
+
+  const status =
+    String(
+      enrolment.status || ""
+    ).toUpperCase();
+
+
+  const statusClass =
+    status === "ACTIVE"
+      ? "paid"
+      : status === "COMPLETED"
+        ? "on-track"
+        : "office";
+
+
+  return `
+    <tr>
+
+      <td>
+        ${esc(
+          student?.student_number || "—"
+        )}
+      </td>
+
+      <td>
+        ${esc(
+          fullName(student)
+        )}
+      </td>
+
+      <td>
+        ${esc(
+          student?.phone || "—"
+        )}
+      </td>
+
+      <td>
+        ${esc(programme)}
+      </td>
+
+      <td>
+        ${esc(
+          enrolment.enrolment_number || "—"
+        )}
+      </td>
+
+      <td>
+        ${fmtDate(
+          enrolment.start_date
+        )}
+      </td>
+
+      <td>
+        <span class="tag-pill ${statusClass}">
+          ${esc(status || "—")}
+        </span>
+      </td>
+
+      <td>
+
+        ${
+          enrolment.student_id
+            ? `
+              <a
+                href="student-profile.html?id=${encodeURIComponent(enrolment.student_id)}"
+                class="btn small outline"
+              >
+                View
+              </a>
+            `
+            : "—"
+        }
+
+      </td>
+
+    </tr>
+  `;
+
+}
+
+
+/* =========================================================
+   SERVICES / PRICING
+   DATABASE-DRIVEN
+========================================================= */
+
+async function loadServices(){
+
+  try{
+
+    const [
+      drivingResult,
+      computerResult,
+      feesResult
+    ] = await Promise.all([
+
+      LashawnDB
+        .from("driving_classes")
+        .select(`
+          id,
+          class_code,
+          class_name,
+          description,
+          minimum_age,
+          training_weeks,
+          theory_required,
+          practical_required,
+          is_active
+        `)
+        .eq("is_active",true)
+        .order("class_code"),
+
+      LashawnDB
+        .from("computer_courses")
+        .select(`
+          id,
+          course_code,
+          course_name,
+          description,
+          duration_weeks,
+          duration_hours,
+          fee,
+          is_active
+        `)
+        .eq("is_active",true)
+        .order("course_code"),
+
+      LashawnDB
+        .from("fee_structures")
+        .select(`
+          id,
+          name,
+          programme,
+          driving_class_id,
+          computer_course_id,
+          amount,
+          description,
+          option_code,
+          unit,
+          quantity_based,
+          course_type,
+          is_active
+        `)
+        .eq("is_active",true)
+        .order("programme")
+        .order("name")
+
+    ]);
+
+
+    if(drivingResult.error)
+      throw drivingResult.error;
+
+    if(computerResult.error)
+      throw computerResult.error;
+
+    if(feesResult.error)
+      throw feesResult.error;
+
+
+    renderDrivingClasses(
+      drivingResult.data || []
+    );
+
+
+    renderComputerCourses(
+      computerResult.data || []
+    );
+
+
+    renderFeeStructures(
+      feesResult.data || []
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "Services load error:",
+      error
+    );
+
+
+    $("price-driving").innerHTML =
+      `<tr>
+        <td colspan="5" class="text-muted">
+          Could not load driving classes.
+        </td>
+      </tr>`;
+
+
+    $("price-computer").innerHTML =
+      `<tr>
+        <td colspan="5" class="text-muted">
+          Could not load computer courses.
+        </td>
+      </tr>`;
+
+
+    $("price-fees").innerHTML =
+      `<tr>
+        <td colspan="7" class="text-muted">
+          Could not load fee structures.
+        </td>
+      </tr>`;
+
+  }
+
+}
+
+
+function renderDrivingClasses(classes){
+
+  $("price-driving").innerHTML =
+    classes.length
+      ? classes.map(item => `
+        <tr>
+
+          <td>
+            <strong>
+              ${esc(item.class_code)}
+            </strong>
+          </td>
+
+          <td>
+            ${esc(item.class_name)}
+          </td>
+
+          <td>
+            ${item.minimum_age ?? "—"}
+          </td>
+
+          <td>
+            ${item.training_weeks ?? "—"}
+          </td>
+
+          <td>
+            ${esc(item.description || "—")}
+          </td>
+
+        </tr>
+      `).join("")
+      : `
+        <tr>
+          <td colspan="5" class="text-muted">
+            No active driving classes.
+          </td>
+        </tr>
+      `;
+
+}
+
+
+function renderComputerCourses(courses){
+
+  $("price-computer").innerHTML =
+    courses.length
+      ? courses.map(item => `
+        <tr>
+
+          <td>
+            <strong>
+              ${esc(item.course_code)}
+            </strong>
+          </td>
+
+          <td>
+            ${esc(item.course_name)}
+          </td>
+
+          <td>
+            ${
+              item.duration_weeks != null
+                ? item.duration_weeks + " weeks"
+                : "—"
+            }
+          </td>
+
+          <td>
+            ${
+              item.duration_hours != null
+                ? item.duration_hours + " hours"
+                : "—"
+            }
+          </td>
+
+          <td>
+            ${money(item.fee)}
+          </td>
+
+        </tr>
+      `).join("")
+      : `
+        <tr>
+          <td colspan="5" class="text-muted">
+            No active computer courses.
+          </td>
+        </tr>
+      `;
+
+}
+
+
+function renderFeeStructures(structures){
+
+  $("price-fees").innerHTML =
+    structures.length
+      ? structures.map(item => `
+        <tr>
+
+          <td>
+            ${esc(item.programme || "—")}
+          </td>
+
+          <td>
+            ${esc(item.name || "—")}
+          </td>
+
+          <td>
+            ${esc(item.option_code || "—")}
+          </td>
+
+          <td>
+            ${esc(item.description || "—")}
+          </td>
+
+          <td>
+            ${esc(item.unit || "—")}
+          </td>
+
+          <td>
+            ${item.quantity_based ? "Yes" : "No"}
+          </td>
+
+          <td>
+            <strong>
+              ${money(item.amount)}
+            </strong>
+          </td>
+
+        </tr>
+      `).join("")
+      : `
+        <tr>
+          <td colspan="7" class="text-muted">
+            No active fee structures.
+          </td>
+        </tr>
+      `;
+
+}
+
+
+/* =========================================================
+   STAFF
+========================================================= */
+
+async function loadStaff(){
+
+  try{
+
+    const {
+      data,
+      error
+    } = await LashawnDB
+      .from("staff")
+      .select("*")
+      .order(
+        "created_at",
+        {ascending:true}
+      );
+
+
+    if(error) throw error;
+
+
+    ALL_STAFF =
+      data || [];
+
+
+    $("stat-admins").textContent =
+      ALL_STAFF.filter(
+        row => row.is_active === true
+      ).length;
+
+
+    $("admin-table").innerHTML =
+      ALL_STAFF.length
+        ? ALL_STAFF.map(staff => `
+
+          <tr>
+
+            <td>
+              ${esc(
+                staff.staff_number || "—"
+              )}
+            </td>
+
+            <td>
+              ${esc(
+                [
+                  staff.first_name,
+                  staff.last_name
+                ]
+                .filter(Boolean)
+                .join(" ")
+              )}
+            </td>
+
+            <td>
+              ${esc(
+                staff.email || "—"
+              )}
+            </td>
+
+            <td>
+
+              <span class="tag-pill ${
+                staff.role === "SUPER_ADMIN"
+                  ? "super"
+                  : "office"
+              }">
+
+                ${esc(
+                  staff.role || "—"
+                )}
+
+              </span>
+
+            </td>
+
+            <td>
+              ${
+                staff.is_active
+                  ? "✅ Active"
+                  : "❌ Inactive"
+              }
+            </td>
+
+          </tr>
+
+        `).join("")
+        : `
+          <tr>
+            <td colspan="5" class="text-muted">
+              No staff records.
+            </td>
+          </tr>
+        `;
+
+
+  }catch(error){
+
+    console.error(
+      "Staff load error:",
+      error
+    );
+
+
+    $("admin-table").innerHTML =
+      `
+      <tr>
+        <td colspan="5" class="text-muted">
+          Could not load staff:
+          ${esc(safeError(error))}
+        </td>
+      </tr>
+      `;
+
+  }
+
+}
+
+
+/* =========================================================
+   RECORD PAYMENT
+========================================================= */
+
+window.openPay = function(invoiceId){
+
+  const invoice =
+    ALL_INVOICES.find(
+      item => item.id === invoiceId
+    );
+
+
+  if(!invoice){
+
+    toast(
+      "Invoice not found."
+    );
+
+    return;
+
+  }
+
+
+  const total =
+    Number(
+      invoice.total_amount || 0
+    );
+
+
+  const paid =
+    Number(
+      invoice.amount_paid || 0
+    );
+
+
+  const balance =
+    Number(
+      invoice.balance != null
+        ? invoice.balance
+        : Math.max(0,total-paid)
+    );
+
+
+  const party =
+    partyFromInvoice(invoice);
+
+
+  $("payInvoiceId").value =
+    invoice.id;
+
+
+  $("payAmount").value =
+    balance > 0
+      ? balance
+      : "";
+
+
+  $("payReference").value = "";
+  $("payNotes").value = "";
+
+
+  $("paymentStudentInfo").innerHTML = `
+
+    <div class="item">
+
+      <div class="k">
+        Student
+      </div>
+
+      <div class="v">
+        ${esc(party.name)}
+      </div>
+
+    </div>
+
+    <div class="item">
+
+      <div class="k">
+        Invoice
+      </div>
+
+      <div class="v">
+        ${esc(
+          invoice.invoice_number || "—"
+        )}
+      </div>
+
+    </div>
+
+    <div class="item">
+
+      <div class="k">
+        Total
+      </div>
+
+      <div class="v">
+        ${money(total)}
+      </div>
+
+    </div>
+
+    <div class="item">
+
+      <div class="k">
+        Paid
+      </div>
+
+      <div class="v">
+        ${money(paid)}
+      </div>
+
+    </div>
+
+    <div class="item">
+
+      <div class="k">
+        Balance
+      </div>
+
+      <div class="v">
+        ${money(balance)}
+      </div>
+
+    </div>
+
+  `;
+
+
+  $("paymentAlert").innerHTML = `
+    <div class="alert alert-info">
+      The payment will be inserted into the payments table.
+      Database payment rules and approval controls remain authoritative.
+    </div>
+  `;
+
+
+  $("paymentModal")
+    .classList
+    .add("active");
+
+};
+
+
+window.closePaymentModal = function(){
+
+  $("paymentModal")
+    .classList
+    .remove("active");
+
+};
+
+
+async function handlePaymentSubmit(event){
+
+  event.preventDefault();
+
+
+  const button =
+    $("paySubmitBtn");
+
+
+  const invoice =
+    ALL_INVOICES.find(
+      item =>
+        item.id ===
+        $("payInvoiceId").value
+    );
+
+
+  if(!invoice){
+
+    toast(
+      "Invoice not found."
+    );
+
+    return;
+
+  }
+
+
+  const amount =
+    Number(
+      $("payAmount").value || 0
+    );
+
+
+  const total =
+    Number(
+      invoice.total_amount || 0
+    );
+
+
+  const paid =
+    Number(
+      invoice.amount_paid || 0
+    );
+
+
+  const balance =
+    Number(
+      invoice.balance != null
+        ? invoice.balance
+        : Math.max(0,total-paid)
+    );
+
+
+  if(amount <= 0){
+
+    $("paymentAlert").innerHTML =
+      `
+      <div class="alert alert-danger">
+        Enter a valid payment amount.
+      </div>
+      `;
+
+    return;
+
+  }
+
+
+  if(amount > balance){
+
+    $("paymentAlert").innerHTML =
+      `
+      <div class="alert alert-danger">
+        Amount exceeds the outstanding balance of
+        ${money(balance)}.
+      </div>
+      `;
+
+    return;
+
+  }
+
+
+  button.disabled = true;
+  button.textContent =
+    "Recording...";
+
+
+  try{
+
+    const {
+      data,
+      error
+    } = await LashawnDB
+      .from("payments")
+      .insert({
+
+        student_id:
+          invoice.student_id,
+
+        enrolment_id:
+          invoice.enrolment_id,
+
+        invoice_id:
+          invoice.id,
+
+        amount,
+
+        payment_method:
+          $("payMethod").value,
+
+        transaction_reference:
+          $("payReference")
+            .value
+            .trim() || null,
+
+        notes:
+          $("payNotes")
+            .value
+            .trim() || null,
+
+        status:"PENDING"
+
+      })
+      .select(`
+        id,
+        payment_number,
+        payment_date,
+        amount,
+        payment_method,
+        transaction_reference,
+        mpesa_receipt_number
+      `)
+      .single();
+
+
+    if(error) throw error;
+
+
+    closePaymentModal();
+
+
+    toast(
+      "Payment recorded and sent for approval."
+    );
+
+
+    await refreshDashboard();
+
+
+  }catch(error){
+
+    console.error(
+      "Payment error:",
+      error
+    );
+
+
+    $("paymentAlert").innerHTML =
+      `
+      <div class="alert alert-danger">
+        ${esc(
+          safeError(error)
+        )}
+      </div>
+      `;
+
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "Record Payment";
+
+  }
+
+}
+
+
+/* =========================================================
+   RECEIPTS
+========================================================= */
+
+function paymentMethodLabel(method){
+
+  return {
+
+    CASH:"Cash",
+    MPESA:"M-Pesa",
+    BANK:"Bank Transfer",
+    CARD:"Card",
+    CHEQUE:"Cheque",
+    OTHER:"Other"
+
+  }[method] ||
+  method ||
+  "—";
+
+}
+
+
+window.showReceipt = function(data){
+
+  $("receiptNumber").textContent =
+    data.receiptNumber || "—";
+
+
+  $("receiptDate").textContent =
+    data.receiptDate
+      ? new Date(
+          data.receiptDate
+        ).toLocaleString(
+          "en-KE",
+          {
+            dateStyle:"medium",
+            timeStyle:"short"
+          }
+        )
+      : "—";
+
+
+  $("receiptStudentNumber").textContent =
+    data.studentNumber || "—";
+
+
+  $("receiptStudentName").textContent =
+    data.studentName || "—";
+
+
+  $("receiptEnrolmentNumber").textContent =
+    data.enrolmentNumber || "—";
+
+
+  $("receiptProgramme").textContent =
+    data.programme || "—";
+
+
+  $("receiptDescription").textContent =
+    data.description || "Fee payment";
+
+
+  $("receiptAmount").textContent =
+    money(data.amount);
+
+
+  $("receiptTotal").textContent =
+    money(data.amount);
+
+
+  $("receiptPaymentMethod").textContent =
+    paymentMethodLabel(
+      data.paymentMethod
+    );
+
+
+  $("receiptReference").textContent =
+    data.reference || "—";
+
+
+  $("receiptModal")
+    .classList
+    .add("active");
+
+};
+
+
+window.closeReceiptModal = function(){
+
+  $("receiptModal")
+    .classList
+    .remove("active");
+
+};
+
+
+window.printReceipt = function(){
+
+  const content =
+    $("receiptContent").innerHTML;
+
+
+  const win =
+    window.open(
+      "",
+      "_blank",
+      "width=850,height=900"
+    );
+
+
+  if(!win){
+
+    toast(
+      "Please allow pop-ups to print."
+    );
+
+    return;
+
+  }
+
+
+  win.document.write(`
+    <!DOCTYPE html>
+
+    <html>
+
+    <head>
+
+      <meta charset="UTF-8">
+
+      <title>
+        Lashawn Payment Receipt
+      </title>
+
+      <style>
+
+        *{
+          box-sizing:border-box
+        }
+
+        body{
+          font-family:Arial,Helvetica,sans-serif;
+          margin:0;
+          padding:30px;
+          color:#1a1e24;
+        }
+
+        .receipt{
+          max-width:700px;
+          margin:auto;
+        }
+
+        .receipt-head{
+          text-align:center;
+          border-bottom:2px solid #0f2d52;
+          padding-bottom:16px;
+          margin-bottom:16px;
+        }
+
+        .receipt-head h2{
+          margin:0;
+          color:#0f2d52;
+          font-size:20px;
+        }
+
+        .sub{
+          font-size:12px;
+          color:#5b6472;
+          margin-top:4px;
+        }
+
+        .receipt-meta{
+          display:flex;
+          justify-content:space-between;
+          gap:16px;
+        }
+
+        .fee-summary{
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:10px;
+        }
+
+        .receipt-box{
+          background:#f8f9fb;
+          border:1px solid #e2e6eb;
+          border-radius:8px;
+          padding:10px;
+        }
+
+        .receipt-label{
+          font-size:11px;
+          color:#5b6472;
+        }
+
+        .receipt-value{
+          font-weight:700;
+          color:#0f2d52;
+          margin-top:2px;
+        }
+
+        table{
+          width:100%;
+          border-collapse:collapse;
+          margin-top:16px;
+        }
+
+        th{
+          background:#eef2f7;
+          color:#0f2d52;
+          text-align:left;
+          padding:10px;
+          border-bottom:1px solid #ddd;
+        }
+
+        td{
+          padding:10px;
+          border-bottom:1px solid #ddd;
+        }
+
+        .receipt-total{
+          margin-top:16px;
+          background:#f8f9fb;
+          border-radius:8px;
+          padding:16px;
+          text-align:center;
+        }
+
+        .receipt-total .label{
+          font-size:11px;
+          color:#5b6472;
+        }
+
+        .receipt-total .amount{
+          font-size:24px;
+          font-weight:900;
+          color:#0f2d52;
+        }
+
+        @media print{
+          body{
+            padding:0;
+          }
+        }
+
+      </style>
+
+```
+</head>
+
+<body>
+
+  <div class="receipt">
+    ${content}
+  </div>
+
+  <script>
+    window.onload=function(){
+      window.print();
+    };
+  <\/script>
+
+</body>
+
+</html>
+```
+
+`);
+
+win.document.close();
+
+};
+
+/* =========================================================
+ACTIVITY / AUDIT LOG
+========================================================= */
+
+async function loadActivity(){
+
+try{
+
+```
+const {
+  data,
+  error
+} = await LashawnDB
+  .from("audit_logs")
+  .select("*")
+  .order(
+    "created_at",
+    {ascending:false}
+  )
+  .limit(300);
+
+
+if(error) throw error;
+
+
+ACTIVITY =
+  data || [];
+
+
+renderActivity();
+```
+
+}catch(error){
+
+```
+console.error(
+  "Activity error:",
+  error
+);
+
+
+$("act-table").innerHTML =
+  `
+  <tr>
+    <td colspan="5" class="text-muted">
+      Could not load activity:
+      ${esc(safeError(error))}
+    </td>
+  </tr>
+  `;
+```
+
+}
+
+}
+
+function activityDetail(row){
+
+const data =
+row.new_data ||
+row.old_data ||
+{};
+
+if(
+row.action === "UPDATE" &&
+row.old_data &&
+row.new_data
+){
+
+```
+const changed =
+  Object.keys(
+    row.new_data
+  )
+  .filter(
+    key =>
+      key !== "updated_at" &&
+      JSON.stringify(
+        row.new_data[key]
+      ) !==
+      JSON.stringify(
+        row.old_data[key]
+      )
+  );
+
+
+if(changed.length){
+
+  return changed
+    .map(
+      key =>
+        `${key}: ${
+          row.old_data[key] ?? "—"
+        } → ${
+          row.new_data[key] ?? "—"
+        }`
+    )
+    .join("; ");
+
+}
+```
+
+}
+
+return [
+
+```
+data.student_number,
+data.enrolment_number,
+data.invoice_number,
+data.payment_number,
+data.amount != null
+  ? money(data.amount)
+  : null,
+data.status,
+data.payment_method,
+data.notes
+```
+
+]
+.filter(Boolean)
+.join(" · ");
+
+}
+
+function renderActivity(){
+
+const query =
+$("actSearch")
+.value
+.trim()
+.toLowerCase();
+
+const tableFilter =
+$("actTable").value;
+
+const rows =
+ACTIVITY.filter(row => {
+
+```
+  if(
+    tableFilter &&
+    row.table_name !== tableFilter
+  ){
+    return false;
+  }
+
+
+  if(!query){
+    return true;
+  }
+
+
+  return [
+
+    row.action,
+    row.table_name,
+    row.record_id,
+    activityDetail(row)
+
+  ]
+  .filter(Boolean)
+  .join(" ")
+  .toLowerCase()
+  .includes(query);
+
+});
+```
+
+$("act-table").innerHTML =
+rows.length
+? rows.map(row => `
+
+```
+    <tr>
+
+      <td>
+        ${
+          row.created_at
+            ? new Date(
+                row.created_at
+              ).toLocaleString(
+                "en-KE",
+                {
+                  dateStyle:"medium",
+                  timeStyle:"short"
+                }
+              )
+            : "—"
+        }
+      </td>
+
+      <td>
+        ${
+          row.user_id
+            ? esc(
+                row.user_id
+              )
+            : "System"
+        }
+      </td>
+
+      <td>
+        ${esc(
+          row.action || "—"
+        )}
+      </td>
+
+      <td>
+        ${esc(
+          row.table_name || "—"
+        )}
+      </td>
+
+      <td>
+        <small>
+          ${esc(
+            activityDetail(row)
+          ).slice(0,300)}
+        </small>
+      </td>
+
+    </tr>
+
+  `).join("")
+  : `
+    <tr>
+      <td colspan="5" class="text-muted">
+        No activity recorded.
+      </td>
+    </tr>
+  `;
+```
+
+}
+
+/* =========================================================
+CREATE OFFICE USER
+========================================================= */
+
+async function createUser(event){
+
+event.preventDefault();
+
+const button =
+$("uBtn");
+
+button.disabled = true;
+
+button.textContent =
+"Creating...";
+
+try{
+
+```
+const {
+  data,
+  error
+} = await LashawnDB.functions.invoke(
+  "create-office-user",
+  {
+    body:{
+
+      first_name:
+        $("uFirst")
+          .value
+          .trim(),
+
+      last_name:
+        $("uLast")
+          .value
+          .trim(),
+
+      phone:
+        $("uPhone")
+          .value
+          .trim() ||
+        null,
+
+      email:
+        $("uEmail")
+          .value
+          .trim()
+          .toLowerCase(),
+
+      password:
+        $("uPass").value
+
+    }
+  }
+);
+
+
+if(error){
+
+  let message =
+    error.message;
+
+
+  try{
+
+    if(error.context){
+
+      const body =
+        await error.context.json();
+
+      message =
+        body.error ||
+        message;
+
+    }
+
+  }catch(_){}
+
+
+  throw new Error(
+    message
+  );
+
+}
+
+
+if(data?.error){
+
+  throw new Error(
+    data.error
+  );
+
+}
+
+
+toast(
+  "Office user created successfully."
+);
+
+
+$("userForm").reset();
+
+
+await loadStaff();
+```
+
+}catch(error){
+
+```
+console.error(
+  "Create user error:",
+  error
+);
+
+
+toast(
+  safeError(error)
+);
+```
+
+}finally{
+
+```
+button.disabled = false;
+
+button.textContent =
+  "Create Office User";
+```
+
+}
+
+}
+
+/* =========================================================
+GLOBAL SIGN-OUT FALLBACK
+========================================================= */
+
+window.signOut =
+window.signOut ||
+async function(){
+
+```
+try{
+
+  await LashawnDB.auth.signOut();
+
+}catch(error){
+
+  console.error(error);
+
+}
+
+
+window.location.href =
+  "login.html";
+```
+
+};
+
 </script>
+
 </body>
 </html>
