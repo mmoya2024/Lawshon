@@ -4,595 +4,3794 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lashawn Academy | Super Admin Dashboard</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-:root{--navy:#071a33;--green:#19d66b;--green-dark:#0e9f50;--bg:#f4f7fb;--text:#172033;--muted:#6b7280;--border:#e3e8ef;--danger:#dc3545;--blue:#2563eb;--shadow:0 8px 30px rgba(7,26,51,.08);--radius:14px}
+:root{
+  --navy:#071a33;
+  --green:#19d66b;
+  --green-dark:#0e9f50;
+  --bg:#f4f7fb;
+  --text:#172033;
+  --muted:#6b7280;
+  --border:#e3e8ef;
+  --danger:#dc3545;
+  --blue:#2563eb;
+  --shadow:0 8px 30px rgba(7,26,51,.08);
+  --radius:14px;
+}
+
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;min-height:100%}
-body{font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-button,input,select{font:inherit}
-button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}
-#bootScreen{position:fixed;inset:0;z-index:9999;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px}
-.boot-box{width:min(430px,100%)}
-.boot-logo{width:70px;height:70px;margin:0 auto 20px;border-radius:18px;background:var(--green);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900}
-.boot-box h1{margin:0 0 8px;font-size:24px}.boot-box p{margin:0;color:#b9c7d8;font-size:14px}
-.spinner{width:34px;height:34px;margin:25px auto 0;border:4px solid rgba(255,255,255,.18);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#errorScreen{display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);align-items:center;justify-content:center;padding:25px}
-.error-card{width:min(620px,100%);background:#fff;border:1px solid var(--border);border-radius:18px;padding:30px;box-shadow:var(--shadow)}
-.error-icon{width:52px;height:52px;border-radius:50%;background:#fee2e2;color:#991b1b;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:800;margin-bottom:18px}
-.error-card h2{margin:0 0 10px}.error-card p{color:var(--muted);line-height:1.6}
-.error-message{background:#f8fafc;border:1px solid var(--border);border-radius:9px;padding:12px;font-family:monospace;font-size:12px;word-break:break-word;margin:15px 0}
-#app{display:none;min-height:100vh}
-.app{min-height:100vh;display:flex}
-.sidebar{width:250px;background:var(--navy);color:#fff;position:fixed;top:0;bottom:0;left:0;z-index:1000;display:flex;flex-direction:column}
-.brand{padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
-.brand h1{margin:0;font-size:20px;font-weight:800}.brand p{margin:5px 0 0;font-size:12px;color:#aebdce}
-.nav{padding:15px 10px;flex:1;overflow:auto}
-.nav button{width:100%;border:0;background:transparent;color:#c9d4e2;padding:12px 14px;border-radius:9px;text-align:left;margin-bottom:4px;transition:.2s}
-.nav button:hover{background:rgba(255,255,255,.07);color:#fff}
-.nav button.active{background:rgba(25,214,107,.15);color:#fff;border-left:3px solid var(--green)}
-.sidebar-footer{padding:15px;border-top:1px solid rgba(255,255,255,.1)}
-.user-box{margin-bottom:10px;font-size:12px;color:#c9d4e2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.logout{width:100%;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;padding:10px;border-radius:8px}
-.logout:hover{background:rgba(255,255,255,.08)}
-.main{margin-left:250px;width:calc(100% - 250px);min-height:100vh}
-.topbar{min-height:70px;background:#fff;border-bottom:1px solid var(--border);padding:15px 25px;display:flex;align-items:center;justify-content:space-between;gap:15px;position:sticky;top:0;z-index:900}
-.topbar-left{display:flex;align-items:center;gap:12px}.topbar h2{margin:0;font-size:21px}
-.connection{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
-.connection-dot{width:9px;height:9px;border-radius:50%;background:var(--green)}
-.mobile-toggle{display:none;border:0;background:var(--navy);color:#fff;border-radius:7px;padding:9px 12px}
-.content{padding:25px}
-.alert{display:none;padding:14px 16px;border-radius:10px;margin-bottom:20px}.alert.show{display:block;position:fixed;top:80px;right:20px;z-index:2000;max-width:420px;box-shadow:var(--shadow)}
-.alert.error{background:#fff0f1;color:#991b1b;border:1px solid #fecaca}
-.alert.success{background:#ecfdf3;color:#166534;border:1px solid #bbf7d0}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:25px}
-.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
-.metric-label{color:var(--muted);font-size:12px;margin-bottom:8px}.metric-value{font-size:28px;font-weight:800}.metric-note{color:var(--muted);font-size:11px;margin-top:7px}
-.section{display:none}.section.active{display:block}
-.section-title{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:15px}
-.section-title h3{margin:0;font-size:18px}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px}
-input,select{border:1px solid var(--border);background:#fff;border-radius:8px;padding:10px 11px;outline:none}
-input:focus,select:focus{border-color:var(--green-dark);box-shadow:0 0 0 3px rgba(25,214,107,.1)}
-.btn{border:0;border-radius:8px;padding:10px 14px;font-weight:600}
-.btn-primary{background:var(--navy);color:#fff}.btn-green{background:var(--green);color:#062015}.btn-light{background:#eef2f7;color:#243044}
-.table-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:auto;box-shadow:var(--shadow)}
-table{width:100%;border-collapse:collapse;min-width:800px}
-th,td{padding:13px 14px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle;font-size:13px}
-th{background:#f8fafc;color:#526071;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-tr:last-child td{border-bottom:0}
-.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700;background:#edf2f7;color:#475569}
-.badge.green{background:#dcfce7;color:#166534}.badge.yellow{background:#fef3c7;color:#92400e}.badge.red{background:#fee2e2;color:#991b1b}.badge.blue{background:#dbeafe;color:#1e40af}
-.empty,.loading{padding:35px 20px;text-align:center;color:var(--muted)}
-@media(max-width:1050px){.cards{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}.main{width:100%;margin-left:0}.mobile-toggle{display:block}.cards{grid-template-columns:1fr}.content{padding:15px}.topbar{padding:12px 15px}.connection{display:none}}
+
+html,body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+}
+
+body{
+  font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+button,input,select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+button:disabled{
+  cursor:not-allowed;
+  opacity:.55;
+}
+
+/* BOOT */
+
+#bootScreen{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:var(--navy);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px;
+}
+
+.boot-box{
+  width:min(430px,100%);
+}
+
+.boot-logo{
+  width:70px;
+  height:70px;
+  margin:0 auto 20px;
+  border-radius:18px;
+  background:var(--green);
+  color:var(--navy);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  font-weight:900;
+}
+
+.boot-box h1{
+  margin:0 0 8px;
+  font-size:24px;
+}
+
+.boot-box p{
+  margin:0;
+  color:#b9c7d8;
+  font-size:14px;
+}
+
+.spinner{
+  width:34px;
+  height:34px;
+  margin:25px auto 0;
+  border:4px solid rgba(255,255,255,.18);
+  border-top-color:var(--green);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+/* ERROR */
+
+#errorScreen{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9998;
+  background:var(--bg);
+  align-items:center;
+  justify-content:center;
+  padding:25px;
+}
+
+.error-card{
+  width:min(620px,100%);
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:30px;
+  box-shadow:var(--shadow);
+}
+
+.error-icon{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:#fee2e2;
+  color:#991b1b;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+  font-weight:800;
+  margin-bottom:18px;
+}
+
+.error-card h2{
+  margin:0 0 10px;
+}
+
+.error-card p{
+  color:var(--muted);
+  line-height:1.6;
+}
+
+.error-message{
+  background:#f8fafc;
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:12px;
+  font-family:monospace;
+  font-size:12px;
+  word-break:break-word;
+  margin:15px 0;
+}
+
+/* APP */
+
+#app{
+  display:none;
+  min-height:100vh;
+}
+
+.app{
+  min-height:100vh;
+  display:flex;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+  width:250px;
+  background:var(--navy);
+  color:#fff;
+  position:fixed;
+  top:0;
+  bottom:0;
+  left:0;
+  z-index:1000;
+  display:flex;
+  flex-direction:column;
+}
+
+.brand{
+  padding:22px 20px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+.brand h1{
+  margin:0;
+  font-size:20px;
+  font-weight:800;
+}
+
+.brand p{
+  margin:5px 0 0;
+  font-size:12px;
+  color:#aebdce;
+}
+
+.nav{
+  padding:15px 10px;
+  flex:1;
+  overflow:auto;
+}
+
+.nav button{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#c9d4e2;
+  padding:12px 14px;
+  border-radius:9px;
+  text-align:left;
+  margin-bottom:4px;
+  transition:.2s;
+}
+
+.nav button:hover{
+  background:rgba(255,255,255,.07);
+  color:#fff;
+}
+
+.nav button.active{
+  background:rgba(25,214,107,.15);
+  color:#fff;
+  border-left:3px solid var(--green);
+}
+
+.sidebar-footer{
+  padding:15px;
+  border-top:1px solid rgba(255,255,255,.1);
+}
+
+.user-box{
+  margin-bottom:10px;
+  font-size:12px;
+  color:#c9d4e2;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.logout{
+  width:100%;
+  border:1px solid rgba(255,255,255,.2);
+  background:transparent;
+  color:#fff;
+  padding:10px;
+  border-radius:8px;
+}
+
+.logout:hover{
+  background:rgba(255,255,255,.08);
+}
+
+/* MAIN */
+
+.main{
+  margin-left:250px;
+  width:calc(100% - 250px);
+  min-height:100vh;
+}
+
+.topbar{
+  min-height:70px;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  padding:15px 25px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  position:sticky;
+  top:0;
+  z-index:900;
+}
+
+.topbar-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.topbar h2{
+  margin:0;
+  font-size:21px;
+}
+
+.connection{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.connection-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:var(--green);
+}
+
+.mobile-toggle{
+  display:none;
+  border:0;
+  background:var(--navy);
+  color:#fff;
+  border-radius:7px;
+  padding:9px 12px;
+}
+
+.content{
+  padding:25px;
+}
+
+/* ALERT */
+
+.alert{
+  display:none;
+  padding:14px 16px;
+  border-radius:10px;
+  margin-bottom:20px;
+}
+
+.alert.show{
+  display:block;
+  position:fixed;
+  top:80px;
+  right:20px;
+  z-index:2000;
+  max-width:420px;
+  box-shadow:var(--shadow);
+}
+
+.alert.error{
+  background:#fff0f1;
+  color:#991b1b;
+  border:1px solid #fecaca;
+}
+
+.alert.success{
+  background:#ecfdf3;
+  color:#166534;
+  border:1px solid #bbf7d0;
+}
+
+/* CARDS */
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:25px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.metric-label{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:8px;
+}
+
+.metric-value{
+  font-size:28px;
+  font-weight:800;
+}
+
+.metric-note{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:7px;
+}
+
+.revenue-card{
+  border-top:3px solid var(--green);
+}
+
+.revenue-card.today{
+  border-top-color:var(--blue);
+}
+
+/* SECTIONS */
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:15px;
+}
+
+.section-title h3{
+  margin:0;
+  font-size:18px;
+}
+
+.toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+/* FORM */
+
+input,select{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:8px;
+  padding:10px 11px;
+  outline:none;
+}
+
+input:focus,select:focus{
+  border-color:var(--green-dark);
+  box-shadow:0 0 0 3px rgba(25,214,107,.1);
+}
+
+/* BUTTONS */
+
+.btn{
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  font-weight:600;
+}
+
+.btn-primary{
+  background:var(--navy);
+  color:#fff;
+}
+
+.btn-green{
+  background:var(--green);
+  color:#062015;
+}
+
+.btn-light{
+  background:#eef2f7;
+  color:#243044;
+}
+
+.btn-red{
+  background:#dc3545;
+  color:#fff;
+}
+
+.btn-red:hover{
+  background:#b91c2b;
+}
+
+/* TABLES */
+
+.table-wrap{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:auto;
+  box-shadow:var(--shadow);
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:800px;
+}
+
+th,td{
+  padding:13px 14px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  vertical-align:middle;
+  font-size:13px;
+}
+
+th{
+  background:#f8fafc;
+  color:#526071;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+
+tr:last-child td{
+  border-bottom:0;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  background:#edf2f7;
+  color:#475569;
+}
+
+.badge.green{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.badge.yellow{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.badge.red{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.badge.blue{
+  background:#dbeafe;
+  color:#1e40af;
+}
+
+.empty,.loading{
+  padding:35px 20px;
+  text-align:center;
+  color:var(--muted);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1050px){
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:700px){
+
+  .sidebar{
+    transform:translateX(-100%);
+    transition:.2s;
+  }
+
+  .sidebar.open{
+    transform:translateX(0);
+  }
+
+  .main{
+    width:100%;
+    margin-left:0;
+  }
+
+  .mobile-toggle{
+    display:block;
+  }
+
+  .cards{
+    grid-template-columns:1fr;
+  }
+
+  .content{
+    padding:15px;
+  }
+
+  .topbar{
+    padding:12px 15px;
+  }
+
+  .connection{
+    display:none;
+  }
+}
 </style>
 </head>
+
 <body>
 
-<div id="bootScreen"><div class="boot-box">
-  <div class="boot-logo">L</div><h1>Lashawn Academy</h1>
-  <p>Connecting to the administration system...</p><div class="spinner"></div>
-</div></div>
+<!-- BOOT SCREEN -->
 
-<div id="errorScreen"><div class="error-card">
-  <div class="error-icon">!</div><h2>Dashboard could not start</h2>
-  <p id="errorDescription">An unexpected error occurred.</p>
-  <div class="error-message" id="errorDetails"></div>
-  <button class="btn btn-primary" onclick="window.location.reload()">Reload Dashboard</button>
-  <button class="btn btn-light" onclick="window.location.href='admin-login.html'">Return to Login</button>
-</div></div>
+<div id="bootScreen">
+  <div class="boot-box">
+    <div class="boot-logo">L</div>
+    <h1>Lashawn Academy</h1>
+    <p>Connecting to the administration system...</p>
+    <div class="spinner"></div>
+  </div>
+</div>
 
-<div id="app"><div class="app">
+<!-- ERROR SCREEN -->
+
+<div id="errorScreen">
+  <div class="error-card">
+    <div class="error-icon">!</div>
+    <h2>Dashboard could not start</h2>
+    <p id="errorDescription">An unexpected error occurred.</p>
+    <div class="error-message" id="errorDetails"></div>
+
+    <button class="btn btn-primary" onclick="window.location.reload()">
+      Reload Dashboard
+    </button>
+
+    <button class="btn btn-light" onclick="window.location.href='admin-login.html'">
+      Return to Login
+    </button>
+  </div>
+</div>
+
+<!-- APPLICATION -->
+
+<div id="app">
+<div class="app">
+
+<!-- SIDEBAR -->
 
 <aside class="sidebar" id="sidebar">
-  <div class="brand"><h1>Lashawn Academy</h1><p>Super Administration</p></div>
-  <nav class="nav">
-    <button class="nav-btn active" data-section="dashboard">Dashboard</button>
-    <button class="nav-btn" data-section="training">6-Week Training</button>
-    <button class="nav-btn" data-section="students">Students</button>
-    <button class="nav-btn" data-section="clients">Walk-in Clients</button>
-    <button class="nav-btn" data-section="enrolments">Enrolments</button>
-    <button class="nav-btn" data-section="payments">Payments</button>
-    <button class="nav-btn" data-section="fees">Fees & Pricing</button>
-    <button class="nav-btn" data-section="staff">Staff</button>
-    <button class="nav-btn" data-section="audit">Audit Activity</button>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="user-box" id="currentUser">Loading user...</div>
-    <button class="logout" id="logoutBtn">Sign Out</button>
+
+  <div class="brand">
+    <h1>Lashawn Academy</h1>
+    <p>Super Administration</p>
   </div>
+
+  <nav class="nav">
+
+    <button class="nav-btn active" data-section="dashboard">
+      Dashboard
+    </button>
+
+    <button class="nav-btn" data-section="training">
+      6-Week Training
+    </button>
+
+    <button class="nav-btn" data-section="students">
+      Students
+    </button>
+
+    <button class="nav-btn" data-section="clients">
+      Walk-in Clients
+    </button>
+
+    <button class="nav-btn" data-section="enrolments">
+      Enrolments
+    </button>
+
+    <button class="nav-btn" data-section="payments">
+      Payments
+    </button>
+
+    <button class="nav-btn" data-section="fees">
+      Fees & Pricing
+    </button>
+
+    <button class="nav-btn" data-section="staff">
+      Staff
+    </button>
+
+    <button class="nav-btn" data-section="audit">
+      Audit Activity
+    </button>
+
+  </nav>
+
+  <div class="sidebar-footer">
+
+    <div class="user-box" id="currentUser">
+      Loading user...
+    </div>
+
+    <button class="logout" id="logoutBtn">
+      Sign Out
+    </button>
+
+  </div>
+
 </aside>
 
+<!-- MAIN -->
+
 <main class="main">
+
 <header class="topbar">
-  <div class="topbar-left"><button class="mobile-toggle" id="mobileToggle">☰</button><h2 id="pageTitle">Dashboard</h2></div>
-  <div class="connection"><span class="connection-dot"></span><span id="connectionStatus">Connected</span></div>
+
+  <div class="topbar-left">
+
+    <button class="mobile-toggle" id="mobileToggle">
+      ☰
+    </button>
+
+    <h2 id="pageTitle">
+      Dashboard
+    </h2>
+
+  </div>
+
+  <div class="connection">
+    <span class="connection-dot"></span>
+    <span id="connectionStatus">
+      Connected
+    </span>
+  </div>
+
 </header>
 
 <div class="content">
+
 <div class="alert" id="alert"></div>
 
+<!-- ================= DASHBOARD ================= -->
+
 <section id="dashboard" class="section active">
+
+  <!-- GENERAL KPIs -->
+
   <div class="cards">
-    <div class="card"><div class="metric-label">Total Students</div><div class="metric-value" id="metricStudents">—</div><div class="metric-note">Registered students</div></div>
-    <div class="card"><div class="metric-label">Active Enrolments</div><div class="metric-value" id="metricEnrolments">—</div><div class="metric-note">Current training</div></div>
-    <div class="card"><div class="metric-label">Pending Payments</div><div class="metric-value" id="metricPayments">—</div><div class="metric-note">Awaiting approval</div></div>
-    <div class="card"><div class="metric-label">Active Staff</div><div class="metric-value" id="metricStaff">—</div><div class="metric-note">Active staff records</div></div>
+
+    <div class="card">
+      <div class="metric-label">
+        Total Students
+      </div>
+      <div class="metric-value" id="metricStudents">
+        —
+      </div>
+      <div class="metric-note">
+        Registered students
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="metric-label">
+        Active Enrolments
+      </div>
+      <div class="metric-value" id="metricEnrolments">
+        —
+      </div>
+      <div class="metric-note">
+        Current training
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="metric-label">
+        Pending Payments
+      </div>
+      <div class="metric-value" id="metricPayments">
+        —
+      </div>
+      <div class="metric-note">
+        Awaiting approval
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="metric-label">
+        Active Staff
+      </div>
+      <div class="metric-value" id="metricStaff">
+        —
+      </div>
+      <div class="metric-note">
+        Active staff records
+      </div>
+    </div>
+
   </div>
+
+  <!-- TODAY REVENUE -->
+
   <div class="cards">
-    <div class="card"><div class="metric-label">Student Revenue</div><div class="metric-value" id="revStudents">—</div><div class="metric-note">Driving &amp; Computer (confirmed)</div></div>
-    <div class="card"><div class="metric-label">Walk-in Revenue</div><div class="metric-value" id="revWalkin">—</div><div class="metric-note">Printing, Cyber &amp; Digital (confirmed)</div></div>
-    <div class="card"><div class="metric-label">Total Revenue</div><div class="metric-value" id="revTotal">—</div><div class="metric-note">All branches</div></div>
-    <div class="card"><div class="metric-label">Walk-in Jobs</div><div class="metric-value" id="metricJobs">—</div><div class="metric-note">Registered jobs</div></div>
+
+    <div class="card revenue-card today">
+
+      <div class="metric-label">
+        Today's Student Revenue
+      </div>
+
+      <div class="metric-value" id="todayRevStudents">
+        —
+      </div>
+
+      <div class="metric-note">
+        Confirmed student payments received today
+      </div>
+
+    </div>
+
+    <div class="card revenue-card today">
+
+      <div class="metric-label">
+        Today's Walk-in Revenue
+      </div>
+
+      <div class="metric-value" id="todayRevWalkin">
+        —
+      </div>
+
+      <div class="metric-note">
+        Confirmed walk-in payments received today
+      </div>
+
+    </div>
+
+    <div class="card revenue-card today">
+
+      <div class="metric-label">
+        Today's Total Revenue
+      </div>
+
+      <div class="metric-value" id="todayRevTotal">
+        —
+      </div>
+
+      <div class="metric-note">
+        All confirmed payments received today
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <div class="metric-label">
+        Walk-in Jobs
+      </div>
+
+      <div class="metric-value" id="metricJobs">
+        —
+      </div>
+
+      <div class="metric-note">
+        Registered jobs
+      </div>
+
+    </div>
+
   </div>
-  <div class="section-title"><h3>Revenue by Branch</h3></div>
-  <div class="table-wrap" style="margin-bottom:25px"><div id="branchRevenue"><div class="loading">Loading...</div></div></div>
-  <div class="section-title"><h3>Recent Enrolments</h3><button class="btn btn-light" onclick="run(loadRecentEnrolments)">Refresh</button></div>
-  <div class="table-wrap"><div id="recentEnrolments"><div class="loading">Loading...</div></div></div>
+
+  <!-- TOTAL REVENUE -->
+
+  <div class="cards">
+
+    <div class="card revenue-card">
+
+      <div class="metric-label">
+        Total Student Revenue
+      </div>
+
+      <div class="metric-value" id="revStudents">
+        —
+      </div>
+
+      <div class="metric-note">
+        All confirmed Driving & Computer payments
+      </div>
+
+    </div>
+
+    <div class="card revenue-card">
+
+      <div class="metric-label">
+        Total Walk-in Revenue
+      </div>
+
+      <div class="metric-value" id="revWalkin">
+        —
+      </div>
+
+      <div class="metric-note">
+        All confirmed Printing, Cyber & Digital payments
+      </div>
+
+    </div>
+
+    <div class="card revenue-card">
+
+      <div class="metric-label">
+        Total Revenue
+      </div>
+
+      <div class="metric-value" id="revTotal">
+        —
+      </div>
+
+      <div class="metric-note">
+        All confirmed payments
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <div class="metric-label">
+        Revenue Date
+      </div>
+
+      <div class="metric-value" id="revenueDate">
+        —
+      </div>
+
+      <div class="metric-note">
+        Local dashboard date
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- BRANCH REVENUE -->
+
+  <div class="section-title">
+    <h3>
+      Revenue by Branch
+    </h3>
+  </div>
+
+  <div class="table-wrap" style="margin-bottom:25px">
+    <div id="branchRevenue">
+      <div class="loading">
+        Loading...
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT ENROLMENTS -->
+
+  <div class="section-title">
+
+    <h3>
+      Recent Enrolments
+    </h3>
+
+    <button class="btn btn-light" onclick="run(loadRecentEnrolments)">
+      Refresh
+    </button>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <div id="recentEnrolments">
+      <div class="loading">
+        Loading...
+      </div>
+    </div>
+
+  </div>
+
 </section>
+
+<!-- ================= TRAINING ================= -->
 
 <section id="training" class="section">
-  <div class="section-title"><h3>6-Week Training Tracker</h3><button class="btn btn-light" onclick="run(loadTraining)">Refresh</button></div>
-  <div class="table-wrap"><div id="trainingTable"><div class="loading">Loading training status...</div></div></div>
+
+  <div class="section-title">
+
+    <h3>
+      6-Week Training Tracker
+    </h3>
+
+    <button class="btn btn-light" onclick="run(loadTraining)">
+      Refresh
+    </button>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <div id="trainingTable">
+      <div class="loading">
+        Loading training status...
+      </div>
+    </div>
+
+  </div>
+
 </section>
+
+<!-- ================= STUDENTS ================= -->
 
 <section id="students" class="section">
-  <div class="section-title"><h3>Students (Driving &amp; Computer)</h3>
-    <div class="toolbar"><input type="search" id="studentSearch" placeholder="Search student..."><button class="btn btn-light" onclick="run(loadStudents)">Search</button></div></div>
-  <div class="table-wrap"><div id="studentsTable"><div class="loading">Loading students...</div></div></div>
+
+  <div class="section-title">
+
+    <h3>
+      Students (Driving & Computer)
+    </h3>
+
+    <div class="toolbar">
+
+      <input
+        type="search"
+        id="studentSearch"
+        placeholder="Search student..."
+      >
+
+      <button
+        class="btn btn-light"
+        onclick="run(loadStudents)"
+      >
+        Search
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <div id="studentsTable">
+      <div class="loading">
+        Loading students...
+      </div>
+    </div>
+
+  </div>
+
 </section>
+
+<!-- ================= CLIENTS ================= -->
 
 <section id="clients" class="section">
-  <div class="section-title"><h3>Walk-in Clients (Printing, Cyber &amp; Digital)</h3><button class="btn btn-light" onclick="run(loadClients)">Refresh</button></div>
-  <div class="table-wrap"><div id="clientsTable"><div class="loading">Loading walk-in clients...</div></div></div>
+
+  <div class="section-title">
+
+    <h3>
+      Walk-in Clients (Printing, Cyber & Digital)
+    </h3>
+
+    <button class="btn btn-light" onclick="run(loadClients)">
+      Refresh
+    </button>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <div id="clientsTable">
+      <div class="loading">
+        Loading walk-in clients...
+      </div>
+    </div>
+
+  </div>
+
 </section>
+
+<!-- ================= ENROLMENTS ================= -->
 
 <section id="enrolments" class="section">
-  <div class="section-title"><h3>Enrolments</h3><button class="btn btn-light" onclick="run(loadEnrolments)">Refresh</button></div>
-  <div class="table-wrap"><div id="enrolmentsTable"><div class="loading">Loading enrolments...</div></div></div>
+
+  <div class="section-title">
+
+    <h3>
+      Enrolments
+    </h3>
+
+    <button class="btn btn-light" onclick="run(loadEnrolments)">
+      Refresh
+    </button>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <div id="enrolmentsTable">
+      <div class="loading">
+        Loading enrolments...
+      </div>
+    </div>
+
+  </div>
+
 </section>
+
+<!-- ================= PAYMENTS ================= -->
 
 <section id="payments" class="section">
-  <div class="section-title"><h3>Payments</h3>
+
+  <div class="section-title">
+
+    <h3>
+      Payments
+    </h3>
+
     <div class="toolbar">
-      <select id="paymentType" onchange="run(loadPayments)"><option value="">Students &amp; Walk-in</option><option value="student">Students only</option><option value="walkin">Walk-in only</option></select>
-      <select id="paymentFilter" onchange="run(loadPayments)">
-        <option value="">All statuses</option><option value="PENDING">Pending</option><option value="CONFIRMED">Confirmed</option><option value="REJECTED">Rejected</option>
+
+      <select
+        id="paymentType"
+        onchange="run(loadPayments)"
+      >
+        <option value="">
+          Students & Walk-in
+        </option>
+
+        <option value="student">
+          Students only
+        </option>
+
+        <option value="walkin">
+          Walk-in only
+        </option>
+
       </select>
-      <button class="btn btn-light" onclick="run(loadPayments)">Refresh</button>
-    </div></div>
-  <div class="table-wrap"><div id="paymentsTable"><div class="loading">Loading payments...</div></div></div>
+
+      <select
+        id="paymentFilter"
+        onchange="run(loadPayments)"
+      >
+
+        <option value="">
+          All statuses
+        </option>
+
+        <option value="PENDING">
+          Pending
+        </option>
+
+        <option value="CONFIRMED">
+          Confirmed
+        </option>
+
+        <option value="REJECTED">
+          Rejected
+        </option>
+
+      </select>
+
+      <button
+        class="btn btn-light"
+        onclick="run(loadPayments)"
+      >
+        Refresh
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <div id="paymentsTable">
+      <div class="loading">
+        Loading payments...
+      </div>
+    </div>
+
+  </div>
+
 </section>
+
+<!-- ================= FEES ================= -->
 
 <section id="fees" class="section">
-  <div class="section-title"><h3>Fees & Pricing</h3>
+
+  <div class="section-title">
+
+    <h3>
+      Fees & Pricing
+    </h3>
+
     <div class="toolbar">
-      <select id="feeProgramme" onchange="run(loadFees)">
-        <option value="">All programmes</option><option value="Driving">Driving</option><option value="Computer">Computer</option>
+
+      <select
+        id="feeProgramme"
+        onchange="run(loadFees)"
+      >
+
+        <option value="">
+          All programmes
+        </option>
+
+        <option value="Driving">
+          Driving
+        </option>
+
+        <option value="Computer">
+          Computer
+        </option>
+
       </select>
-      <button class="btn btn-light" onclick="run(loadFees)">Refresh</button>
-    </div></div>
-  <div class="table-wrap"><div id="feesTable"><div class="loading">Loading fee structures...</div></div></div>
+
+      <button
+        class="btn btn-light"
+        onclick="run(loadFees)"
+      >
+        Refresh
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <div id="feesTable">
+      <div class="loading">
+        Loading fee structures...
+      </div>
+    </div>
+
+  </div>
+
 </section>
+
+<!-- ================= STAFF ================= -->
 
 <section id="staff" class="section">
-  <div class="section-title"><h3>Staff</h3><button class="btn btn-light" onclick="run(loadStaff)">Refresh</button></div>
-  <div class="table-wrap"><div id="staffTable"><div class="loading">Loading staff...</div></div></div>
+
+  <div class="section-title">
+
+    <h3>
+      Staff
+    </h3>
+
+    <button
+      class="btn btn-light"
+      onclick="run(loadStaff)"
+    >
+      Refresh
+    </button>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <div id="staffTable">
+      <div class="loading">
+        Loading staff...
+      </div>
+    </div>
+
+  </div>
+
 </section>
 
+<!-- ================= AUDIT ================= -->
+
 <section id="audit" class="section">
-  <div class="section-title"><h3>Audit Activity</h3><button class="btn btn-light" onclick="run(loadAudit)">Refresh</button></div>
-  <div class="table-wrap"><div id="auditTable"><div class="loading">Loading audit activity...</div></div></div>
+
+  <div class="section-title">
+
+    <h3>
+      Audit Activity
+    </h3>
+
+    <button
+      class="btn btn-light"
+      onclick="run(loadAudit)"
+    >
+      Refresh
+    </button>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <div id="auditTable">
+      <div class="loading">
+        Loading audit activity...
+      </div>
+    </div>
+
+  </div>
+
 </section>
 
 </div>
 </main>
-</div></div>
+
+</div>
+</div>
 
 <script>
 "use strict";
 
-/* Own Supabase client. Does not use LashawnDB or js/supabase.js */
-const SUPABASE_URL = "https://qjfinbftcserrjiedduf.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqZmluYmZ0Y3NlcnJqaWVkZHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzOTgzMzksImV4cCI6MjEwNTk3NDMzOX0.WHAkxqTTtzQH_za4OPMWJAILRUUHIL5Akk8900QX5c0";
+/* ============================================================
+   SUPABASE
+============================================================ */
 
-let db = null, currentSession = null;
+const SUPABASE_URL =
+  "https://qjfinbftcserrjiedduf.supabase.co";
+
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqZmluYmZ0Y3NlcnJqaWVkZHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzOTgzMzksImV4cCI6MjEwNTk3NDMzOX0.WHAkxqTTtzQH_za4OPMWJAILRUUHIL5Akk8900QX5c0";
+
+let db = null;
+let currentSession = null;
 
 const $ = id => document.getElementById(id);
-const escapeHtml = v => v == null ? "" : String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
-const money = v => new Intl.NumberFormat("en-KE",{style:"currency",currency:"KES",maximumFractionDigits:2}).format(Number(v||0));
-const dateOnly = v => { if(!v) return "—"; try{ return new Date(v).toLocaleDateString("en-KE"); }catch{ return v; } };
-const empty = m => `<div class="empty">${escapeHtml(m||"No records found.")}</div>`;
-const loadingHtml = m => `<div class="loading">${m}</div>`;
-const fullName = s => s ? [s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ") : "—";
-const cell = v => escapeHtml(v == null ? "—" : v);
-const byId = rows => Object.fromEntries((rows||[]).map(r => [r.id,r]));
+
+const escapeHtml = v =>
+  v == null
+    ? ""
+    : String(v)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+const money = v =>
+  new Intl.NumberFormat("en-KE",{
+    style:"currency",
+    currency:"KES",
+    maximumFractionDigits:2
+  }).format(Number(v || 0));
+
+const dateOnly = v => {
+
+  if(!v) return "—";
+
+  try{
+    return new Date(v).toLocaleDateString("en-KE");
+  }catch{
+    return v;
+  }
+
+};
+
+const empty = m =>
+  `<div class="empty">${escapeHtml(m || "No records found.")}</div>`;
+
+const loadingHtml = m =>
+  `<div class="loading">${m}</div>`;
+
+const fullName = s =>
+  s
+    ? [s.first_name,s.middle_name,s.last_name]
+        .filter(Boolean)
+        .join(" ")
+    : "—";
+
+const cell = v =>
+  escapeHtml(v == null ? "—" : v);
+
+const byId = rows =>
+  Object.fromEntries(
+    (rows || []).map(r => [r.id,r])
+  );
+
+/* ============================================================
+   STATUS BADGE
+============================================================ */
 
 function badge(status){
-  const v = String(status || "unknown"), l = v.toLowerCase();
+
+  const v = String(status || "unknown");
+  const l = v.toLowerCase();
+
   let c = "";
-  if(["approved","confirmed","active","completed","paid","ready"].includes(l)) c = "green";
-  else if(["pending","in progress","ongoing"].includes(l)) c = "yellow";
-  else if(["rejected","cancelled","inactive"].includes(l)) c = "red";
-  else if(l === "new") c = "blue";
-  return `<span class="badge ${c}">${escapeHtml(v)}</span>`;
+
+  if([
+    "approved",
+    "confirmed",
+    "active",
+    "completed",
+    "paid",
+    "ready"
+  ].includes(l)){
+    c = "green";
+  }
+
+  else if([
+    "pending",
+    "in progress",
+    "ongoing"
+  ].includes(l)){
+    c = "yellow";
+  }
+
+  else if([
+    "rejected",
+    "cancelled",
+    "inactive"
+  ].includes(l)){
+    c = "red";
+  }
+
+  else if(l === "new"){
+    c = "blue";
+  }
+
+  return `<span class="badge ${c}">
+    ${escapeHtml(v)}
+  </span>`;
 }
 
-function showAlert(message, type="error"){
+/* ============================================================
+   ALERT
+============================================================ */
+
+function showAlert(message,type="error"){
+
   const a = $("alert");
-  a.className = "alert show " + type;
+
+  a.className =
+    "alert show " + type;
+
   a.textContent = message;
+
   clearTimeout(window.__alertTimer);
-  window.__alertTimer = setTimeout(()=>{ a.className = "alert"; a.textContent = ""; }, 9000);
+
+  window.__alertTimer =
+    setTimeout(() => {
+
+      a.className = "alert";
+      a.textContent = "";
+
+    },9000);
 }
 
-/* Run a loader from a button and show any error */
+/* ============================================================
+   RUN LOADER
+============================================================ */
+
 async function run(fn){
-  try{ await fn(); }catch(e){ console.error(e); showAlert(e.message || "Unable to load."); }
+
+  try{
+
+    await fn();
+
+  }catch(e){
+
+    console.error(e);
+
+    showAlert(
+      e.message || "Unable to load."
+    );
+
+  }
+
 }
 
-function showStartupError(title, message){
+/* ============================================================
+   STARTUP ERROR
+============================================================ */
+
+function showStartupError(title,message){
+
   $("bootScreen").style.display = "none";
+
   $("app").style.display = "none";
+
   $("errorScreen").style.display = "flex";
-  $("errorDescription").textContent = title || "Dashboard could not start.";
-  $("errorDetails").textContent = message || "Unknown error.";
+
+  $("errorDescription").textContent =
+    title || "Dashboard could not start.";
+
+  $("errorDetails").textContent =
+    message || "Unknown error.";
 }
 
-/* Build a table: heads = array of labels, rows = array of arrays of ready HTML */
-function tableHtml(heads, rows){
-  return `<table><thead><tr>${heads.map(h=>`<th>${escapeHtml(h)}</th>`).join("")}</tr></thead><tbody>${
-    rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+/* ============================================================
+   TABLE
+============================================================ */
+
+function tableHtml(heads,rows){
+
+  return `
+    <table>
+
+      <thead>
+        <tr>
+          ${heads.map(h =>
+            `<th>${escapeHtml(h)}</th>`
+          ).join("")}
+        </tr>
+      </thead>
+
+      <tbody>
+        ${
+          rows.map(r =>
+            `<tr>
+              ${r.map(c =>
+                `<td>${c}</td>`
+              ).join("")}
+            </tr>`
+          ).join("")
+        }
+      </tbody>
+
+    </table>
+  `;
 }
 
-/* Generic table of every column in the data */
-function autoTable(data, opts={}){
-  const cols = Object.keys(data[0]);
-  return tableHtml(cols, data.map(row => cols.map(col => {
-    let v = row[col];
-    if(opts.activeCol && col === opts.activeCol) return badge(v ? "active" : "inactive");
-    if(opts.dateSuffix && col.endsWith("_at")) v = v ? dateOnly(v) : "—";
-    if(v && typeof v === "object") v = JSON.stringify(v);
-    return cell(v);
-  })));
+/* ============================================================
+   GENERIC TABLE
+============================================================ */
+
+function autoTable(data,opts={}){
+
+  if(!data || !data.length){
+    return empty("No records found.");
+  }
+
+  const cols =
+    Object.keys(data[0]);
+
+  return tableHtml(
+    cols,
+
+    data.map(row =>
+      cols.map(col => {
+
+        let v = row[col];
+
+        if(
+          opts.activeCol &&
+          col === opts.activeCol
+        ){
+          return badge(
+            v ? "active" : "inactive"
+          );
+        }
+
+        if(
+          opts.dateSuffix &&
+          col.endsWith("_at")
+        ){
+          v = v ? dateOnly(v) : "—";
+        }
+
+        if(v && typeof v === "object"){
+          v = JSON.stringify(v);
+        }
+
+        return cell(v);
+
+      })
+    )
+  );
 }
 
-const studentCell = s => `${escapeHtml(fullName(s))}<br><small>${escapeHtml(s?.student_number||"")}</small>`;
+/* ============================================================
+   STUDENT HELPERS
+============================================================ */
+
+const studentCell = s =>
+  `${escapeHtml(fullName(s))}
+   <br>
+   <small>${escapeHtml(s?.student_number || "")}</small>`;
 
 async function fetchStudents(ids){
-  ids = [...new Set(ids.filter(Boolean))];
-  if(!ids.length) return {};
-  const r = await db.from("students").select("id,student_number,first_name,middle_name,last_name").in("id",ids);
-  if(r.error) throw r.error;
+
+  ids = [
+    ...new Set(
+      ids.filter(Boolean)
+    )
+  ];
+
+  if(!ids.length){
+    return {};
+  }
+
+  const r =
+    await db
+      .from("students")
+      .select(
+        "id,student_number,first_name,middle_name,last_name"
+      )
+      .in("id",ids);
+
+  if(r.error){
+    throw r.error;
+  }
+
   return byId(r.data);
 }
 
-/* ---------- Setup ---------- */
+/* ============================================================
+   DATABASE INITIALISATION
+============================================================ */
+
 function initialiseDatabase(){
-  if(!window.supabase || typeof window.supabase.createClient !== "function")
-    throw new Error("Supabase JavaScript library did not load.");
-  if(!SUPABASE_URL || !SUPABASE_URL.startsWith("https://")) throw new Error("Invalid Supabase URL.");
-  if(!SUPABASE_KEY) throw new Error("Supabase publishable/anon key has not been configured in this file.");
-  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-  if(!db || typeof db.from !== "function") throw new Error("Supabase client could not be created.");
+
+  if(
+    !window.supabase ||
+    typeof window.supabase.createClient !== "function"
+  ){
+    throw new Error(
+      "Supabase JavaScript library did not load."
+    );
+  }
+
+  if(
+    !SUPABASE_URL ||
+    !SUPABASE_URL.startsWith("https://")
+  ){
+    throw new Error(
+      "Invalid Supabase URL."
+    );
+  }
+
+  if(!SUPABASE_KEY){
+
+    throw new Error(
+      "Supabase publishable/anon key has not been configured in this file."
+    );
+  }
+
+  db =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY,
+      {
+        auth:{
+          persistSession:true,
+          autoRefreshToken:true,
+          detectSessionInUrl:true
+        }
+      }
+    );
+
+  if(
+    !db ||
+    typeof db.from !== "function"
+  ){
+    throw new Error(
+      "Supabase client could not be created."
+    );
+  }
 }
 
+/* ============================================================
+   AUTHENTICATION
+============================================================ */
+
 async function checkAuthentication(){
-  const {data,error} = await db.auth.getSession();
-  if(error) throw error;
-  currentSession = data.session;
-  if(!currentSession){ window.location.href = "admin-login.html"; return false; }
-  $("currentUser").textContent = currentSession.user.email || "Authenticated user";
+
+  const {
+    data,
+    error
+  } = await db.auth.getSession();
+
+  if(error){
+    throw error;
+  }
+
+  currentSession =
+    data.session;
+
+  if(!currentSession){
+
+    window.location.href =
+      "admin-login.html";
+
+    return false;
+  }
+
+  $("currentUser").textContent =
+    currentSession.user.email ||
+    "Authenticated user";
+
   try{
-    const r = await db.rpc("get_my_profile");
-    if(!r.error){ const p = Array.isArray(r.data) ? r.data[0] : r.data; if(p) window.LashawnProfile = p; }
-  }catch(e){ console.warn("Profile lookup skipped:", e); }
+
+    const r =
+      await db.rpc("get_my_profile");
+
+    if(!r.error){
+
+      const p =
+        Array.isArray(r.data)
+          ? r.data[0]
+          : r.data;
+
+      if(p){
+        window.LashawnProfile = p;
+      }
+
+    }
+
+  }catch(e){
+
+    console.warn(
+      "Profile lookup skipped:",
+      e
+    );
+
+  }
+
   return true;
 }
 
-/* ---------- Navigation ---------- */
-const TITLES = {dashboard:"Dashboard",training:"6-Week Training",students:"Students (Driving & Computer)",clients:"Walk-in Clients",enrolments:"Enrolments",payments:"Payments",fees:"Fees & Pricing",staff:"Staff",audit:"Audit Activity"};
-const LOADERS = {dashboard:loadDashboard,training:loadTraining,students:loadStudents,clients:loadClients,enrolments:loadEnrolments,payments:loadPayments,fees:loadFees,staff:loadStaff,audit:loadAudit};
+/* ============================================================
+   NAVIGATION
+============================================================ */
 
-document.querySelectorAll(".nav-btn").forEach(button => {
-  button.addEventListener("click", async () => {
-    const target = button.dataset.section;
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-    button.classList.add("active");
-    if($(target)) $(target).classList.add("active");
-    $("pageTitle").textContent = TITLES[target] || "Super Admin";
-    if(window.innerWidth <= 700) $("sidebar").classList.remove("open");
-    run(LOADERS[target]);
+const TITLES = {
+
+  dashboard:"Dashboard",
+
+  training:"6-Week Training",
+
+  students:
+    "Students (Driving & Computer)",
+
+  clients:
+    "Walk-in Clients",
+
+  enrolments:
+    "Enrolments",
+
+  payments:
+    "Payments",
+
+  fees:
+    "Fees & Pricing",
+
+  staff:
+    "Staff",
+
+  audit:
+    "Audit Activity"
+};
+
+const LOADERS = {
+
+  dashboard:loadDashboard,
+
+  training:loadTraining,
+
+  students:loadStudents,
+
+  clients:loadClients,
+
+  enrolments:loadEnrolments,
+
+  payments:loadPayments,
+
+  fees:loadFees,
+
+  staff:loadStaff,
+
+  audit:loadAudit
+};
+
+document
+  .querySelectorAll(".nav-btn")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      async () => {
+
+        const target =
+          button.dataset.section;
+
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach(b =>
+            b.classList.remove("active")
+          );
+
+        document
+          .querySelectorAll(".section")
+          .forEach(s =>
+            s.classList.remove("active")
+          );
+
+        button.classList.add("active");
+
+        if($(target)){
+          $(target).classList.add("active");
+        }
+
+        $("pageTitle").textContent =
+          TITLES[target] ||
+          "Super Admin";
+
+        if(window.innerWidth <= 700){
+
+          $("sidebar")
+            .classList
+            .remove("open");
+
+        }
+
+        run(LOADERS[target]);
+
+      }
+    );
+
   });
-});
-$("mobileToggle").addEventListener("click", () => $("sidebar").classList.toggle("open"));
 
-/* ---------- Dashboard ---------- */
-async function countTable(table, filterFn=null){
-  let q = db.from(table).select("*",{count:"exact",head:true});
-  if(filterFn) q = filterFn(q);
-  const {count,error} = await q;
-  if(error){ console.error(table,error); return 0; }
+$("mobileToggle")
+  .addEventListener(
+    "click",
+    () =>
+      $("sidebar")
+        .classList
+        .toggle("open")
+  );
+
+/* ============================================================
+   COUNTER
+============================================================ */
+
+async function countTable(
+  table,
+  filterFn = null
+){
+
+  let q =
+    db
+      .from(table)
+      .select("*",{
+        count:"exact",
+        head:true
+      });
+
+  if(filterFn){
+    q = filterFn(q);
+  }
+
+  const {
+    count,
+    error
+  } = await q;
+
+  if(error){
+
+    console.error(
+      table,
+      error
+    );
+
+    return 0;
+  }
+
   return count || 0;
 }
 
+/* ============================================================
+   BRANCHES
+============================================================ */
+
 let BRANCHES = {};
+
 async function loadBranches(){
-  const {data,error} = await db.from("branches").select("*");
-  if(error){ console.warn("Branches:", error.message); return; }
-  BRANCHES = Object.fromEntries((data||[]).map(b => [b.id, b.name || b.branch_name || b.code || "Branch"]));
+
+  const {
+    data,
+    error
+  } = await db
+    .from("branches")
+    .select("*");
+
+  if(error){
+
+    console.warn(
+      "Branches:",
+      error.message
+    );
+
+    return;
+  }
+
+  BRANCHES =
+    Object.fromEntries(
+      (data || []).map(b => [
+
+        b.id,
+
+        b.branch_name ||
+        b.name ||
+        b.branch_code ||
+        b.code ||
+        "Branch"
+
+      ])
+    );
 }
-const branchName = id => BRANCHES[id] || "—";
+
+const branchName = id =>
+  BRANCHES[id] || "—";
+
+/* ============================================================
+   LOCAL DATE KEY
+   IMPORTANT:
+   Does NOT use UTC.
+============================================================ */
+
+function localDateKey(date = new Date()){
+
+  const y =
+    date.getFullYear();
+
+  const m =
+    String(
+      date.getMonth() + 1
+    ).padStart(2,"0");
+
+  const d =
+    String(
+      date.getDate()
+    ).padStart(2,"0");
+
+  return `${y}-${m}-${d}`;
+}
+
+function localDateLabel(){
+
+  return new Date()
+    .toLocaleDateString(
+      "en-KE",
+      {
+        day:"2-digit",
+        month:"short",
+        year:"numeric"
+      }
+    );
+}
+
+/* ============================================================
+   DASHBOARD
+============================================================ */
 
 async function loadDashboard(){
-  const [s,j,e,p,st] = await Promise.all([
+
+  const [
+    s,
+    j,
+    e,
+    p,
+    st
+  ] = await Promise.all([
+
     countTable("students"),
+
     countTable("printing_jobs"),
-    countTable("enrolments", q => q.eq("status","ACTIVE")),
-    countTable("payments", q => q.eq("status","PENDING")),
-    countTable("staff", q => q.eq("is_active",true))
+
+    countTable(
+      "enrolments",
+      q =>
+        q.eq(
+          "status",
+          "ACTIVE"
+        )
+    ),
+
+    countTable(
+      "payments",
+      q =>
+        q.eq(
+          "status",
+          "PENDING"
+        )
+    ),
+
+    countTable(
+      "staff",
+      q =>
+        q.eq(
+          "is_active",
+          true
+        )
+    )
+
   ]);
-  $("metricStudents").textContent = s;
-  $("metricJobs").textContent = j;
-  $("metricEnrolments").textContent = e;
-  $("metricPayments").textContent = p;
-  $("metricStaff").textContent = st;
-  await Promise.all([loadRevenue(), loadRecentEnrolments()]);
+
+  $("metricStudents").textContent =
+    s;
+
+  $("metricJobs").textContent =
+    j;
+
+  $("metricEnrolments").textContent =
+    e;
+
+  $("metricPayments").textContent =
+    p;
+
+  $("metricStaff").textContent =
+    st;
+
+  $("revenueDate").textContent =
+    localDateLabel();
+
+  await Promise.all([
+
+    loadRevenue(),
+
+    loadRecentEnrolments()
+
+  ]);
 }
+
+/* ============================================================
+   REVENUE
+============================================================ */
 
 async function loadRevenue(){
-  const {data,error} = await db.from("payments")
-    .select("amount,printing_job_id,students(branch_id),enrolments(branch_id),printing_jobs(branch_id)")
-    .eq("status","CONFIRMED").limit(10000);
-  if(error) throw error;
-  let stu = 0, wal = 0; const by = {};
-  (data||[]).forEach(r => {
-    const a = Number(r.amount||0), walk = !!r.printing_job_id;
-    const b = (walk ? r.printing_jobs?.branch_id : (r.enrolments?.branch_id || r.students?.branch_id)) || "none";
-    by[b] = by[b] || {stu:0, wal:0};
-    if(walk){ wal += a; by[b].wal += a; } else { stu += a; by[b].stu += a; }
+
+  /*
+    Confirmed payments only.
+
+    Student payment:
+      printing_job_id = NULL
+
+    Walk-in payment:
+      printing_job_id IS NOT NULL
+
+    payment_date is used for TODAY.
+  */
+
+  const {
+    data,
+    error
+  } = await db
+    .from("payments")
+    .select(`
+      id,
+      amount,
+      status,
+      payment_date,
+      printing_job_id,
+      students(branch_id),
+      enrolments(branch_id),
+      printing_jobs(branch_id)
+    `)
+    .eq(
+      "status",
+      "CONFIRMED"
+    )
+    .limit(10000);
+
+  if(error){
+    throw error;
+  }
+
+  let totalStudent = 0;
+  let totalWalkin = 0;
+
+  let todayStudent = 0;
+  let todayWalkin = 0;
+
+  const by = {};
+
+  const todayKey =
+    localDateKey();
+
+  (data || []).forEach(r => {
+
+    const amount =
+      Number(r.amount || 0);
+
+    const walkin =
+      !!r.printing_job_id;
+
+    /*
+      Determine branch.
+    */
+
+    const branchId =
+      (
+        walkin
+          ? r.printing_jobs?.branch_id
+          : (
+              r.enrolments?.branch_id ||
+              r.students?.branch_id
+            )
+      ) || "none";
+
+    if(!by[branchId]){
+
+      by[branchId] = {
+
+        student:0,
+        walkin:0,
+
+        todayStudent:0,
+        todayWalkin:0
+
+      };
+
+    }
+
+    /*
+      ALL-TIME TOTALS
+    */
+
+    if(walkin){
+
+      totalWalkin += amount;
+
+      by[branchId].walkin +=
+        amount;
+
+    }else{
+
+      totalStudent += amount;
+
+      by[branchId].student +=
+        amount;
+
+    }
+
+    /*
+      TODAY
+
+      payment_date may contain:
+      2026-09-30
+      or
+      2026-09-30T...
+    */
+
+    const paymentDate =
+      r.payment_date
+        ? String(
+            r.payment_date
+          ).slice(0,10)
+        : "";
+
+    if(
+      paymentDate === todayKey
+    ){
+
+      if(walkin){
+
+        todayWalkin +=
+          amount;
+
+        by[branchId]
+          .todayWalkin +=
+          amount;
+
+      }else{
+
+        todayStudent +=
+          amount;
+
+        by[branchId]
+          .todayStudent +=
+          amount;
+
+      }
+
+    }
+
   });
-  $("revStudents").textContent = money(stu);
-  $("revWalkin").textContent = money(wal);
-  $("revTotal").textContent = money(stu + wal);
-  const keys = Object.keys(by);
-  $("branchRevenue").innerHTML = keys.length ? tableHtml(
-    ["Branch","Student Revenue","Walk-in Revenue","Total"],
-    keys.map(k => [cell(k === "none" ? "Unassigned" : branchName(k)), money(by[k].stu), money(by[k].wal), "<strong>"+money(by[k].stu+by[k].wal)+"</strong>"])
-  ) : empty("No confirmed payments yet.");
+
+  /* ----------------------------
+     TOTAL REVENUE CARDS
+  ---------------------------- */
+
+  $("revStudents").textContent =
+    money(totalStudent);
+
+  $("revWalkin").textContent =
+    money(totalWalkin);
+
+  $("revTotal").textContent =
+    money(
+      totalStudent +
+      totalWalkin
+    );
+
+  /* ----------------------------
+     TODAY REVENUE CARDS
+  ---------------------------- */
+
+  $("todayRevStudents").textContent =
+    money(todayStudent);
+
+  $("todayRevWalkin").textContent =
+    money(todayWalkin);
+
+  $("todayRevTotal").textContent =
+    money(
+      todayStudent +
+      todayWalkin
+    );
+
+  /* ----------------------------
+     BRANCH REVENUE
+  ---------------------------- */
+
+  const keys =
+    Object.keys(by);
+
+  if(!keys.length){
+
+    $("branchRevenue").innerHTML =
+      empty(
+        "No confirmed payments yet."
+      );
+
+    return;
+  }
+
+  $("branchRevenue").innerHTML =
+    tableHtml(
+
+      [
+        "Branch",
+
+        "Today Student",
+        "Today Walk-in",
+        "Today Total",
+
+        "Total Student",
+        "Total Walk-in",
+        "Total Revenue"
+      ],
+
+      keys.map(k => {
+
+        const b =
+          by[k];
+
+        const todayTotal =
+          b.todayStudent +
+          b.todayWalkin;
+
+        const total =
+          b.student +
+          b.walkin;
+
+        return [
+
+          cell(
+            k === "none"
+              ? "Unassigned"
+              : branchName(k)
+          ),
+
+          money(
+            b.todayStudent
+          ),
+
+          money(
+            b.todayWalkin
+          ),
+
+          `<strong>${money(
+            todayTotal
+          )}</strong>`,
+
+          money(
+            b.student
+          ),
+
+          money(
+            b.walkin
+          ),
+
+          `<strong>${money(
+            total
+          )}</strong>`
+
+        ];
+
+      })
+
+    );
 }
+
+/* ============================================================
+   RECENT ENROLMENTS
+============================================================ */
 
 async function loadRecentEnrolments(){
-  const target = $("recentEnrolments");
-  target.innerHTML = loadingHtml("Loading...");
-  const {data,error} = await db.from("enrolments")
-    .select("id,enrolment_number,student_id,programme,start_date,expected_end_date,status")
-    .order("created_at",{ascending:false}).limit(10);
-  if(error) throw error;
-  if(!data || !data.length){ target.innerHTML = empty("No enrolments found."); return; }
-  const sm = await fetchStudents(data.map(r => r.student_id));
-  target.innerHTML = tableHtml(
-    ["Enrolment","Student","Programme","Start","Expected End","Status"],
-    data.map(r => [cell(r.enrolment_number), studentCell(sm[r.student_id]), cell(r.programme), dateOnly(r.start_date), dateOnly(r.expected_end_date), badge(r.status)])
-  );
+
+  const target =
+    $("recentEnrolments");
+
+  target.innerHTML =
+    loadingHtml("Loading...");
+
+  const {
+    data,
+    error
+  } = await db
+    .from("enrolments")
+    .select(`
+      id,
+      enrolment_number,
+      student_id,
+      programme,
+      start_date,
+      expected_end_date,
+      status
+    `)
+    .order(
+      "created_at",
+      {
+        ascending:false
+      }
+    )
+    .limit(10);
+
+  if(error){
+    throw error;
+  }
+
+  if(
+    !data ||
+    !data.length
+  ){
+
+    target.innerHTML =
+      empty(
+        "No enrolments found."
+      );
+
+    return;
+  }
+
+  const sm =
+    await fetchStudents(
+      data.map(
+        r => r.student_id
+      )
+    );
+
+  target.innerHTML =
+    tableHtml(
+
+      [
+        "Enrolment",
+        "Student",
+        "Programme",
+        "Start",
+        "Expected End",
+        "Status"
+      ],
+
+      data.map(r => [
+
+        cell(
+          r.enrolment_number
+        ),
+
+        studentCell(
+          sm[r.student_id]
+        ),
+
+        cell(
+          r.programme
+        ),
+
+        dateOnly(
+          r.start_date
+        ),
+
+        dateOnly(
+          r.expected_end_date
+        ),
+
+        badge(
+          r.status
+        )
+
+      ])
+
+    );
 }
 
-/* ---------- Training ---------- */
+/* ============================================================
+   TRAINING
+============================================================ */
+
 async function loadTraining(){
-  const target = $("trainingTable");
-  target.innerHTML = loadingHtml("Loading training status...");
-  const {data,error} = await db.from("academy_student_training_status").select("*").limit(100);
-  if(error) throw error;
-  target.innerHTML = data && data.length ? autoTable(data) : empty("No training records found.");
+
+  const target =
+    $("trainingTable");
+
+  target.innerHTML =
+    loadingHtml(
+      "Loading training status..."
+    );
+
+  const {
+    data,
+    error
+  } = await db
+    .from(
+      "academy_student_training_status"
+    )
+    .select("*")
+    .limit(100);
+
+  if(error){
+    throw error;
+  }
+
+  target.innerHTML =
+    data && data.length
+      ? autoTable(data)
+      : empty(
+          "No training records found."
+        );
 }
 
-/* ---------- Students (Driving & Computer) ---------- */
+/* ============================================================
+   STUDENTS
+============================================================ */
+
 async function loadStudents(){
-  const target = $("studentsTable");
-  target.innerHTML = loadingHtml("Loading students...");
-  const search = $("studentSearch").value.trim();
-  let q = db.from("students")
-    .select("id,student_number,first_name,middle_name,last_name,phone,email,national_id,gender,status,registration_date,branch_id")
-    .order("created_at",{ascending:false}).limit(100);
+
+  const target =
+    $("studentsTable");
+
+  target.innerHTML =
+    loadingHtml(
+      "Loading students..."
+    );
+
+  const search =
+    $("studentSearch")
+      .value
+      .trim();
+
+  let q =
+    db
+      .from("students")
+      .select(`
+        id,
+        student_number,
+        first_name,
+        middle_name,
+        last_name,
+        phone,
+        email,
+        national_id,
+        gender,
+        status,
+        registration_date,
+        branch_id
+      `)
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(100);
+
   if(search){
-    const s = search.replaceAll(",","");
-    q = q.or(["student_number","first_name","middle_name","last_name","phone","national_id"].map(c => `${c}.ilike.%${s}%`).join(","));
+
+    const s =
+      search.replaceAll(",","");
+
+    q =
+      q.or(
+        [
+          "student_number",
+          "first_name",
+          "middle_name",
+          "last_name",
+          "phone",
+          "national_id"
+        ]
+        .map(
+          c =>
+            `${c}.ilike.%${s}%`
+        )
+        .join(",")
+      );
+
   }
-  const {data,error} = await q;
-  if(error) throw error;
-  if(!data || !data.length){ target.innerHTML = empty("No students found."); return; }
-  target.innerHTML = tableHtml(
-    ["Student No.","Name","Phone","Email","ID","Branch","Status","Registered","Actions"],
-    data.map(s => [cell(s.student_number), cell(fullName(s)), cell(s.phone), cell(s.email), cell(s.national_id), cell(branchName(s.branch_id)), badge(s.status), dateOnly(s.registration_date),
-      `<button class="btn btn-red" data-act="del-student" data-id="${escapeHtml(s.id)}" data-name="${escapeHtml(fullName(s))}">Delete</button>`])
-  );
+
+  const {
+    data,
+    error
+  } = await q;
+
+  if(error){
+    throw error;
+  }
+
+  if(
+    !data ||
+    !data.length
+  ){
+
+    target.innerHTML =
+      empty(
+        "No students found."
+      );
+
+    return;
+  }
+
+  target.innerHTML =
+    tableHtml(
+
+      [
+        "Student No.",
+        "Name",
+        "Phone",
+        "Email",
+        "ID",
+        "Branch",
+        "Status",
+        "Registered",
+        "Actions"
+      ],
+
+      data.map(s => [
+
+        cell(
+          s.student_number
+        ),
+
+        cell(
+          fullName(s)
+        ),
+
+        cell(
+          s.phone
+        ),
+
+        cell(
+          s.email
+        ),
+
+        cell(
+          s.national_id
+        ),
+
+        cell(
+          branchName(
+            s.branch_id
+          )
+        ),
+
+        badge(
+          s.status
+        ),
+
+        dateOnly(
+          s.registration_date
+        ),
+
+        `
+        <button
+          class="btn btn-red"
+          data-act="del-student"
+          data-id="${escapeHtml(s.id)}"
+          data-name="${escapeHtml(fullName(s))}"
+        >
+          Delete
+        </button>
+        `
+
+      ])
+
+    );
 }
 
-/* ---------- Walk-in clients ---------- */
+/* ============================================================
+   WALK-IN CLIENTS
+============================================================ */
+
 async function loadClients(){
-  const target = $("clientsTable");
-  target.innerHTML = loadingHtml("Loading walk-in clients...");
-  const {data,error} = await db.from("printing_jobs")
-    .select("*,printing_customers(customer_name,customer_number,phone)")
-    .order("created_at",{ascending:false}).limit(200);
-  if(error) throw error;
-  if(!data || !data.length){ target.innerHTML = empty("No walk-in clients found."); return; }
-  target.innerHTML = tableHtml(
-    ["Job No.","Customer","Phone","Branch","Date","Status","Actions"],
-    data.map(j => { const c = j.printing_customers;
-      return [cell(j.job_number), `${cell(c?.customer_name)}<br><small>${escapeHtml(c?.customer_number||"")}</small>`, cell(c?.phone), cell(branchName(j.branch_id)), dateOnly(j.created_at), badge(j.status || "active"),
-      `<button class="btn btn-red" data-act="del-job" data-id="${escapeHtml(j.id)}" data-name="${escapeHtml(c?.customer_name||j.job_number)}">Delete</button>`]; })
-  );
-}
 
-/* ---------- Enrolments ---------- */
-async function loadEnrolments(){
-  const target = $("enrolmentsTable");
-  target.innerHTML = loadingHtml("Loading enrolments...");
-  const {data,error} = await db.from("enrolments")
-    .select("id,enrolment_number,student_id,programme,driving_class_id,computer_course_id,branch_id,instructor_id,start_date,expected_end_date,actual_end_date,status,training_weeks,notes,created_at")
-    .order("created_at",{ascending:false}).limit(100);
-  if(error) throw error;
-  if(!data || !data.length){ target.innerHTML = empty("No enrolments found."); return; }
-  const dIds = data.map(r => r.driving_class_id).filter(Boolean);
-  const cIds = data.map(r => r.computer_course_id).filter(Boolean);
-  const none = {data:[],error:null};
-  const [sm, dr, cr] = await Promise.all([
-    fetchStudents(data.map(r => r.student_id)),
-    dIds.length ? db.from("driving_classes").select("id,class_code,class_name").in("id",dIds) : none,
-    cIds.length ? db.from("computer_courses").select("id,course_code,course_name").in("id",cIds) : none
-  ]);
-  if(dr.error) throw dr.error;
-  if(cr.error) throw cr.error;
-  const dm = byId(dr.data), cm = byId(cr.data);
-  target.innerHTML = tableHtml(
-    ["Enrolment","Student","Programme","Course/Class","Start","End","Weeks","Branch","Status"],
-    data.map(r => {
-      let course = "—";
-      const d = dm[r.driving_class_id], c = cm[r.computer_course_id];
-      if(d) course = [d.class_code,d.class_name].filter(Boolean).join(" — ");
-      if(c) course = [c.course_code,c.course_name].filter(Boolean).join(" — ");
-      return [cell(r.enrolment_number), studentCell(sm[r.student_id]), cell(r.programme), cell(course), dateOnly(r.start_date), dateOnly(r.actual_end_date || r.expected_end_date), cell(r.training_weeks), cell(branchName(r.branch_id)), badge(r.status)];
-    })
-  );
-}
+  const target =
+    $("clientsTable");
 
-/* ---------- Payments ---------- */
-async function loadPayments(){
-  const target = $("paymentsTable");
-  target.innerHTML = loadingHtml("Loading payments...");
-  const status = $("paymentFilter").value, type = $("paymentType").value;
-  let q = db.from("payments")
-    .select("id,payment_number,amount,payment_method,transaction_reference,mpesa_receipt_number,payment_date,status,printing_job_id,students(student_number,first_name,middle_name,last_name,branch_id),enrolments(branch_id),printing_jobs(job_number,branch_id,printing_customers(customer_name,customer_number))")
-    .order("payment_date",{ascending:false}).limit(200);
-  if(status) q = q.eq("status",status);
-  if(type === "student") q = q.is("printing_job_id",null);
-  if(type === "walkin") q = q.not("printing_job_id","is",null);
-  const {data,error} = await q;
-  if(error) throw error;
-  if(!data || !data.length){ target.innerHTML = empty("No payments found."); return; }
-  target.innerHTML = tableHtml(
-    ["Payment","Client","Type","Branch","Amount","Method","Reference","Date","Status","Action"],
-    data.map(p => {
-      const walk = !!p.printing_job_id, c = p.printing_jobs?.printing_customers;
-      const who = walk ? `${cell(c?.customer_name)}<br><small>${escapeHtml(c?.customer_number||"")}</small>` : studentCell(p.students);
-      const br = walk ? p.printing_jobs?.branch_id : (p.enrolments?.branch_id || p.students?.branch_id);
-      const pending = String(p.status||"").toUpperCase() === "PENDING";
-      const id = escapeHtml(p.id);
-      return [cell(p.payment_number), who, walk ? badge("Walk-in") : badge("Student"), cell(branchName(br)), money(p.amount), cell(p.payment_method),
-        cell(p.mpesa_receipt_number || p.transaction_reference), dateOnly(p.payment_date), badge(p.status),
-        pending ? `<button class="btn btn-green" data-act="approve" data-id="${id}">Approve</button> <button class="btn btn-red" data-act="reject" data-id="${id}">Reject</button>` : "—"];
-    })
-  );
-}
+  target.innerHTML =
+    loadingHtml(
+      "Loading walk-in clients..."
+    );
 
-/* Approve / reject / delete actions */
-document.addEventListener("click", async e => {
-  const b = e.target.closest("[data-act]"); if(!b) return;
-  const {act,id,name} = b.dataset;
-  try{
-    if(act === "approve"){
-      if(!confirm("Approve this payment?")) return;
-      const {error} = await db.rpc("approve_payment",{p_payment_id:id}); if(error) throw error;
-      showAlert("Payment approved.","success"); await loadPayments();
-    }else if(act === "reject"){
-      const reason = prompt("Reason for rejecting this payment (e.g. M-Pesa code not found):");
-      if(reason === null) return;
-      const {error} = await db.rpc("reject_payment",{p_payment_id:id,p_reason:reason}); if(error) throw error;
-      showAlert("Payment rejected.","success"); await loadPayments();
-    }else if(act === "del-student"){
-      if(prompt(`Permanently delete ${name} and their unpaid records?\nStudents with confirmed payments cannot be deleted.\n\nType DELETE to continue:`) !== "DELETE") return showAlert("Delete cancelled. You must type DELETE in capital letters.");
-      const {error} = await db.rpc("delete_student",{p_student_id:id}); if(error) throw error;
-      showAlert("Student deleted.","success"); await loadStudents();
-    }else if(act === "del-job"){
-      if(prompt(`Permanently delete the job for ${name} and its unpaid records?\nJobs with confirmed payments cannot be deleted.\n\nType DELETE to continue:`) !== "DELETE") return showAlert("Delete cancelled. You must type DELETE in capital letters.");
-      const {error} = await db.rpc("delete_printing_job",{p_job_id:id}); if(error) throw error;
-      showAlert("Walk-in job deleted.","success"); await loadClients();
-    }
-    loadDashboard().catch(console.error);
-  }catch(err){ console.error(err); showAlert(err.message || "Action failed."); }
-});
+  const {
+    data,
+    error
+  } = await db
+    .from("printing_jobs")
+    .select(`
+      *,
+      printing_customers(
+        customer_name,
+        customer_number,
+        phone
+      )
+    `)
+    .order(
+      "created_at",
+      {
+        ascending:false
+      }
+    )
+    .limit(200);
 
-/* ---------- Fees ---------- */
-async function loadFees(){
-  const target = $("feesTable");
-  target.innerHTML = loadingHtml("Loading fee structures...");
-  const programme = $("feeProgramme").value;
-  let q = db.from("fee_structures")
-    .select("id,name,programme,driving_class_id,computer_course_id,amount,description,option_code,unit,quantity_based,course_type,is_active")
-    .order("name",{ascending:true});
-  if(programme) q = q.eq("programme",programme);
-  const {data,error} = await q;
-  if(error) throw error;
-  if(!data || !data.length){ target.innerHTML = empty("No fee structures found."); return; }
-  const dIds = data.map(r => r.driving_class_id).filter(Boolean);
-  const cIds = data.map(r => r.computer_course_id).filter(Boolean);
-  const none = {data:[],error:null};
-  const [dr, cr] = await Promise.all([
-    dIds.length ? db.from("driving_classes").select("id,class_code,class_name").in("id",dIds) : none,
-    cIds.length ? db.from("computer_courses").select("id,course_code,course_name").in("id",cIds) : none
-  ]);
-  if(dr.error) throw dr.error;
-  if(cr.error) throw cr.error;
-  const dm = byId(dr.data), cm = byId(cr.data);
-  target.innerHTML = tableHtml(
-    ["Name","Programme","Course/Class","Amount","Unit","Quantity","Option","Type","Status"],
-    data.map(f => {
-      let course = "—";
-      const d = dm[f.driving_class_id], c = cm[f.computer_course_id];
-      if(d) course = [d.class_code,d.class_name].filter(Boolean).join(" — ");
-      if(c) course = [c.course_code,c.course_name].filter(Boolean).join(" — ");
-      return [cell(f.name), cell(f.programme), cell(course), money(f.amount), cell(f.unit), f.quantity_based ? "Yes" : "No", cell(f.option_code), cell(f.course_type), badge(f.is_active ? "active" : "inactive")];
-    })
-  );
-}
-
-/* ---------- Staff ---------- */
-async function loadStaff(){
-  const target = $("staffTable");
-  target.innerHTML = loadingHtml("Loading staff...");
-  const {data,error} = await db.from("staff").select("*").order("created_at",{ascending:false}).limit(100);
-  if(error) throw error;
-  target.innerHTML = data && data.length ? autoTable(data,{activeCol:"is_active",dateSuffix:true}) : empty("No staff records found.");
-}
-
-/* ---------- Audit ---------- */
-async function loadAudit(){
-  const target = $("auditTable");
-  target.innerHTML = loadingHtml("Loading audit activity...");
-  const {data,error} = await db.from("audit_logs").select("*").order("created_at",{ascending:false}).limit(100);
-  if(error) throw error;
-  target.innerHTML = data && data.length ? autoTable(data,{dateSuffix:true}) : empty("No audit activity found.");
-}
-
-/* ---------- Logout ---------- */
-$("logoutBtn").addEventListener("click", async () => {
-  try{ if(db) await db.auth.signOut(); }
-  catch(e){ console.error("Logout:",e); }
-  finally{ window.location.href = "admin-login.html"; }
-});
-
-/* ---------- Start ---------- */
-async function startDashboard(){
-  try{
-    initialiseDatabase();
-    if(!(await checkAuthentication())) return;
-    $("bootScreen").style.display = "none";
-    $("app").style.display = "block";
-    $("connectionStatus").textContent = "Supabase connected";
-    await loadBranches();
-    await loadDashboard();
-  }catch(e){
-    console.error("Lashawn dashboard startup error:", e);
-    showStartupError("The Super Admin Dashboard could not connect.", e.message || String(e));
+  if(error){
+    throw error;
   }
+
+  if(
+    !data ||
+    !data.length
+  ){
+
+    target.innerHTML =
+      empty(
+        "No walk-in clients found."
+      );
+
+    return;
+  }
+
+  target.innerHTML =
+    tableHtml(
+
+      [
+        "Job No.",
+        "Customer",
+        "Phone",
+        "Branch",
+        "Date",
+        "Status",
+        "Actions"
+      ],
+
+      data.map(j => {
+
+        const c =
+          j.printing_customers;
+
+        return [
+
+          cell(
+            j.job_number
+          ),
+
+          `
+          ${cell(
+            c?.customer_name
+          )}
+          <br>
+          <small>
+            ${escapeHtml(
+              c?.customer_number || ""
+            )}
+          </small>
+          `,
+
+          cell(
+            c?.phone
+          ),
+
+          cell(
+            branchName(
+              j.branch_id
+            )
+          ),
+
+          dateOnly(
+            j.created_at
+          ),
+
+          badge(
+            j.status ||
+            "active"
+          ),
+
+          `
+          <button
+            class="btn btn-red"
+            data-act="del-job"
+            data-id="${escapeHtml(j.id)}"
+            data-name="${escapeHtml(
+              c?.customer_name ||
+              j.job_number
+            )}"
+          >
+            Delete
+          </button>
+          `
+
+        ];
+
+      })
+
+    );
 }
 
-if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", startDashboard);
-else startDashboard();
+/* ============================================================
+   ENROLMENTS
+============================================================ */
+
+async function loadEnrolments(){
+
+  const target =
+    $("enrolmentsTable");
+
+  target.innerHTML =
+    loadingHtml(
+      "Loading enrolments..."
+    );
+
+  const {
+    data,
+    error
+  } = await db
+    .from("enrolments")
+    .select(`
+      id,
+      enrolment_number,
+      student_id,
+      programme,
+      driving_class_id,
+      computer_course_id,
+      branch_id,
+      instructor_id,
+      start_date,
+      expected_end_date,
+      actual_end_date,
+      status,
+      training_weeks,
+      notes,
+      created_at
+    `)
+    .order(
+      "created_at",
+      {
+        ascending:false
+      }
+    )
+    .limit(100);
+
+  if(error){
+    throw error;
+  }
+
+  if(
+    !data ||
+    !data.length
+  ){
+
+    target.innerHTML =
+      empty(
+        "No enrolments found."
+      );
+
+    return;
+  }
+
+  const dIds =
+    data
+      .map(
+        r => r.driving_class_id
+      )
+      .filter(Boolean);
+
+  const cIds =
+    data
+      .map(
+        r => r.computer_course_id
+      )
+      .filter(Boolean);
+
+  const none = {
+    data:[],
+    error:null
+  };
+
+  const [
+    sm,
+    dr,
+    cr
+  ] = await Promise.all([
+
+    fetchStudents(
+      data.map(
+        r => r.student_id
+      )
+    ),
+
+    dIds.length
+      ? db
+          .from("driving_classes")
+          .select(
+            "id,class_code,class_name"
+          )
+          .in("id",dIds)
+      : none,
+
+    cIds.length
+      ? db
+          .from("computer_courses")
+          .select(
+            "id,course_code,course_name"
+          )
+          .in("id",cIds)
+      : none
+
+  ]);
+
+  if(dr.error){
+    throw dr.error;
+  }
+
+  if(cr.error){
+    throw cr.error;
+  }
+
+  const dm =
+    byId(dr.data);
+
+  const cm =
+    byId(cr.data);
+
+  target.innerHTML =
+    tableHtml(
+
+      [
+        "Enrolment",
+        "Student",
+        "Programme",
+        "Course/Class",
+        "Start",
+        "End",
+        "Weeks",
+        "Branch",
+        "Status"
+      ],
+
+      data.map(r => {
+
+        let course =
+          "—";
+
+        const d =
+          dm[r.driving_class_id];
+
+        const c =
+          cm[r.computer_course_id];
+
+        if(d){
+
+          course =
+            [
+              d.class_code,
+              d.class_name
+            ]
+            .filter(Boolean)
+            .join(" — ");
+
+        }
+
+        if(c){
+
+          course =
+            [
+              c.course_code,
+              c.course_name
+            ]
+            .filter(Boolean)
+            .join(" — ");
+
+        }
+
+        return [
+
+          cell(
+            r.enrolment_number
+          ),
+
+          studentCell(
+            sm[r.student_id]
+          ),
+
+          cell(
+            r.programme
+          ),
+
+          cell(
+            course
+          ),
+
+          dateOnly(
+            r.start_date
+          ),
+
+          dateOnly(
+            r.actual_end_date ||
+            r.expected_end_date
+          ),
+
+          cell(
+            r.training_weeks
+          ),
+
+          cell(
+            branchName(
+              r.branch_id
+            )
+          ),
+
+          badge(
+            r.status
+          )
+
+        ];
+
+      })
+
+    );
+}
+
+/* ============================================================
+   PAYMENTS
+============================================================ */
+
+async function loadPayments(){
+
+  const target =
+    $("paymentsTable");
+
+  target.innerHTML =
+    loadingHtml(
+      "Loading payments..."
+    );
+
+  const status =
+    $("paymentFilter").value;
+
+  const type =
+    $("paymentType").value;
+
+  let q =
+    db
+      .from("payments")
+      .select(`
+        id,
+        payment_number,
+        amount,
+        payment_method,
+        transaction_reference,
+        mpesa_receipt_number,
+        payment_date,
+        status,
+        printing_job_id,
+
+        students(
+          student_number,
+          first_name,
+          middle_name,
+          last_name,
+          branch_id
+        ),
+
+        enrolments(
+          branch_id
+        ),
+
+        printing_jobs(
+          job_number,
+          branch_id,
+          printing_customers(
+            customer_name,
+            customer_number
+          )
+        )
+      `)
+      .order(
+        "payment_date",
+        {
+          ascending:false
+        }
+      )
+      .limit(200);
+
+  if(status){
+    q =
+      q.eq(
+        "status",
+        status
+      );
+  }
+
+  if(type === "student"){
+
+    q =
+      q.is(
+        "printing_job_id",
+        null
+      );
+
+  }
+
+  if(type === "walkin"){
+
+    q =
+      q.not(
+        "printing_job_id",
+        "is",
+        null
+      );
+
+  }
+
+  const {
+    data,
+    error
+  } = await q;
+
+  if(error){
+    throw error;
+  }
+
+  if(
+    !data ||
+    !data.length
+  ){
+
+    target.innerHTML =
+      empty(
+        "No payments found."
+      );
+
+    return;
+  }
+
+  target.innerHTML =
+    tableHtml(
+
+      [
+        "Payment",
+        "Client",
+        "Type",
+        "Branch",
+        "Amount",
+        "Method",
+        "Reference",
+        "Date",
+        "Status",
+        "Action"
+      ],
+
+      data.map(p => {
+
+        const walk =
+          !!p.printing_job_id;
+
+        const c =
+          p.printing_jobs
+            ?.printing_customers;
+
+        const who =
+          walk
+
+            ? `
+              ${cell(
+                c?.customer_name
+              )}
+              <br>
+              <small>
+                ${escapeHtml(
+                  c?.customer_number ||
+                  ""
+                )}
+              </small>
+              `
+
+            : studentCell(
+                p.students
+              );
+
+        const br =
+          walk
+
+            ? p.printing_jobs
+                ?.branch_id
+
+            : (
+                p.enrolments
+                  ?.branch_id ||
+                p.students
+                  ?.branch_id
+              );
+
+        const pending =
+          String(
+            p.status || ""
+          ).toUpperCase() ===
+          "PENDING";
+
+        const id =
+          escapeHtml(
+            p.id
+          );
+
+        return [
+
+          cell(
+            p.payment_number
+          ),
+
+          who,
+
+          walk
+            ? badge("Walk-in")
+            : badge("Student"),
+
+          cell(
+            branchName(br)
+          ),
+
+          money(
+            p.amount
+          ),
+
+          cell(
+            p.payment_method
+          ),
+
+          cell(
+            p.mpesa_receipt_number ||
+            p.transaction_reference
+          ),
+
+          dateOnly(
+            p.payment_date
+          ),
+
+          badge(
+            p.status
+          ),
+
+          pending
+
+            ? `
+              <button
+                class="btn btn-green"
+                data-act="approve"
+                data-id="${id}"
+              >
+                Approve
+              </button>
+
+              <button
+                class="btn btn-red"
+                data-act="reject"
+                data-id="${id}"
+              >
+                Reject
+              </button>
+              `
+
+            : "—"
+
+        ];
+
+      })
+
+    );
+}
+
+/* ============================================================
+   PAYMENT / DELETE ACTIONS
+============================================================ */
+
+document.addEventListener(
+  "click",
+  async e => {
+
+    const b =
+      e.target.closest(
+        "[data-act]"
+      );
+
+    if(!b) return;
+
+    const {
+      act,
+      id,
+      name
+    } = b.dataset;
+
+    try{
+
+      /* APPROVE */
+
+      if(act === "approve"){
+
+        if(
+          !confirm(
+            "Approve this payment?"
+          )
+        ){
+          return;
+        }
+
+        const {
+          error
+        } = await db.rpc(
+          "approve_payment",
+          {
+            p_payment_id:id
+          }
+        );
+
+        if(error){
+          throw error;
+        }
+
+        showAlert(
+          "Payment approved.",
+          "success"
+        );
+
+        await loadPayments();
+      }
+
+      /* REJECT */
+
+      else if(act === "reject"){
+
+        const reason =
+          prompt(
+            "Reason for rejecting this payment (e.g. M-Pesa code not found):"
+          );
+
+        if(reason === null){
+          return;
+        }
+
+        const {
+          error
+        } = await db.rpc(
+          "reject_payment",
+          {
+            p_payment_id:id,
+            p_reason:reason
+          }
+        );
+
+        if(error){
+          throw error;
+        }
+
+        showAlert(
+          "Payment rejected.",
+          "success"
+        );
+
+        await loadPayments();
+      }
+
+      /* DELETE STUDENT */
+
+      else if(
+        act === "del-student"
+      ){
+
+        const confirmation =
+          prompt(
+            `Permanently delete ${name} and their unpaid records?
+
+Students with confirmed payments cannot be deleted.
+
+Type DELETE to continue:`
+          );
+
+        if(
+          confirmation !==
+          "DELETE"
+        ){
+
+          showAlert(
+            "Delete cancelled. You must type DELETE in capital letters."
+          );
+
+          return;
+        }
+
+        const {
+          error
+        } = await db.rpc(
+          "delete_student",
+          {
+            p_student_id:id
+          }
+        );
+
+        if(error){
+          throw error;
+        }
+
+        showAlert(
+          "Student deleted.",
+          "success"
+        );
+
+        await loadStudents();
+      }
+
+      /* DELETE WALK-IN JOB */
+
+      else if(
+        act === "del-job"
+      ){
+
+        const confirmation =
+          prompt(
+            `Permanently delete the job for ${name} and its unpaid records?
+
+Jobs with confirmed payments cannot be deleted.
+
+Type DELETE to continue:`
+          );
+
+        if(
+          confirmation !==
+          "DELETE"
+        ){
+
+          showAlert(
+            "Delete cancelled. You must type DELETE in capital letters."
+          );
+
+          return;
+        }
+
+        const {
+          error
+        } = await db.rpc(
+          "delete_printing_job",
+          {
+            p_job_id:id
+          }
+        );
+
+        if(error){
+          throw error;
+        }
+
+        showAlert(
+          "Walk-in job deleted.",
+          "success"
+        );
+
+        await loadClients();
+      }
+
+      await loadDashboard();
+
+    }catch(err){
+
+      console.error(err);
+
+      showAlert(
+        err.message ||
+        "Action failed."
+      );
+
+    }
+
+  }
+);
+
+/* ============================================================
+   FEES
+============================================================ */
+
+async function loadFees(){
+
+  const target =
+    $("feesTable");
+
+  target.innerHTML =
+    loadingHtml(
+      "Loading fee structures..."
+    );
+
+  const programme =
+    $("feeProgramme").value;
+
+  let q =
+    db
+      .from("fee_structures")
+      .select(`
+        id,
+        name,
+        programme,
+        driving_class_id,
+        computer_course_id,
+        amount,
+        description,
+        option_code,
+        unit,
+        quantity_based,
+        course_type,
+        is_active
+      `)
+      .order(
+        "name",
+        {
+          ascending:true
+        }
+      );
+
+  if(programme){
+
+    q =
+      q.eq(
+        "programme",
+        programme
+      );
+
+  }
+
+  const {
+    data,
+    error
+  } = await q;
+
+  if(error){
+    throw error;
+  }
+
+  if(
+    !data ||
+    !data.length
+  ){
+
+    target.innerHTML =
+      empty(
+        "No fee structures found."
+      );
+
+    return;
+  }
+
+  const dIds =
+    data
+      .map(
+        r => r.driving_class_id
+      )
+      .filter(Boolean);
+
+  const cIds =
+    data
+      .map(
+        r => r.computer_course_id
+      )
+      .filter(Boolean);
+
+  const none = {
+    data:[],
+    error:null
+  };
+
+  const [
+    dr,
+    cr
+  ] = await Promise.all([
+
+    dIds.length
+
+      ? db
+          .from("driving_classes")
+          .select(
+            "id,class_code,class_name"
+          )
+          .in(
+            "id",
+            dIds
+          )
+
+      : none,
+
+    cIds.length
+
+      ? db
+          .from("computer_courses")
+          .select(
+            "id,course_code,course_name"
+          )
+          .in(
+            "id",
+            cIds
+          )
+
+      : none
+
+  ]);
+
+  if(dr.error){
+    throw dr.error;
+  }
+
+  if(cr.error){
+    throw cr.error;
+  }
+
+  const dm =
+    byId(dr.data);
+
+  const cm =
+    byId(cr.data);
+
+  target.innerHTML =
+    tableHtml(
+
+      [
+        "Name",
+        "Programme",
+        "Course/Class",
+        "Amount",
+        "Unit",
+        "Quantity",
+        "Option",
+        "Type",
+        "Status"
+      ],
+
+      data.map(f => {
+
+        let course =
+          "—";
+
+        const d =
+          dm[f.driving_class_id];
+
+        const c =
+          cm[f.computer_course_id];
+
+        if(d){
+
+          course =
+            [
+              d.class_code,
+              d.class_name
+            ]
+            .filter(Boolean)
+            .join(" — ");
+
+        }
+
+        if(c){
+
+          course =
+            [
+              c.course_code,
+              c.course_name
+            ]
+            .filter(Boolean)
+            .join(" — ");
+
+        }
+
+        return [
+
+          cell(f.name),
+
+          cell(f.programme),
+
+          cell(course),
+
+          money(f.amount),
+
+          cell(f.unit),
+
+          f.quantity_based
+            ? "Yes"
+            : "No",
+
+          cell(f.option_code),
+
+          cell(f.course_type),
+
+          badge(
+            f.is_active
+              ? "active"
+              : "inactive"
+          )
+
+        ];
+
+      })
+
+    );
+}
+
+/* ============================================================
+   STAFF
+============================================================ */
+
+async function loadStaff(){
+
+  const target =
+    $("staffTable");
+
+  target.innerHTML =
+    loadingHtml(
+      "Loading staff..."
+    );
+
+  const {
+    data,
+    error
+  } = await db
+    .from("staff")
+    .select("*")
+    .order(
+      "created_at",
+      {
+        ascending:false
+      }
+    )
+    .limit(100);
+
+  if(error){
+    throw error;
+  }
+
+  target.innerHTML =
+    data && data.length
+
+      ? autoTable(
+          data,
+          {
+            activeCol:"is_active",
+            dateSuffix:true
+          }
+        )
+
+      : empty(
+          "No staff records found."
+        );
+}
+
+/* ============================================================
+   AUDIT
+============================================================ */
+
+async function loadAudit(){
+
+  const target =
+    $("auditTable");
+
+  target.innerHTML =
+    loadingHtml(
+      "Loading audit activity..."
+    );
+
+  const {
+    data,
+    error
+  } = await db
+    .from("audit_logs")
+    .select("*")
+    .order(
+      "created_at",
+      {
+        ascending:false
+      }
+    )
+    .limit(100);
+
+  if(error){
+    throw error;
+  }
+
+  target.innerHTML =
+    data && data.length
+
+      ? autoTable(
+          data,
+          {
+            dateSuffix:true
+          }
+        )
+
+      : empty(
+          "No audit activity found."
+        );
+}
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+
+$("logoutBtn")
+  .addEventListener(
+    "click",
+    async () => {
+
+      try{
+
+        if(db){
+
+          await db.auth.signOut();
+
+        }
+
+      }catch(e){
+
+        console.error(
+          "Logout:",
+          e
+        );
+
+      }finally{
+
+        window.location.href =
+          "admin-login.html";
+
+      }
+
+    }
+  );
+
+/* ============================================================
+   START DASHBOARD
+============================================================ */
+
+async function startDashboard(){
+
+  try{
+
+    initialiseDatabase();
+
+    if(
+      !(await checkAuthentication())
+    ){
+      return;
+    }
+
+    $("bootScreen")
+      .style
+      .display = "none";
+
+    $("app")
+      .style
+      .display = "block";
+
+    $("connectionStatus")
+      .textContent =
+      "Supabase connected";
+
+    await loadBranches();
+
+    await loadDashboard();
+
+  }catch(e){
+
+    console.error(
+      "Lashawn Super Admin startup error:",
+      e
+    );
+
+    showStartupError(
+      "The Super Admin Dashboard could not connect.",
+      e.message ||
+      String(e)
+    );
+
+  }
+
+}
+
+/* ============================================================
+   INITIALISE
+============================================================ */
+
+if(
+  document.readyState ===
+  "loading"
+){
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    startDashboard
+  );
+
+}else{
+
+  startDashboard();
+
+}
 </script>
+
 </body>
 </html>
