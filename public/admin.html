@@ -920,7 +920,8 @@ input[readonly]{
             <input
               id="quantity"
               type="number"
-              min="1"
+              min="0.5"
+              step="0.5"
               value="1">
 
           </div>
@@ -2346,6 +2347,11 @@ function updateFee(){
   const q =
     $("quantity");
 
+  const isBanner =
+    !!fee &&
+    /banner/i.test(
+      String(fee.name || "")
+    );
 
   if(!fee){
 
@@ -2358,6 +2364,9 @@ function updateFee(){
     };
 
     q.disabled = true;
+    q.min = "1";
+    q.step = "1";
+    q.value = "1";
 
     $("feeDescription")
       .textContent = "";
@@ -2370,24 +2379,55 @@ function updateFee(){
 
     if(fee.quantity_based){
 
-      qty =
-        Math.max(
-          1,
-          Number(q.value || 1)
-        );
+      /*
+       * Banner printing is charged per metre and starts
+       * from 0.5 metre. Quantities can be 0.5, 1.0,
+       * 1.5, 2.0, etc.
+       */
+      if(isBanner){
 
-      q.disabled = false;
+        q.disabled = false;
+        q.min = "0.5";
+        q.step = "0.5";
+
+        const current =
+          Number(q.value || 0);
+
+        qty =
+          current >= 0.5
+            ? Math.ceil(current * 2) / 2
+            : 0.5;
+
+        q.value = qty;
+
+      }
+
+      else{
+
+        q.disabled = false;
+        q.min = "1";
+        q.step = "1";
+
+        qty =
+          Math.max(
+            1,
+            Number(q.value || 1)
+          );
+
+        q.value = qty;
+
+      }
 
     }
 
     else{
 
       q.value = 1;
-
+      q.min = "1";
+      q.step = "1";
       q.disabled = true;
 
     }
-
 
     const unit =
       Number(fee.amount || 0);
@@ -2406,7 +2446,6 @@ function updateFee(){
         )
       );
 
-
     CALC = {
 
       unit,
@@ -2422,13 +2461,11 @@ function updateFee(){
 
     };
 
-
     $("feeDescription")
       .textContent =
         fee.description || "";
 
   }
-
 
   $("unitFee").value =
     money(CALC.unit);
@@ -4724,6 +4761,25 @@ function showReceipt(d){
     )}
 
     <hr>
+
+    <div
+      style="
+        text-align:center;
+        border:2px solid #000;
+        padding:8px;
+        margin:12px 0;
+        font-weight:900;
+        font-size:13px;
+        letter-spacing:.5px">
+      NO REFUND
+      <div
+        style="
+          font-size:10px;
+          font-weight:700;
+          margin-top:3px">
+        ALL PAYMENTS ARE NON-REFUNDABLE.
+      </div>
+    </div>
 
     <p
       style="
