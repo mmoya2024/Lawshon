@@ -21,6 +21,7 @@ button,input,select,textarea{font:inherit}
 .user-name{color:#fff;font-weight:800;margin-bottom:3px}
 .user-email{word-break:break-word;margin-bottom:10px}
 .main{margin-left:245px;padding:28px}
+.topbar{margin-bottom:18px}
 .topbar h1{margin:0;font-size:26px}
 .db-status{color:var(--muted);font-size:12px;margin:6px 0 24px}
 .db-status.ok{color:var(--green-dark)}
@@ -508,6 +509,7 @@ function showNotice(msg, type="info"){
 function setStatus(text, cls){
   $("dbStatus").textContent = text;
   $("dbStatus").className = "db-status " + (cls || "");
+  $("dbStatus").style.display = cls === "ok" ? "none" : "";
 }
 
 /* AUTH */
