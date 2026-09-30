@@ -212,7 +212,7 @@ input[readonly]{background:#f5f7fa}
           </div>
 
           <div class="form-group"><label>Unit Fee</label><input id="unitFee" value="KES 0.00" readonly></div>
-          <div class="form-group"><label>Quantity</label><input id="quantity" type="number" min="1" value="1"></div>
+          <div class="form-group"><label>Quantity</label><input id="quantity" type="number" min="0.1" step="0.1" value="1"></div>
           <div class="form-group"><label>Total Fee</label><input id="totalFee" value="KES 0.00" readonly></div>
           <div class="form-group"><label>Initial Payment</label><input id="amountPaid" type="number" min="0" step="0.01" value="0"></div>
           <div class="form-group"><label>Balance</label><input id="balance" value="KES 0.00" readonly></div>
@@ -662,7 +662,7 @@ function updateFee(){
     let qty = 1;
 
     if(fee.quantity_based){
-      qty = Math.max(1, Number(q.value || 1));
+      qty = Math.max(0.1, Math.round(Number(q.value || 1) * 10) / 10);
       q.disabled = false;
     }
     else{
@@ -671,7 +671,7 @@ function updateFee(){
     }
 
     const unit = Number(fee.amount || 0);
-    const total = unit * qty;
+    const total = Math.round(unit * qty * 100) / 100;
     const paid = Math.min(total, Math.max(0, Number($("amountPaid").value || 0)));
 
     CALC = {unit, qty, total, paid, balance: total - paid};
