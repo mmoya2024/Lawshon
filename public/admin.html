@@ -2171,8 +2171,11 @@ async function guard(){
 
   }
 
-  $("navApprovals").style.display =
-    IS_SUPER ? "" : "none";
+  const approvalsNav = $("navApprovals");
+  if(approvalsNav){
+    approvalsNav.style.display =
+      IS_SUPER ? "" : "none";
+  }
 
   setStatus(
     "● Connected to Supabase",
