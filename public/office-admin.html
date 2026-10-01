@@ -448,6 +448,10 @@ input[readonly]{
       Dashboard
     </button>
 
+    <button data-panel="mywork" id="navMyWork">
+      My Work Today
+    </button>
+
     <button data-panel="training">
       6-Week Training
     </button>
@@ -6465,6 +6469,7 @@ async function loadServices(){
 
 const LOADERS = {
   dashboard: loadOverviewPage,
+  mywork: loadMyWorkToday,
   training: loadTraining,
   registration: loadEnrolmentFormPage,
   students: loadStudents,
