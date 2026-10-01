@@ -456,12 +456,12 @@ input[readonly]{
       New Registration / Enrolment
     </button>
 
-    <button data-panel="students">
-      Students
-    </button>
-
     <button data-panel="walkins">
       Walk-in Clients
+    </button>
+
+    <button data-panel="students">
+      Students
     </button>
 
     <button data-panel="enrolments">
@@ -3061,6 +3061,23 @@ async function saveEnrolment(e){
        STUDENT REGISTRATION
     ------------------------------------------------------- */
 
+    // Re-check the live Supabase session immediately before the RPC.
+    // This prevents a stale/expired browser session from reaching the
+    // registration function and being reported simply as "authentication required".
+    let { data: liveSessionData, error: liveSessionError } =
+      await DB.auth.getSession();
+
+    if(liveSessionError)
+      throw new Error("Authentication check failed: " + liveSessionError.message);
+
+    if(!liveSessionData?.session){
+      const refreshed = await DB.auth.refreshSession();
+      if(refreshed.error)
+        throw new Error("Your login session has expired. Please log in again.");
+      if(!refreshed.data?.session)
+        throw new Error("Authentication required. Please log in again.");
+    }
+
     const {
       data,
       error
@@ -3127,8 +3144,13 @@ async function saveEnrolment(e){
       );
 
 
-    if(error)
-      throw error;
+    if(error){
+      const msg = error.message || "Registration failed.";
+      if(/authentication required|jwt|not authenticated|auth\.uid/i.test(msg)){
+        throw new Error("Authentication required. Your login session is no longer valid. Please log out and log in again.");
+      }
+      throw new Error(msg);
+    }
 
 
     const r =
