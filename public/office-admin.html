@@ -3385,54 +3385,26 @@ async function saveEnrolment(e){
 ============================================================ */
 
 async function loadOverview(){
+  const {data,error}=await DB.rpc("get_office_dashboard");
+  if(error) throw error;
+  const summary=data?.summary||{};
+  const user=data?.user||{};
 
-  const todayStart = new Date();
-  todayStart.setHours(0,0,0,0);
-  const todayEnd = new Date(todayStart);
-  todayEnd.setDate(todayEnd.getDate()+1);
-  const from = todayStart.toISOString();
-  const to = todayEnd.toISOString();
+  if(user.branch_name){
+    CURRENT_BRANCH_ID=user.branch_id||null;
+    CURRENT_BRANCH_NAME=user.branch_name;
+  }
 
-  const b = CURRENT_BRANCH_ID;
-
-  const studentsQ = b
-    ? DB.from(T.students).select("id",{count:"exact",head:true}).eq("branch_id",b)
-    : DB.from(T.students).select("id",{count:"exact",head:true});
-  const enrolmentsQ = b
-    ? DB.from(T.enrolments).select("id",{count:"exact",head:true}).eq("branch_id",b)
-    : DB.from(T.enrolments).select("id",{count:"exact",head:true});
-  const jobsQ = b
-    ? DB.from("printing_jobs").select("id",{count:"exact",head:true}).eq("branch_id",b)
-    : DB.from("printing_jobs").select("id",{count:"exact",head:true});
-
-  const [s,e,j,p,f,q,se,todayP] = await Promise.all([
-    studentsQ, enrolmentsQ, jobsQ,
-    DB.from(T.payments).select("amount,printing_job_id").eq("status","CONFIRMED").limit(10000),
-    DB.from(T.fees).select("id",{count:"exact",head:true}).eq("is_active",true),
-    DB.from(T.payments).select("id",{count:"exact",head:true}).eq("status","PENDING"),
-    DB.from(T.selfEnrolments).select("id",{count:"exact",head:true}).in("status",["PENDING_PAYMENT","PENDING_VERIFICATION"]),
-    DB.from(T.payments).select("amount").eq("status","CONFIRMED").gte("payment_date",from).lt("payment_date",to).limit(10000)
-  ]);
-
-  for(const x of [s,e,j,p,f,q,se,todayP]) if(x.error) throw x.error;
-
-  let stu=0, prt=0;
-  (p.data||[]).forEach(r=>{
-    if(r.printing_job_id) prt += Number(r.amount||0);
-    else stu += Number(r.amount||0);
-  });
-  const todayRev=(todayP.data||[]).reduce((sum,r)=>sum+Number(r.amount||0),0);
-
-  $("statStudents").textContent=s.count??0;
-  $("statEnrolments").textContent=e.count??0;
-  $("statJobs").textContent=j.count??0;
-  $("statFees").textContent=f.count??0;
-  $("statStudentRev").textContent=money(stu);
-  $("statPrintRev").textContent=money(prt);
-  $("statTotalRev").textContent=money(stu+prt);
-  $("statTodayRev").textContent=money(todayRev);
-  $("statPending").textContent=q.count??0;
-  $("statSelfEnrolments").textContent=se.count??0;
+  $("statStudents").textContent=Number(summary.students||0);
+  $("statEnrolments").textContent=Number(summary.enrolments||0);
+  $("statJobs").textContent=Number(summary.printing_jobs||0);
+  $("statFees").textContent=Number(summary.active_fee_structures||0);
+  $("statStudentRev").textContent=money(summary.student_revenue);
+  $("statPrintRev").textContent=money(summary.printing_revenue);
+  $("statTotalRev").textContent=money(summary.total_revenue);
+  $("statTodayRev").textContent=money(summary.today_revenue);
+  $("statPending").textContent=Number(summary.pending_payments||0);
+  $("statSelfEnrolments").textContent=Number(summary.pending_self_enrolments||0);
 }
 
 
@@ -3442,35 +3414,77 @@ async function loadOverview(){
 async function loadMyWorkToday(){
   const target=$("myWorkActivity");
   target.innerHTML=`<div class="hint">Loading today's work...</div>`;
-  const start=new Date(); start.setHours(0,0,0,0);
-  const end=new Date(start); end.setDate(end.getDate()+1);
-  const from=start.toISOString(), to=end.toISOString();
-  $("myWorkUser").textContent=CURRENT_USER_EMAIL||"Office Admin";
-  $("myWorkBranch").textContent="Branch: "+(CURRENT_BRANCH_NAME||"All branches");
-  const b=CURRENT_BRANCH_ID;
-  const [studentsRes,enrolmentsRes,jobsRes,paymentsRes,invoicesRes,receiptsRes]=await Promise.all([
-    (b?DB.from(T.students).select("id,student_number,first_name,middle_name,last_name,created_at,branch_id,status").eq("branch_id",b):DB.from(T.students).select("id,student_number,first_name,middle_name,last_name,created_at,branch_id,status")).gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
-    (b?DB.from(T.enrolments).select("id,enrolment_number,student_id,programme,created_at,branch_id,status").eq("branch_id",b):DB.from(T.enrolments).select("id,enrolment_number,student_id,programme,created_at,branch_id,status")).gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
-    (b?DB.from("printing_jobs").select("id,job_number,created_at,status,branch_id,total_amount,total").eq("branch_id",b):DB.from("printing_jobs").select("id,job_number,created_at,status,branch_id,total_amount,total")).gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
-    DB.from(T.payments).select("id,payment_number,student_id,enrolment_id,printing_job_id,amount,payment_method,payment_date,status,received_by,created_at").eq("status","CONFIRMED").gte("payment_date",from).lt("payment_date",to).order("payment_date",{ascending:false}),
-    DB.from(T.invoices).select("id,invoice_number,student_id,enrolment_id,printing_job_id,total_amount,created_at,created_by,status").gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
-    DB.from("receipts").select("id,student_id,created_at").gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false})
-  ]);
-  const students=studentsRes.data||[], enrolments=enrolmentsRes.data||[], jobs=jobsRes.data||[];
-  const studentIds=new Set(students.map(x=>x.id)), enrolmentIds=new Set(enrolments.map(x=>x.id)), jobIds=new Set(jobs.map(x=>x.id));
-  const authId=window.__lashawnSessionUserId||"", staffId=window.__lashawnStaffId||"";
-  const payments=(paymentsRes.data||[]).filter(p=>(p.received_by&&[String(authId),String(staffId)].includes(String(p.received_by)))||(p.student_id&&studentIds.has(p.student_id))||(p.enrolment_id&&enrolmentIds.has(p.enrolment_id))||(p.printing_job_id&&jobIds.has(p.printing_job_id)));
-  const invoices=(invoicesRes.data||[]).filter(i=>(i.created_by&&[String(authId),String(staffId)].includes(String(i.created_by)))||(i.student_id&&studentIds.has(i.student_id))||(i.enrolment_id&&enrolmentIds.has(i.enrolment_id))||(i.printing_job_id&&jobIds.has(i.printing_job_id)));
-  const receipts=receiptsRes.data||[], amount=payments.reduce((sum,p)=>sum+Number(p.amount||0),0);
-  $("workStudents").textContent=students.length; $("workEnrolments").textContent=enrolments.length; $("workJobs").textContent=jobs.length; $("workPayments").textContent=payments.length; $("workAmount").textContent=money(amount); $("workInvoices").textContent=invoices.length; $("workReceipts").textContent=receipts.length;
+
+  const {data,error}=await DB.rpc("get_office_dashboard");
+  if(error) throw error;
+
+  const user=data?.user||{};
+  const work=data?.work||{};
+  const students=Array.isArray(work.students)?work.students:[];
+  const enrolments=Array.isArray(work.enrolments)?work.enrolments:[];
+  const jobs=Array.isArray(work.printing_jobs)?work.printing_jobs:[];
+  const payments=Array.isArray(work.payments)?work.payments:[];
+  const invoices=Array.isArray(work.invoices)?work.invoices:[];
+  const receipts=Array.isArray(work.receipts)?work.receipts:[];
+
+  $("myWorkUser").textContent=CURRENT_USER_EMAIL||user.email||"Office Admin";
+  $("myWorkBranch").textContent="Branch: "+(user.branch_name||CURRENT_BRANCH_NAME||"All branches");
+
+  $("workStudents").textContent=students.length;
+  $("workEnrolments").textContent=enrolments.length;
+  $("workJobs").textContent=jobs.length;
+  $("workPayments").textContent=payments.length;
+  $("workAmount").textContent=money(payments.reduce((sum,p)=>sum+Number(p.amount||0),0));
+  $("workInvoices").textContent=invoices.length;
+  $("workReceipts").textContent=receipts.length;
+
   const activity=[];
-  students.forEach(x=>activity.push({time:x.created_at,type:"Student registered",reference:x.student_number,description:fullName(x),amount:null,status:x.status}));
-  enrolments.forEach(x=>activity.push({time:x.created_at,type:"Enrolment created",reference:x.enrolment_number,description:x.programme,amount:null,status:x.status}));
-  jobs.forEach(x=>activity.push({time:x.created_at,type:"Walk-in job",reference:x.job_number||x.id,description:"Printing / service job",amount:x.total_amount??x.total,status:x.status}));
-  payments.forEach(x=>activity.push({time:x.payment_date||x.created_at,type:"Payment received",reference:x.payment_number||x.id,description:x.payment_method||"Payment",amount:x.amount,status:x.status}));
-  invoices.forEach(x=>activity.push({time:x.created_at,type:"Invoice created",reference:x.invoice_number||x.id,description:"Invoice",amount:x.total_amount,status:x.status}));
+  students.forEach(x=>activity.push({
+    time:x.created_at,
+    type:"Student registered",
+    reference:x.student_number,
+    description:fullName(x),
+    amount:null,
+    status:x.status
+  }));
+  enrolments.forEach(x=>activity.push({
+    time:x.created_at,
+    type:"Enrolment created",
+    reference:x.enrolment_number,
+    description:x.programme,
+    amount:null,
+    status:x.status
+  }));
+  jobs.forEach(x=>activity.push({
+    time:x.created_at,
+    type:"Walk-in job",
+    reference:x.job_number||x.id,
+    description:"Printing / service job",
+    amount:x.total_amount,
+    status:x.status
+  }));
+  payments.forEach(x=>activity.push({
+    time:x.payment_date||x.created_at,
+    type:"Payment received",
+    reference:x.payment_number||x.id,
+    description:x.payment_method||"Payment",
+    amount:x.amount,
+    status:x.status
+  }));
+  invoices.forEach(x=>activity.push({
+    time:x.created_at,
+    type:"Invoice created",
+    reference:x.invoice_number||x.id,
+    description:"Invoice",
+    amount:x.total_amount,
+    status:x.status
+  }));
+
   activity.sort((a,b)=>new Date(b.time)-new Date(a.time));
-  target.innerHTML=activity.length?`<table class="table"><thead><tr><th>Time</th><th>Activity</th><th>Reference</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody>${activity.map(a=>`<tr><td>${esc(new Date(a.time).toLocaleTimeString("en-KE",{hour:"2-digit",minute:"2-digit"}))}</td><td><strong>${esc(a.type)}</strong></td><td>${esc(a.reference)}</td><td>${esc(a.description)}</td><td>${a.amount==null?"—":money(a.amount)}</td><td>${a.status?badge(a.status):"—"}</td></tr>`).join("")}</tbody></table>`:`<div class="empty">No work recorded for this branch today.</div>`;
+
+  target.innerHTML=activity.length
+    ? `<table class="table"><thead><tr><th>Time</th><th>Activity</th><th>Reference</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody>${activity.map(a=>`<tr><td>${esc(new Date(a.time).toLocaleTimeString("en-KE",{hour:"2-digit",minute:"2-digit"}))}</td><td><strong>${esc(a.type)}</strong></td><td>${esc(a.reference||"—")}</td><td>${esc(a.description||"—")}</td><td>${a.amount==null?"—":money(a.amount)}</td><td>${a.status?badge(a.status):"—"}</td></tr>`).join("")}</tbody></table>`
+    : `<div class="empty">No work recorded for this branch today.</div>`;
 }
 
 
