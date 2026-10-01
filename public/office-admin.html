@@ -3437,159 +3437,194 @@ async function loadOverview(){
 
 
 /* ============================================================
-   MY WORK TODAY – FIXED
+   MY WORK TODAY – FULLY FIXED
 ============================================================ */
 async function loadMyWorkToday(){
-  const target=$("myWorkActivity");
-  target.innerHTML=`<div class="hint">Loading today's work...</div>`;
+  const target = $("myWorkActivity");
+  target.innerHTML = `<div class="hint">Loading today's work...</div>`;
 
-  // Use local date boundaries
-  const start=new Date(); start.setHours(0,0,0,0);
-  const end=new Date(start); end.setDate(end.getDate()+1);
-  const from=start.toISOString(), to=end.toISOString();
+  // Use local date boundaries (midnight to midnight)
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 1);
 
-  $("myWorkUser").textContent=CURRENT_USER_EMAIL||"Office Admin";
-  $("myWorkBranch").textContent="Branch: "+(CURRENT_BRANCH_NAME||"All branches");
+  const from = start.toISOString();
+  const to = end.toISOString();
 
-  const b=CURRENT_BRANCH_ID;
+  $("myWorkUser").textContent = CURRENT_USER_EMAIL || "Office Admin";
+  $("myWorkBranch").textContent = "Branch: " + (CURRENT_BRANCH_NAME || "All branches");
 
-  // --- Students registered today (branch filter) ---
-  const [studentsRes,enrolmentsRes,jobsRes,paymentsRes,invoicesRes,receiptsRes]=await Promise.all([
-    (b
-      ? DB.from(T.students).select("id,student_number,first_name,middle_name,last_name,created_at,branch_id,status").eq("branch_id",b)
-      : DB.from(T.students).select("id,student_number,first_name,middle_name,last_name,created_at,branch_id,status")
-    ).gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
+  const b = CURRENT_BRANCH_ID;
 
-    (b
-      ? DB.from(T.enrolments).select("id,enrolment_number,student_id,programme,created_at,branch_id,status").eq("branch_id",b)
-      : DB.from(T.enrolments).select("id,enrolment_number,student_id,programme,created_at,branch_id,status")
-    ).gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
+  try {
+    // ── 1. Students registered today (branch-filtered) ──
+    let studentsQuery = DB.from(T.students)
+      .select("id,student_number,first_name,middle_name,last_name,created_at,branch_id,status")
+      .gte("created_at", from)
+      .lt("created_at", to)
+      .order("created_at", { ascending: false });
+    if (b) studentsQuery = studentsQuery.eq("branch_id", b);
+    const studentsRes = await studentsQuery;
 
-    (b
-      ? DB.from("printing_jobs").select("id,job_number,created_at,status,branch_id,total_amount,total").eq("branch_id",b)
-      : DB.from("printing_jobs").select("id,job_number,created_at,status,branch_id,total_amount,total")
-    ).gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
+    // ── 2. Enrolments created today (branch-filtered) ──
+    let enrolmentsQuery = DB.from(T.enrolments)
+      .select("id,enrolment_number,student_id,programme,created_at,branch_id,status")
+      .gte("created_at", from)
+      .lt("created_at", to)
+      .order("created_at", { ascending: false });
+    if (b) enrolmentsQuery = enrolmentsQuery.eq("branch_id", b);
+    const enrolmentsRes = await enrolmentsQuery;
 
-    // Payments: use created_at for today's filter, branch-agnostic (because payment might belong to student from another branch)
-    DB.from(T.payments)
+    // ── 3. Walk-in / printing jobs today (branch-filtered) ──
+    let jobsQuery = DB.from("printing_jobs")
+      .select("id,job_number,created_at,status,branch_id,total_amount,total")
+      .gte("created_at", from)
+      .lt("created_at", to)
+      .order("created_at", { ascending: false });
+    if (b) jobsQuery = jobsQuery.eq("branch_id", b);
+    const jobsRes = await jobsQuery;
+
+    // ── 4. Payments received today ──
+    // No branch filter — a payment may belong to any student.
+    // Filter only by created_at (today).
+    const paymentsRes = await DB
+      .from(T.payments)
       .select("id,payment_number,student_id,enrolment_id,printing_job_id,amount,payment_method,payment_date,created_at,status,received_by")
-      .eq("status","CONFIRMED")
-      .gte("created_at",from)
-      .lt("created_at",to)
-      .order("created_at",{ascending:false}),
+      .eq("status", "CONFIRMED")
+      .gte("created_at", from)
+      .lt("created_at", to)
+      .order("created_at", { ascending: false });
 
-    (b
-      ? DB.from(T.invoices).select("id,invoice_number,student_id,enrolment_id,printing_job_id,total_amount,created_at,created_by,status").eq("branch_id",b) // might not have branch_id
-      : DB.from(T.invoices).select("id,invoice_number,student_id,enrolment_id,printing_job_id,total_amount,created_at,created_by,status")
-    ).gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
+    // ── 5. Invoices created today ──
+    // IMPORTANT: invoices table does NOT have branch_id.
+    // Filter only by created_at.
+    const invoicesRes = await DB
+      .from(T.invoices)
+      .select("id,invoice_number,student_id,enrolment_id,printing_job_id,total_amount,created_at,created_by,status")
+      .gte("created_at", from)
+      .lt("created_at", to)
+      .order("created_at", { ascending: false });
 
-    DB.from("receipts").select("id,student_id,created_at").gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false})
-  ]);
+    // ── 6. Receipts today ──
+    const receiptsRes = await DB
+      .from("receipts")
+      .select("id,student_id,created_at")
+      .gte("created_at", from)
+      .lt("created_at", to)
+      .order("created_at", { ascending: false });
 
-  // Log errors if any
-  const responses = { studentsRes, enrolmentsRes, jobsRes, paymentsRes, invoicesRes, receiptsRes };
-  for (const [key, res] of Object.entries(responses)) {
-    if (res.error) console.error(`Error in ${key}:`, res.error);
-  }
+    // ── Check for errors ──
+    const allRes = { studentsRes, enrolmentsRes, jobsRes, paymentsRes, invoicesRes, receiptsRes };
+    for (const [key, res] of Object.entries(allRes)) {
+      if (res.error) {
+        console.error(`My Work Today – ${key} error:`, res.error);
+        throw new Error(`${key}: ${res.error.message}`);
+      }
+    }
 
-  const students = studentsRes.data || [];
-  const enrolments = enrolmentsRes.data || [];
-  const jobs = jobsRes.data || [];
-  const payments = paymentsRes.data || [];      // already filtered by created_at
-  const invoices = invoicesRes.data || [];
-  const receipts = receiptsRes.data || [];
+    const students = studentsRes.data || [];
+    const enrolments = enrolmentsRes.data || [];
+    const jobs = jobsRes.data || [];
+    const payments = paymentsRes.data || [];
+    const invoices = invoicesRes.data || [];
+    const receipts = receiptsRes.data || [];
 
-  // Compute totals
-  const amount = payments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
+    // ── Compute total amount ──
+    const amount = payments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
 
-  // Update stat cards
-  $("workStudents").textContent = students.length;
-  $("workEnrolments").textContent = enrolments.length;
-  $("workJobs").textContent = jobs.length;
-  $("workPayments").textContent = payments.length;
-  $("workAmount").textContent = money(amount);
-  $("workInvoices").textContent = invoices.length;
-  $("workReceipts").textContent = receipts.length;
+    // ── Update stat cards ──
+    $("workStudents").textContent = students.length;
+    $("workEnrolments").textContent = enrolments.length;
+    $("workJobs").textContent = jobs.length;
+    $("workPayments").textContent = payments.length;
+    $("workAmount").textContent = money(amount);
+    $("workInvoices").textContent = invoices.length;
+    $("workReceipts").textContent = receipts.length;
 
-  // Build activity feed
-  const activity = [];
+    // ── Build activity feed ──
+    const activity = [];
 
-  students.forEach(x => activity.push({
-    time: x.created_at,
-    type: "Student registered",
-    reference: x.student_number,
-    description: fullName(x),
-    amount: null,
-    status: x.status
-  }));
+    students.forEach(x => activity.push({
+      time: x.created_at,
+      type: "Student registered",
+      reference: x.student_number || "—",
+      description: fullName(x) || "—",
+      amount: null,
+      status: x.status
+    }));
 
-  enrolments.forEach(x => activity.push({
-    time: x.created_at,
-    type: "Enrolment created",
-    reference: x.enrolment_number,
-    description: x.programme,
-    amount: null,
-    status: x.status
-  }));
+    enrolments.forEach(x => activity.push({
+      time: x.created_at,
+      type: "Enrolment created",
+      reference: x.enrolment_number || "—",
+      description: x.programme || "—",
+      amount: null,
+      status: x.status
+    }));
 
-  jobs.forEach(x => activity.push({
-    time: x.created_at,
-    type: "Walk-in job",
-    reference: x.job_number || x.id,
-    description: "Printing / service job",
-    amount: x.total_amount ?? x.total,
-    status: x.status
-  }));
+    jobs.forEach(x => activity.push({
+      time: x.created_at,
+      type: "Walk-in job",
+      reference: x.job_number || x.id,
+      description: "Printing / service job",
+      amount: x.total_amount ?? x.total ?? null,
+      status: x.status
+    }));
 
-  // Use created_at for consistency; fall back to payment_date
-  payments.forEach(x => activity.push({
-    time: x.created_at || x.payment_date,
-    type: "Payment received",
-    reference: x.payment_number || x.id,
-    description: x.payment_method || "Payment",
-    amount: x.amount,
-    status: x.status
-  }));
+    payments.forEach(x => activity.push({
+      time: x.created_at || x.payment_date,
+      type: "Payment received",
+      reference: x.payment_number || x.id,
+      description: x.payment_method || "Payment",
+      amount: x.amount,
+      status: x.status
+    }));
 
-  invoices.forEach(x => activity.push({
-    time: x.created_at,
-    type: "Invoice created",
-    reference: x.invoice_number || x.id,
-    description: "Invoice",
-    amount: x.total_amount,
-    status: x.status
-  }));
+    invoices.forEach(x => activity.push({
+      time: x.created_at,
+      type: "Invoice created",
+      reference: x.invoice_number || x.id,
+      description: "Invoice",
+      amount: x.total_amount,
+      status: x.status
+    }));
 
-  // Sort by time descending
-  activity.sort((a,b) => new Date(b.time) - new Date(a.time));
+    // Sort descending by time
+    activity.sort((a, b) => new Date(b.time) - new Date(a.time));
 
-  // Render activity table
-  target.innerHTML = activity.length
-    ? `<table class="table">
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>Activity</th>
-            <th>Reference</th>
-            <th>Description</th>
-            <th>Amount</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${activity.map(a => `
+    // Render
+    target.innerHTML = activity.length
+      ? `<table class="table">
+          <thead>
             <tr>
-              <td>${esc(new Date(a.time).toLocaleTimeString("en-KE",{hour:"2-digit",minute:"2-digit"}))}</td>
-              <td><strong>${esc(a.type)}</strong></td>
-              <td>${esc(a.reference)}</td>
-              <td>${esc(a.description)}</td>
-              <td>${a.amount == null ? "—" : money(a.amount)}</td>
-              <td>${a.status ? badge(a.status) : "—"}</td>
+              <th>Time</th>
+              <th>Activity</th>
+              <th>Reference</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Status</th>
             </tr>
-          `).join("")}
-        </tbody>
-      </table>`
-    : `<div class="empty">No work recorded for this branch today.</div>`;
+          </thead>
+          <tbody>
+            ${activity.map(a => `
+              <tr>
+                <td>${esc(new Date(a.time).toLocaleTimeString("en-KE", { hour: "2-digit", minute: "2-digit" }))}</td>
+                <td><strong>${esc(a.type)}</strong></td>
+                <td>${esc(a.reference)}</td>
+                <td>${esc(a.description)}</td>
+                <td>${a.amount == null ? "—" : money(a.amount)}</td>
+                <td>${a.status ? badge(a.status) : "—"}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>`
+      : `<div class="empty">No work recorded for this branch today.</div>`;
+
+  } catch (err) {
+    console.error("loadMyWorkToday failed:", err);
+    target.innerHTML = `<div class="notice err">${esc(err.message || "Could not load today's work.")}</div>`;
+  }
 }
 
 
