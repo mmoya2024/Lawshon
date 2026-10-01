@@ -448,10 +448,6 @@ input[readonly]{
       Dashboard
     </button>
 
-    <button data-panel="mywork" id="navMyWork">
-      My Work Today
-    </button>
-
     <button data-panel="training">
       6-Week Training
     </button>
@@ -1499,40 +1495,71 @@ input[readonly]{
     <div class="page-heading">
       <div>
         <h2>Walk-in Clients</h2>
-        <p>List of customers who visited the office for one-off services. Driving and computer students are managed under Students and Enrolments.</p>
+        <p>One-off services for clients who visit the office. Driving and computer lessons are handled under enrolment.</p>
       </div>
       <button class="btn btn-light" id="refreshWalkins">↻ Refresh</button>
     </div>
 
     <div id="walkinAlert"></div>
 
-    <div class="card table-card">
-      <div class="table-head">
-        <div>
-          <h3>Walk-in Customers</h3>
-          <p class="hint">These are service customers only — not driving or computer lesson registrations.</p>
+    <div class="card">
+      <div class="table-head"><h3>New Walk-in Service</h3></div>
+      <form id="walkinForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="walkinName">Client Name *</label>
+            <input id="walkinName" required placeholder="Enter client's name">
+          </div>
+          <div class="form-group">
+            <label for="walkinPhone">Phone Number</label>
+            <input id="walkinPhone" type="tel" placeholder="07XXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label for="walkinService">Service *</label>
+            <select id="walkinService" required><option value="">Loading services...</option></select>
+            <div class="hint">Only Cyber / Digital and Printing services are shown here. Driving and computer courses are excluded.</div>
+          </div>
+          <div class="form-group">
+            <label for="walkinQuantity">Quantity *</label>
+            <input id="walkinQuantity" type="number" min="1" step="1" value="1" required>
+          </div>
+          <div class="form-group">
+            <label for="walkinUnitPrice">Rate</label>
+            <input id="walkinUnitPrice" type="number" readonly>
+          </div>
+          <div class="form-group">
+            <label for="walkinTotal">Total</label>
+            <input id="walkinTotal" type="number" readonly>
+          </div>
+          <div class="form-group">
+            <label for="walkinPaymentMethod">Payment Method *</label>
+            <select id="walkinPaymentMethod" required>
+              <option value="CASH">Cash</option><option value="MPESA">M-Pesa</option><option value="BANK">Bank Transfer</option><option value="CARD">Card</option><option value="CHEQUE">Cheque</option><option value="OTHER">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="walkinReference">Payment Reference</label>
+            <input id="walkinReference" placeholder="M-Pesa code / receipt / reference">
+          </div>
+          <div class="form-group full">
+            <label for="walkinNotes">Notes</label>
+            <textarea id="walkinNotes" rows="2" placeholder="Optional notes"></textarea>
+          </div>
         </div>
-      </div>
-      <div class="toolbar">
-        <input type="search" id="walkinSearch" class="search" placeholder="Search client, phone, service, job or receipt number...">
-      </div>
+        <div class="actions">
+          <button class="btn btn-success" type="submit" id="saveWalkinBtn">Save Walk-in &amp; Receive Payment</button>
+          <button class="btn outline" type="button" id="resetWalkinBtn">Clear</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card table-card">
+      <div class="table-head"><h3>Walk-in Client Transactions</h3></div>
+      <div class="toolbar"><input type="search" id="walkinSearch" class="search" placeholder="Search client, service or job number..."></div>
       <div class="table-wrap">
         <table class="table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Client Name</th>
-              <th>Phone</th>
-              <th>Service</th>
-              <th>Qty</th>
-              <th>Amount</th>
-              <th>Payment</th>
-              <th>Reference</th>
-              <th>Job / Receipt</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="walkinsTable"><tr><td colspan="10" class="empty">Loading walk-in customers...</td></tr></tbody>
+          <thead><tr><th>Date</th><th>Client Name</th><th>Service</th><th>Qty</th><th>Total</th><th>Status</th><th>Job No.</th></tr></thead>
+          <tbody id="walkinsTable"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1968,16 +1995,6 @@ function enr(r){
   return null;
 
 }
-
-const badge = status => {
-  const value = String(status ?? "—").trim();
-  const normalized = value.toUpperCase();
-  let cls = "";
-  if (["PAID","ACTIVE","COMPLETED","CONFIRMED","VERIFIED","SUCCESS","SUCCESSFUL"].includes(normalized)) cls = "green";
-  else if (["PENDING","PARTIAL","PROCESSING","IN_PROGRESS","UNPAID"].includes(normalized)) cls = "yellow";
-  else if (["CANCELLED","CANCELED","FAILED","REJECTED","OVERDUE","INACTIVE"].includes(normalized)) cls = "red";
-  return `<span class="pill ${cls}">${esc(value)}</span>`;
-};
 
 const today = () =>
   new Date()
@@ -3441,36 +3458,143 @@ async function loadOverview(){
 ============================================================ */
 async function loadMyWorkToday(){
   const target=$("myWorkActivity");
+  if(!target) return;
   target.innerHTML=`<div class="hint">Loading today's work...</div>`;
-  const start=new Date(); start.setHours(0,0,0,0);
-  const end=new Date(start); end.setDate(end.getDate()+1);
-  const from=start.toISOString(), to=end.toISOString();
+
+  const start=new Date();
+  start.setHours(0,0,0,0);
+  const end=new Date(start);
+  end.setDate(end.getDate()+1);
+  const from=start.toISOString();
+  const to=end.toISOString();
+
   $("myWorkUser").textContent=CURRENT_USER_EMAIL||"Office Admin";
   $("myWorkBranch").textContent="Branch: "+(CURRENT_BRANCH_NAME||"All branches");
+
   const b=CURRENT_BRANCH_ID;
+  const authId=String(window.__lashawnSessionUserId||"");
+  const staffId=String(window.__lashawnStaffId||"");
+
+  /*
+     IMPORTANT:
+     My Work Today is not limited to records CREATED today by the student.
+     A payment made today for an older student is still today's work.
+     Likewise, an invoice/payment/job may have been created by this staff
+     member even when the linked student was registered earlier.
+  */
+  const branchQuery=(table,columns)=>{
+    let q=DB.from(table).select(columns).gte("created_at",from).lt("created_at",to);
+    if(b) q=q.eq("branch_id",b);
+    return q.order("created_at",{ascending:false});
+  };
+
   const [studentsRes,enrolmentsRes,jobsRes,paymentsRes,invoicesRes,receiptsRes]=await Promise.all([
-    (b?DB.from(T.students).select("id,student_number,first_name,middle_name,last_name,created_at,branch_id,status").eq("branch_id",b):DB.from(T.students).select("id,student_number,first_name,middle_name,last_name,created_at,branch_id,status")).gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
-    (b?DB.from(T.enrolments).select("id,enrolment_number,student_id,programme,created_at,branch_id,status").eq("branch_id",b):DB.from(T.enrolments).select("id,enrolment_number,student_id,programme,created_at,branch_id,status")).gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
-    (b?DB.from("printing_jobs").select("id,job_number,created_at,status,branch_id,total_amount,total").eq("branch_id",b):DB.from("printing_jobs").select("id,job_number,created_at,status,branch_id,total_amount,total")).gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
-    DB.from(T.payments).select("id,payment_number,student_id,enrolment_id,printing_job_id,amount,payment_method,payment_date,status,received_by,created_at").eq("status","CONFIRMED").gte("payment_date",from).lt("payment_date",to).order("payment_date",{ascending:false}),
-    DB.from(T.invoices).select("id,invoice_number,student_id,enrolment_id,printing_job_id,total_amount,created_at,created_by,status").gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false}),
-    DB.from("receipts").select("id,student_id,created_at").gte("created_at",from).lt("created_at",to).order("created_at",{ascending:false})
+    branchQuery(T.students,"id,student_number,first_name,middle_name,last_name,created_at,branch_id,status"),
+    branchQuery(T.enrolments,"id,enrolment_number,student_id,programme,created_at,branch_id,status"),
+    branchQuery("printing_jobs","id,job_number,created_at,status,branch_id,total_amount,total,amount"),
+    DB.from(T.payments)
+      .select("id,payment_number,student_id,enrolment_id,printing_job_id,amount,payment_method,payment_date,status,received_by,created_at")
+      .eq("status","CONFIRMED")
+      .gte("created_at",from)
+      .lt("created_at",to)
+      .order("created_at",{ascending:false}),
+    DB.from(T.invoices)
+      .select("id,invoice_number,student_id,enrolment_id,printing_job_id,total_amount,created_at,created_by,status")
+      .gte("created_at",from)
+      .lt("created_at",to)
+      .order("created_at",{ascending:false}),
+    DB.from("receipts")
+      .select("id,student_id,created_at")
+      .gte("created_at",from)
+      .lt("created_at",to)
+      .order("created_at",{ascending:false})
   ]);
-  const students=studentsRes.data||[], enrolments=enrolmentsRes.data||[], jobs=jobsRes.data||[];
-  const studentIds=new Set(students.map(x=>x.id)), enrolmentIds=new Set(enrolments.map(x=>x.id)), jobIds=new Set(jobs.map(x=>x.id));
-  const authId=window.__lashawnSessionUserId||"", staffId=window.__lashawnStaffId||"";
-  const payments=(paymentsRes.data||[]).filter(p=>(p.received_by&&[String(authId),String(staffId)].includes(String(p.received_by)))||(p.student_id&&studentIds.has(p.student_id))||(p.enrolment_id&&enrolmentIds.has(p.enrolment_id))||(p.printing_job_id&&jobIds.has(p.printing_job_id)));
-  const invoices=(invoicesRes.data||[]).filter(i=>(i.created_by&&[String(authId),String(staffId)].includes(String(i.created_by)))||(i.student_id&&studentIds.has(i.student_id))||(i.enrolment_id&&enrolmentIds.has(i.enrolment_id))||(i.printing_job_id&&jobIds.has(i.printing_job_id)));
-  const receipts=receiptsRes.data||[], amount=payments.reduce((sum,p)=>sum+Number(p.amount||0),0);
-  $("workStudents").textContent=students.length; $("workEnrolments").textContent=enrolments.length; $("workJobs").textContent=jobs.length; $("workPayments").textContent=payments.length; $("workAmount").textContent=money(amount); $("workInvoices").textContent=invoices.length; $("workReceipts").textContent=receipts.length;
+
+  const errors=[studentsRes,enrolmentsRes,jobsRes,paymentsRes,invoicesRes,receiptsRes]
+    .filter(x=>x.error)
+    .map(x=>x.error.message);
+  if(errors.length){
+    console.error("My Work Today query errors:",errors);
+    target.innerHTML=`<div class="empty">Could not load today's work.<br><small>${esc(errors.join(" | "))}</small></div>`;
+    return;
+  }
+
+  const students=studentsRes.data||[];
+  const enrolments=enrolmentsRes.data||[];
+  const jobs=jobsRes.data||[];
+
+  const studentIds=new Set(students.map(x=>String(x.id)));
+  const enrolmentIds=new Set(enrolments.map(x=>String(x.id)));
+  const jobIds=new Set(jobs.map(x=>String(x.id)));
+
+  /* Payments belong to today's work when:
+     1. this staff member received them, OR
+     2. they belong to an Eldoret record, OR
+     3. they belong to a student/enrolment/job created today in Eldoret.
+     This also catches payments for students who were registered earlier. */
+  const payments=(paymentsRes.data||[]).filter(p=>{
+    const receivedBy=String(p.received_by||"");
+    if(authId && receivedBy===authId) return true;
+    if(staffId && receivedBy===staffId) return true;
+    if(studentIds.has(String(p.student_id||""))) return true;
+    if(enrolmentIds.has(String(p.enrolment_id||""))) return true;
+    if(jobIds.has(String(p.printing_job_id||""))) return true;
+    return !b;
+  });
+
+  /* Invoices are similarly linked to today's branch work or this staff member. */
+  const invoices=(invoicesRes.data||[]).filter(i=>{
+    const createdBy=String(i.created_by||"");
+    if(authId && createdBy===authId) return true;
+    if(staffId && createdBy===staffId) return true;
+    if(studentIds.has(String(i.student_id||""))) return true;
+    if(enrolmentIds.has(String(i.enrolment_id||""))) return true;
+    if(jobIds.has(String(i.printing_job_id||""))) return true;
+    return !b;
+  });
+
+  /* Receipts do not always carry branch/creator fields, so associate them
+     with today's students where possible. */
+  const receipts=(receiptsRes.data||[]).filter(r=>!b || studentIds.has(String(r.student_id||"")) || !r.student_id);
+
+  const amount=payments.reduce((sum,p)=>sum+Number(p.amount||0),0);
+
+  $("workStudents").textContent=students.length;
+  $("workEnrolments").textContent=enrolments.length;
+  $("workJobs").textContent=jobs.length;
+  $("workPayments").textContent=payments.length;
+  $("workAmount").textContent=money(amount);
+  $("workInvoices").textContent=invoices.length;
+  $("workReceipts").textContent=receipts.length;
+
   const activity=[];
-  students.forEach(x=>activity.push({time:x.created_at,type:"Student registered",reference:x.student_number,description:fullName(x),amount:null,status:x.status}));
-  enrolments.forEach(x=>activity.push({time:x.created_at,type:"Enrolment created",reference:x.enrolment_number,description:x.programme,amount:null,status:x.status}));
-  jobs.forEach(x=>activity.push({time:x.created_at,type:"Walk-in job",reference:x.job_number||x.id,description:"Printing / service job",amount:x.total_amount??x.total,status:x.status}));
-  payments.forEach(x=>activity.push({time:x.payment_date||x.created_at,type:"Payment received",reference:x.payment_number||x.id,description:x.payment_method||"Payment",amount:x.amount,status:x.status}));
-  invoices.forEach(x=>activity.push({time:x.created_at,type:"Invoice created",reference:x.invoice_number||x.id,description:"Invoice",amount:x.total_amount,status:x.status}));
+  students.forEach(x=>activity.push({
+    time:x.created_at,type:"Student registered",reference:x.student_number,
+    description:fullName(x),amount:null,status:x.status
+  }));
+  enrolments.forEach(x=>activity.push({
+    time:x.created_at,type:"Enrolment created",reference:x.enrolment_number,
+    description:x.programme,amount:null,status:x.status
+  }));
+  jobs.forEach(x=>activity.push({
+    time:x.created_at,type:"Walk-in job",reference:x.job_number||x.id,
+    description:"Walk-in / service job",amount:x.total_amount??x.total??x.amount,status:x.status
+  }));
+  payments.forEach(x=>activity.push({
+    time:x.created_at||x.payment_date,type:"Payment received",
+    reference:x.payment_number||x.id,description:x.payment_method||"Payment",
+    amount:x.amount,status:x.status
+  }));
+  invoices.forEach(x=>activity.push({
+    time:x.created_at,type:"Invoice created",reference:x.invoice_number||x.id,
+    description:"Invoice",amount:x.total_amount,status:x.status
+  }));
+
   activity.sort((a,b)=>new Date(b.time)-new Date(a.time));
-  target.innerHTML=activity.length?`<table class="table"><thead><tr><th>Time</th><th>Activity</th><th>Reference</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody>${activity.map(a=>`<tr><td>${esc(new Date(a.time).toLocaleTimeString("en-KE",{hour:"2-digit",minute:"2-digit"}))}</td><td><strong>${esc(a.type)}</strong></td><td>${esc(a.reference)}</td><td>${esc(a.description)}</td><td>${a.amount==null?"—":money(a.amount)}</td><td>${a.status?badge(a.status):"—"}</td></tr>`).join("")}</tbody></table>`:`<div class="empty">No work recorded for this branch today.</div>`;
+
+  target.innerHTML=activity.length
+    ? `<table class="table"><thead><tr><th>Time</th><th>Activity</th><th>Reference</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody>${activity.map(a=>`<tr><td>${esc(new Date(a.time).toLocaleTimeString("en-KE",{hour:"2-digit",minute:"2-digit"}))}</td><td><strong>${esc(a.type)}</strong></td><td>${esc(a.reference||"—")}</td><td>${esc(a.description||"—")}</td><td>${a.amount==null?"—":money(a.amount)}</td><td>${a.status?badge(a.status):"—"}</td></tr>`).join("")}</tbody></table>`
+    : `<div class="empty">No work recorded for ${esc(CURRENT_BRANCH_NAME||"this office")} today.</div>`;
 }
 
 
@@ -6413,63 +6537,95 @@ async function loadTraining(){
 
 let WALKIN_ROWS = [];
 
+function walkinServiceRows(){
+  return (FEES || []).filter(f => {
+    const type = String(f.course_type || "").toUpperCase();
+    const programme = String(f.programme || "").toUpperCase();
+    return ["CYBER", "PRINTING_DIGITAL"].includes(type) || ["CYBER", "PRINTING_DIGITAL"].includes(programme);
+  });
+}
+
+function walkinDisplayUnit(f){ return String(f.unit || "").trim() || (f.quantity_based ? "UNIT" : "SERVICE"); }
+function walkinStep(f){
+  const u=walkinDisplayUnit(f).toUpperCase(), n=String(f.name||"").toUpperCase();
+  return (u.includes("METRE") || n.includes("BANNER") || n.includes("STICKER")) ? 0.5 : 1;
+}
+
+function renderWalkinServiceOptions(){
+  const select=$("walkinService"); if(!select) return;
+  const rows=walkinServiceRows(), seen=new Set();
+  const unique=rows.filter(f=>{
+    const key=[String(f.name||"").trim().toLowerCase(),Number(f.amount||0),String(f.unit||"").trim().toLowerCase()].join("|");
+    if(seen.has(key)) return false; seen.add(key); return true;
+  });
+  select.innerHTML='<option value="">Select service</option>'+unique.map((f,i)=>`<option value="${esc(f.id)}" data-index="${i}">${esc(f.name)} — ${money(f.amount)} / ${esc(walkinDisplayUnit(f))}</option>`).join("");
+  select._walkinOptions=unique;
+}
+
+function updateWalkinQuantityRules(){
+  const select=$("walkinService"), qty=$("walkinQuantity"); if(!qty) return;
+  const options=select?._walkinOptions||[], f=options[select?.selectedOptions[0]?.dataset.index];
+  if(!f){qty.min="1";qty.step="1";qty.value="1";return;}
+  const step=walkinStep(f); qty.min=String(step);qty.step=String(step);
+  if(Number(qty.value)<step || !Number.isFinite(Number(qty.value))) qty.value=String(step);
+}
+
+function updateWalkinTotal(){
+  const select=$("walkinService"), options=select?._walkinOptions||[], f=options[select?.selectedOptions[0]?.dataset.index];
+  const qty=Number($("walkinQuantity")?.value||0), rate=Number(f?.amount||0);
+  $("walkinUnitPrice").value=f?rate.toFixed(2):""; $("walkinTotal").value=f&&qty>0?(rate*qty).toFixed(2):"";
+}
+
 function renderWalkins(){
   const target=$("walkinsTable"); if(!target) return;
   const q=String($("walkinSearch")?.value||"").trim().toLowerCase();
   const rows=WALKIN_ROWS.filter(j=>{
-    const c=j.printing_customers||{};
-    const phone=c.phone||c.customer_phone||j.phone||j.customer_phone||"";
-    const reference=j.payment_reference||j.reference||j.transaction_reference||j.mpesa_receipt_number||j.receipt_number||"";
-    const receipt=j.receipt_number||j.receipt_no||j.job_number||j.payment_number||"";
-    const text=[c.customer_name,c.customer_number,phone,j.service,j.service_name,j.description,j.job_number,reference,receipt].filter(Boolean).join(" ").toLowerCase();
+    const c=j.printing_customers||{}, text=[c.customer_name,c.customer_number,j.service,j.service_name,j.description,j.job_number].filter(Boolean).join(" ").toLowerCase();
     return !q||text.includes(q);
   });
-
   target.innerHTML=rows.length?rows.map(j=>{
-    const c=j.printing_customers||{};
-    const phone=c.phone||c.customer_phone||j.phone||j.customer_phone||"—";
-    const total=Number(j.total_amount??j.total??j.amount??j.amount_paid??0);
-    const payment=j.payment_method||j.method||j.payment_type||"—";
-    const reference=j.payment_reference||j.reference||j.transaction_reference||j.mpesa_receipt_number||"—";
-    const receipt=j.receipt_number||j.receipt_no||j.job_number||j.payment_number||"—";
-    return `<tr>
-      <td>${esc(fmtDate(j.created_at||j.job_date))}</td>
-      <td><strong>${esc(c.customer_name||j.customer_name||"—")}</strong></td>
-      <td>${esc(phone)}</td>
-      <td>${esc(j.service||j.service_name||j.description||"—")}</td>
-      <td>${esc(j.quantity??j.qty??1)}</td>
-      <td>${money(total)}</td>
-      <td>${esc(payment)}</td>
-      <td>${esc(reference)}</td>
-      <td>${esc(receipt)}</td>
-      <td>${badge(j.status||"PAID")}</td>
-    </tr>`;
-  }).join(""):empty(10,"No walk-in customers found.");
+    const c=j.printing_customers||{}, total=Number(j.total_amount??j.total??j.amount??0);
+    return `<tr><td>${esc(fmtDate(j.created_at||j.job_date))}</td><td><strong>${esc(c.customer_name||"—")}</strong></td><td>${esc(j.service||j.service_name||j.description||"—")}</td><td>${esc(j.quantity??j.qty??1)}</td><td>${money(total)}</td><td>${badge(j.status||"PENDING")}</td><td>${esc(j.job_number||"—")}</td></tr>`;
+  }).join(""):empty(7,"No walk-in client transactions found.");
 }
 
 async function loadWalkins(){
-  const target=$("walkinsTable"); if(target) target.innerHTML=empty(10,"Loading walk-in customers...");
-  let q=DB.from("printing_jobs").select(`*,printing_customers(*)`).order("created_at",{ascending:false}).limit(500);
+  const target=$("walkinsTable"); if(target) target.innerHTML=empty(7,"Loading walk-in clients...");
+  let q=DB.from("printing_jobs").select(`id,job_number,created_at,job_date,status,total_amount,total,amount,quantity,qty,service,service_name,description,branch_id,printing_customers(customer_name,customer_number)`).order("created_at",{ascending:false}).limit(500);
   if(CURRENT_BRANCH_ID) q=q.eq("branch_id",CURRENT_BRANCH_ID);
   const {data,error}=await q;
-  if(error){
-    console.error(error);
-    if(target) target.innerHTML=empty(10,esc(error.message));
-    return;
-  }
-  WALKIN_ROWS=data||[];
-  renderWalkins();
+  if(error){console.error(error);if(target)target.innerHTML=empty(7,esc(error.message));return;}
+  WALKIN_ROWS=data||[]; renderWalkins();
+}
+
+function resetWalkinForm(){
+  $("walkinForm")?.reset(); $("walkinQuantity").value="1"; renderWalkinServiceOptions(); updateWalkinQuantityRules(); updateWalkinTotal();
+}
+
+async function saveWalkinClient(){
+  const name=$("walkinName").value.trim(), phone=$("walkinPhone").value.trim()||null, select=$("walkinService"), options=select._walkinOptions||[], f=options[select.selectedOptions[0]?.dataset.index], quantity=Number($("walkinQuantity").value||0), unitPrice=Number(f?.amount||0), total=unitPrice*quantity;
+  if(!name) throw new Error("Client Name is required."); if(!f) throw new Error("Please select a service."); if(!quantity||quantity<=0) throw new Error("Enter a valid quantity.");
+  const btn=$("saveWalkinBtn"); btn.disabled=true; btn.textContent="Saving...";
+  try{
+    const {data,error}=await DB.rpc("register_printing_job",{p_first_name:name,p_last_name:"",p_phone:phone,p_email:null,p_description:f.name,p_quantity:quantity,p_unit_price:unitPrice,p_amount_paid:total,p_payment_method:$("walkinPaymentMethod").value,p_reference:$("walkinReference").value.trim()||null,p_notes:$("walkinNotes").value.trim()||null});
+    if(error) throw error;
+    const r=Array.isArray(data)?data[0]:data;
+    showNotice(`Walk-in saved successfully. Client: ${name} | Service: ${f.name} | Total: ${money(total)} | Job: ${r?.job_number||"—"}`);
+    toast("Walk-in client saved"); await loadWalkins(); await loadOverviewPage(); resetWalkinForm();
+  }finally{btn.disabled=false;btn.textContent="Save Walk-in & Receive Payment";}
 }
 
 async function loadServices(){
-  /* Walk-in Clients is a list/history page only.
-     New service transactions are recorded through the appropriate service/payment workflow. */
+  /* Walk-in Clients are one-off service customers only.
+     Do not render driving/computer lesson tables here. */
+  renderWalkinServiceOptions();
+  updateWalkinQuantityRules();
+  updateWalkinTotal();
   await loadWalkins();
 }
 
 const LOADERS = {
   dashboard: loadOverviewPage,
-  mywork: loadMyWorkToday,
   training: loadTraining,
   registration: loadEnrolmentFormPage,
   students: loadStudents,
@@ -6479,11 +6635,13 @@ const LOADERS = {
   fees: loadFees
 };
 
+$("walkinService")?.addEventListener("change",()=>{updateWalkinQuantityRules();updateWalkinTotal();});
+$("walkinQuantity")?.addEventListener("input",updateWalkinTotal);
 $("walkinSearch")?.addEventListener("input",renderWalkins);
-$("refreshWalkins")?.addEventListener("click",async()=>{
-  try{await loadServices();toast("Walk-in customers refreshed");}
-  catch(e){console.error(e);toast(e.message||"Could not refresh walk-in customers",false);}
-});
+$("refreshWalkins")?.addEventListener("click",async()=>{try{await loadServices();toast("Walk-in clients refreshed");}catch(e){console.error(e);toast(e.message||"Could not refresh walk-in clients",false);}});
+$("resetWalkinBtn")?.addEventListener("click",resetWalkinForm);
+$("walkinForm")?.addEventListener("submit",async e=>{e.preventDefault();try{await saveWalkinClient();}catch(err){console.error(err);showNotice(err.message||"Could not save walk-in client.","err");toast(err.message||"Could not save walk-in client",false);}});
+
 
 $("trainingSearch")?.addEventListener("input",renderTraining);
 $("refreshTraining")?.addEventListener("click",async()=>{
