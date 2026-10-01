@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lashawn Academy | Login</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --navy:#071a33;
+  --navy2:#0d2748;
+  --green:#18a957;
+  --green2:#0f8d47;
+  --bg:#f4f7fb;
+  --text:#172033;
+  --muted:#6b7280;
+  --border:#dbe2ea;
+  --danger:#a92323;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,Arial,Helvetica,sans-serif;
+  background:linear-gradient(135deg,var(--navy),#0d3157);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  color:var(--text);
+}
+.login-wrap{
+  width:100%;
+  max-width:440px;
+}
+.card{
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 22px 60px rgba(0,0,0,.24);
+  padding:34px;
+}
+.brand{
+  text-align:center;
+  margin-bottom:28px;
+}
+.logo{
+  width:82px;
+  height:82px;
+  object-fit:contain;
+  margin:0 auto 12px;
+  display:block;
+}
+.brand h1{
+  margin:0;
+  color:var(--navy);
+  font-size:25px;
+  letter-spacing:.3px;
+}
+.brand p{
+  margin:7px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+.form-group{
+  margin-bottom:17px;
+}
+label{
+  display:block;
+  font-weight:700;
+  font-size:14px;
+  margin-bottom:7px;
+}
+input{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:13px 14px;
+  font-size:15px;
+  outline:none;
+  transition:.2s;
+}
+input:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(24,169,87,.12);
+}
+.password-wrap{position:relative}
+.password-wrap input{padding-right:76px}
+.toggle{
+  position:absolute;
+  right:8px;
+  top:7px;
+  border:0;
+  background:transparent;
+  color:var(--navy2);
+  font-weight:700;
+  cursor:pointer;
+  padding:7px;
+}
+button.login{
+  width:100%;
+  border:0;
+  border-radius:9px;
+  background:var(--green);
+  color:#fff;
+  font-weight:800;
+  font-size:15px;
+  padding:14px;
+  cursor:pointer;
+  margin-top:4px;
+}
+button.login:hover{background:var(--green2)}
+button.login:disabled{
+  opacity:.65;
+  cursor:not-allowed;
+}
+.message{
+  display:none;
+  padding:11px 13px;
+  border-radius:8px;
+  margin-bottom:16px;
+  font-size:14px;
+  line-height:1.4;
+}
+.message.error{
+  display:block;
+  background:#fff0f0;
+  color:var(--danger);
+  border:1px solid #f0caca;
+}
+.message.info{
+  display:block;
+  background:#eef6ff;
+  color:#14518b;
+  border:1px solid #c9e0f7;
+}
+.footer{
+  text-align:center;
+  margin-top:20px;
+  color:rgba(255,255,255,.72);
+  font-size:12px;
+}
+.forgot{
+  display:block;
+  text-align:right;
+  margin-top:9px;
+  color:var(--navy2);
+  font-size:13px;
+  text-decoration:none;
+  font-weight:600;
+}
+.forgot:hover{text-decoration:underline}
+@media(max-width:520px){
+  .card{padding:25px 20px}
+}
+</style>
+</head>
+
+<body>
+<div class="login-wrap">
+  <div class="card">
+
+    <div class="brand">
+      <img
+        class="logo"
+        src="/images/logo.png"
+        alt="Lashawn Academy"
+        onerror="this.style.display='none'">
+      <h1>Lashawn Academy</h1>
+      <p>Office Administration Portal</p>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <form id="loginForm" autocomplete="on">
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="username"
+          placeholder="Enter your email"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-wrap">
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required>
+          <button type="button" class="toggle" id="togglePassword">Show</button>
+        </div>
+        <a href="#" class="forgot" id="forgotPassword">Forgot password?</a>
+      </div>
+
+      <button class="login" id="loginBtn" type="submit">
+        Sign In
+      </button>
+    </form>
+
+  </div>
+
+  <div class="footer">
+    Lashawn Driving &amp; Computer College
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://qjfinbftcserrjiedduf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
+
+const DB = window.supabase
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
+
+const $ = id => document.getElementById(id);
+
+function showMessage(message, type="error"){
+  const box = $("message");
+  box.textContent = message;
+  box.className = "message " + type;
+}
+
+function clearMessage(){
+  const box = $("message");
+  box.textContent = "";
+  box.className = "message";
+}
+
+function setLoading(loading){
+  const btn = $("loginBtn");
+  btn.disabled = loading;
+  btn.textContent = loading ? "Signing in..." : "Sign In";
+}
+
+function friendlyAuthError(error){
+  const msg = String(error?.message || "");
+
+  if(/invalid login credentials/i.test(msg)){
+    return "Invalid email or password.";
+  }
+  if(/email not confirmed/i.test(msg)){
+    return "Your email address has not been confirmed. Please confirm it before signing in.";
+  }
+  if(/rate limit/i.test(msg)){
+    return "Too many attempts. Please wait a moment and try again.";
+  }
+  if(/network|fetch/i.test(msg)){
+    return "Network error. Check your internet connection and try again.";
+  }
+
+  return msg || "Unable to sign in.";
+}
+
+async function redirectIfAlreadyLoggedIn(){
+  if(!DB) return;
+
+  try{
+    const {data:{session}} = await DB.auth.getSession();
+
+    if(session){
+      window.location.replace("/office-admin");
+    }
+  }catch(error){
+    console.warn("Existing session check failed:", error);
+  }
+}
+
+$("togglePassword").addEventListener("click", () => {
+  const input = $("password");
+  const visible = input.type === "text";
+
+  input.type = visible ? "password" : "text";
+  $("togglePassword").textContent = visible ? "Show" : "Hide";
+});
+
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  clearMessage();
+
+  if(!DB){
+    showMessage("Supabase could not be loaded. Check the internet connection and try again.");
+    return;
+  }
+
+  const email = $("email").value.trim().toLowerCase();
+  const password = $("password").value;
+
+  if(!email || !password){
+    showMessage("Enter your email and password.");
+    return;
+  }
+
+  setLoading(true);
+
+  try{
+    const {data, error} = await DB.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if(error) throw error;
+
+    if(!data?.session){
+      throw new Error("Login succeeded but no active session was created.");
+    }
+
+    showMessage("Login successful. Opening Office Admin...", "info");
+
+    // Small delay so the success message is visible.
+    setTimeout(() => {
+      window.location.replace("/office-admin");
+    }, 250);
+
+  }catch(error){
+    console.error("Login error:", error);
+    showMessage(friendlyAuthError(error));
+    setLoading(false);
+  }
+});
+
+$("forgotPassword").addEventListener("click", async event => {
+  event.preventDefault();
+  clearMessage();
+
+  if(!DB){
+    showMessage("Supabase could not be loaded.");
+    return;
+  }
+
+  const email = $("email").value.trim().toLowerCase();
+
+  if(!email){
+    showMessage("Enter your email address first, then click Forgot password.");
+    $("email").focus();
+    return;
+  }
+
+  try{
+    const {error} = await DB.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/login.html"
+    });
+
+    if(error) throw error;
+
+    showMessage(
+      "If this email is registered, a password-reset email has been sent.",
+      "info"
+    );
+  }catch(error){
+    console.error("Password reset error:", error);
+    showMessage(friendlyAuthError(error));
+  }
+});
+
+redirectIfAlreadyLoggedIn();
+</script>
+</body>
+</html>
