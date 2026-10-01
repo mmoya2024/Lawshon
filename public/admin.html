@@ -452,6 +452,10 @@ input[readonly]{
       6-Week Training
     </button>
 
+    <button data-panel="registration">
+      New Registration / Enrolment
+    </button>
+
     <button data-panel="students">
       Students
     </button>
@@ -667,15 +671,79 @@ input[readonly]{
 
 
   <!-- =======================================================
+       6-WEEK TRAINING
+  ======================================================== -->
+
+  <section class="panel" id="panel-training">
+
+    <p class="lede">
+      Monitor active student training separately from registration and enrolment.
+      This section is for the six-week training period, progress and expected completion.
+    </p>
+
+    <div class="grid">
+      <div class="card stat">
+        <div class="label">Active Training</div>
+        <div class="value" id="trainingActive">0</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Starting Today</div>
+        <div class="value" id="trainingStarting">0</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Due This Week</div>
+        <div class="value" id="trainingDue">0</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Completed</div>
+        <div class="value" id="trainingCompleted">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+        <div>
+          <h2>6-Week Training Register</h2>
+          <div class="hint">New registrations are handled under <strong>New Registration / Enrolment</strong>. Use this page to monitor their training.</div>
+        </div>
+        <button class="btn outline" type="button" id="refreshTraining">Refresh</button>
+      </div>
+
+      <input class="search" id="trainingSearch" placeholder="Search student, enrolment, phone or programme">
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Student No.</th>
+              <th>Student</th>
+              <th>Phone</th>
+              <th>Programme</th>
+              <th>Start</th>
+              <th>Expected End</th>
+              <th>Week</th>
+              <th>Progress</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="trainingTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- =======================================================
        NEW ENROLMENT
   ======================================================== -->
 
   <section
     class="panel"
-    id="panel-training">
+    id="panel-registration">
 
     <p class="lede">
-      Register a student or process a Cyber / Printing / Digital service.
+      Register a new student or process a Cyber / Printing / Digital service.
       Prices are loaded from Supabase.
     </p>
 
@@ -6328,17 +6396,91 @@ async function loadEnrolmentFormPage(){
   if(typeof loadEnrolmentForm === "function") await loadEnrolmentForm();
 }
 
+let TRAINING_ROWS = [];
+
+function trainingWeekInfo(startDate, endDate, status){
+  const start = startDate ? new Date(startDate + "T00:00:00") : null;
+  const end = endDate ? new Date(endDate + "T23:59:59") : null;
+  const now = new Date();
+  if(!start) return {week:"—", progress:0};
+  const elapsed = Math.max(0, now - start);
+  const week = Math.min(6, Math.floor(elapsed / (7 * 86400000)) + 1);
+  let progress = Math.round(Math.min(100, (elapsed / (42 * 86400000)) * 100));
+  if(String(status || "").toUpperCase() === "COMPLETED") progress = 100;
+  return {week: "Week " + week + " / 6", progress};
+}
+
+function renderTraining(){
+  const q = String($("trainingSearch")?.value || "").trim().toLowerCase();
+  const rows = TRAINING_ROWS.filter(e => {
+    const s = e.students || {};
+    return [e.enrolment_number,e.programme,e.status,e.payment_status,s.student_number,s.first_name,s.middle_name,s.last_name,s.phone]
+      .filter(Boolean).join(" ").toLowerCase().includes(q);
+  });
+
+  const active = TRAINING_ROWS.filter(e => !["COMPLETED","CANCELLED","CLOSED"].includes(String(e.status || "").toUpperCase())).length;
+  const today = new Date().toISOString().slice(0,10);
+  const weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate()+7);
+  const weekEndStr = weekEnd.toISOString().slice(0,10);
+  const starting = TRAINING_ROWS.filter(e => e.start_date === today).length;
+  const due = TRAINING_ROWS.filter(e => e.expected_end_date && e.expected_end_date >= today && e.expected_end_date <= weekEndStr && !["COMPLETED","CANCELLED","CLOSED"].includes(String(e.status || "").toUpperCase())).length;
+  const completed = TRAINING_ROWS.filter(e => String(e.status || "").toUpperCase() === "COMPLETED").length;
+
+  $("trainingActive").textContent = active;
+  $("trainingStarting").textContent = starting;
+  $("trainingDue").textContent = due;
+  $("trainingCompleted").textContent = completed;
+
+  $("trainingTable").innerHTML = rows.length ? rows.map(e => {
+    const s = e.students || {};
+    const wi = trainingWeekInfo(e.start_date,e.expected_end_date,e.status);
+    return `<tr>
+      <td>${esc(s.student_number || "—")}</td>
+      <td>${esc(fullName(s) || "—")}</td>
+      <td>${esc(s.phone || "—")}</td>
+      <td>${esc(e.programme || "—")}</td>
+      <td>${esc(fmtDate(e.start_date))}</td>
+      <td>${esc(fmtDate(e.expected_end_date))}</td>
+      <td>${esc(wi.week)}</td>
+      <td><div style="min-width:110px"><div style="height:7px;background:#edf0f5;border-radius:99px;overflow:hidden"><div style="height:100%;width:${wi.progress}%;background:var(--green)"></div></div><div class="hint">${wi.progress}%</div></div></td>
+      <td>${badge(e.status || "—")}</td>
+    </tr>`;
+  }).join("") : empty(9,"No training records found.");
+}
+
+async function loadTraining(){
+  let q = DB.from(T.enrolments)
+    .select("id,enrolment_number,student_id,programme,branch_id,start_date,expected_end_date,status,payment_status,created_at,students(first_name,middle_name,last_name,phone,student_number)")
+    .order("start_date",{ascending:false});
+
+  if(CURRENT_BRANCH_ID) q = q.eq("branch_id",CURRENT_BRANCH_ID);
+
+  const {data,error} = await q;
+  if(error) throw error;
+
+  TRAINING_ROWS = (data || []).filter(e => e.programme !== "PRINTING_DIGITAL");
+  renderTraining();
+}
+
 async function loadServices(){ return; }
 
 const LOADERS = {
   dashboard: loadOverviewPage,
-  training: loadEnrolmentFormPage,
+  training: loadTraining,
+  registration: loadEnrolmentFormPage,
   students: loadStudents,
   walkins: loadServices,
   enrolments: loadEnrolments,
   payments: loadPayments,
   fees: loadFees
 };
+
+
+$("trainingSearch")?.addEventListener("input",renderTraining);
+$("refreshTraining")?.addEventListener("click",async()=>{
+  try{ await loadTraining(); toast("Training refreshed"); }
+  catch(e){ console.error(e); toast(e.message || "Could not load training",false); }
+});
 
 
 document
