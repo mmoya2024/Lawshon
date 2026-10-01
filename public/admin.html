@@ -1745,9 +1745,21 @@ const supabaseClient =
    AUTHORIZED OFFICE ACCOUNTS
 ========================================================= */
 
-const OFFICE_EMAILS = [
-  "office@lashawnacademy.com",
-  "admin@lashawnacademy.com"
+/*
+  OFFICE ADMIN AUTHORIZATION
+
+  Database roles currently used by Lashawn:
+    SUPER_ADMIN     = full administration
+    ADMIN           = Office Administration
+    BRANCH_MANAGER  = branch-level management
+
+  Access to this page is determined from public.staff using the
+  authenticated Supabase auth_user_id. We do NOT replace or
+  rename the existing staff roles.
+*/
+const OFFICE_ADMIN_ROLES = [
+  "ADMIN",
+  "SUPER_ADMIN"
 ];
 
 
@@ -1954,83 +1966,228 @@ async function guard(){
     error
   } = await supabaseClient.auth.getSession();
 
+
   if(error){
-    console.error(error);
+
+    console.error("Session error:",error);
+
     location.href = "/admin-login.html";
+
     return false;
   }
+
 
   if(!session?.user){
 
     location.href = "/admin-login.html";
+
     return false;
   }
 
+
   CURRENT_USER = session.user;
+
 
   const email =
     String(session.user.email || "")
       .trim()
       .toLowerCase();
 
-  if(!OFFICE_EMAILS.includes(email)){
 
-    document.body.innerHTML = `
-      <div style="
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        background:#f4f7fb;
-        padding:20px;
-        font-family:Arial;
-      ">
-        <div style="
-          background:#fff;
-          border-radius:14px;
-          padding:35px;
-          max-width:520px;
-          text-align:center;
-          box-shadow:0 15px 45px rgba(0,0,0,.1);
-        ">
-          <h2 style="color:#071a33;">
-            Office Admin Access Required
-          </h2>
+  /*
+    IMPORTANT:
+    Do not authorize Office Admin access by email alone.
 
-          <p style="color:#667085;">
-            This account is authenticated but does not have
-            Office Admin access.
-          </p>
+    The authenticated Supabase user's UUID must match
+    public.staff.auth_user_id, the staff record must be active,
+    and the staff role must be ADMIN or SUPER_ADMIN.
 
-          <p style="font-size:13px;color:#667085;">
-            Signed in as:
-            <strong>${esc(email)}</strong>
-          </p>
+    BRANCH_MANAGER remains a separate role and is therefore
+    NOT granted access to this Office Admin page.
+  */
+  const {
+    data:staff,
+    error:staffError
+  } = await supabaseClient
+    .from("staff")
+    .select(`
+      id,
+      auth_user_id,
+      staff_number,
+      first_name,
+      last_name,
+      phone,
+      email,
+      national_id,
+      role,
+      branch_id,
+      is_active
+    `)
+    .eq("auth_user_id",session.user.id)
+    .eq("is_active",true)
+    .maybeSingle();
 
-          <button
-            onclick="location.href='/admin-login.html'"
-            style="
-              border:0;
-              background:#071a33;
-              color:#fff;
-              padding:11px 18px;
-              border-radius:8px;
-              font-weight:700;
-              cursor:pointer;
-            "
-          >
-            Return to Admin Login
-          </button>
-        </div>
-      </div>
-    `;
+
+  if(staffError){
+
+    console.error(
+      "Staff authorization lookup error:",
+      staffError
+    );
+
+    showAccessDenied(
+      email,
+      "Unable to verify your staff authorization. Please contact the system administrator."
+    );
 
     return false;
   }
 
-  $("userEmail").textContent = email;
+
+  if(!staff){
+
+    console.warn(
+      "No active staff record found for auth user:",
+      session.user.id
+    );
+
+    showAccessDenied(
+      email,
+      "This account is authenticated but has no active Lashawn staff authorization record."
+    );
+
+    return false;
+  }
+
+
+  const role =
+    String(staff.role || "")
+      .trim()
+      .toUpperCase();
+
+
+  if(!OFFICE_ADMIN_ROLES.includes(role)){
+
+    console.warn(
+      "Office Admin access denied. Staff role:",
+      role
+    );
+
+    showAccessDenied(
+      email,
+      `Your staff role is ${role || "UNASSIGNED"}. This page requires ADMIN or SUPER_ADMIN access.`
+    );
+
+    return false;
+  }
+
+
+  /*
+    Keep the authenticated user and staff record available
+    to the rest of the page.
+  */
+  window.CURRENT_STAFF = staff;
+
+  window.CURRENT_ROLE = role;
+
+
+  $("userEmail").textContent =
+    `${email} • ${role}`;
+
+
+  console.log(
+    "Office Admin access granted:",
+    {
+      email,
+      role,
+      staffId:staff.id,
+      staffNumber:staff.staff_number,
+      branchId:staff.branch_id
+    }
+  );
+
 
   return true;
+}
+
+
+function showAccessDenied(email,message){
+
+  document.body.innerHTML = `
+    <div style="
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#f4f7fb;
+      padding:20px;
+      font-family:Arial;
+    ">
+      <div style="
+        background:#fff;
+        border-radius:14px;
+        padding:35px;
+        max-width:560px;
+        width:100%;
+        text-align:center;
+        box-shadow:0 15px 45px rgba(0,0,0,.1);
+      ">
+
+        <div style="
+          width:58px;
+          height:58px;
+          margin:0 auto 15px;
+          border-radius:50%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          background:#fee2e2;
+          color:#991b1b;
+          font-size:28px;
+          font-weight:800;
+        ">
+          !
+        </div>
+
+        <h2 style="color:#071a33;margin:0 0 12px;">
+          Office Admin Access Required
+        </h2>
+
+        <p style="
+          color:#667085;
+          line-height:1.6;
+          margin:0 0 12px;
+        ">
+          ${esc(message)}
+        </p>
+
+        <p style="
+          font-size:13px;
+          color:#667085;
+          margin:0 0 22px;
+        ">
+          Signed in as:
+          <strong>${esc(email)}</strong>
+        </p>
+
+        <button
+          onclick="location.href='/admin-login.html'"
+          style="
+            border:0;
+            background:#071a33;
+            color:#fff;
+            padding:11px 18px;
+            border-radius:8px;
+            font-weight:700;
+            cursor:pointer;
+          "
+        >
+          Return to Admin Login
+        </button>
+
+      </div>
+    </div>
+  `;
 }
 
 
