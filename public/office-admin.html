@@ -4475,7 +4475,10 @@ function renderServices(){
 
   /* DRIVING */
 
-  $("drivingServices").innerHTML =
+  const drivingTarget = $("drivingServices");
+  if(!drivingTarget) return;
+
+  drivingTarget.innerHTML =
 
     DRIVING.length
 
@@ -4513,7 +4516,10 @@ function renderServices(){
 
   /* COMPUTER */
 
-  $("computerServices").innerHTML =
+  const computerTarget = $("computerServices");
+  if(!computerTarget) return;
+
+  computerTarget.innerHTML =
 
     COMPUTER.length
 
@@ -4566,7 +4572,10 @@ function renderServices(){
     );
 
 
-  $("cyberServices").innerHTML =
+  const cyberTarget = $("cyberServices");
+  if(!cyberTarget) return;
+
+  cyberTarget.innerHTML =
 
     cyber.length
 
@@ -4642,7 +4651,10 @@ function renderServices(){
     );
 
 
-  $("feeServices").innerHTML =
+  const feeTarget = $("feeServices");
+  if(!feeTarget) return;
+
+  feeTarget.innerHTML =
 
     otherFees.length
 
@@ -6497,7 +6509,12 @@ async function saveWalkinClient(){
 }
 
 async function loadServices(){
-  renderServices(); renderWalkinServiceOptions(); updateWalkinQuantityRules(); updateWalkinTotal(); await loadWalkins();
+  /* Walk-in Clients are one-off service customers only.
+     Do not render driving/computer lesson tables here. */
+  renderWalkinServiceOptions();
+  updateWalkinQuantityRules();
+  updateWalkinTotal();
+  await loadWalkins();
 }
 
 const LOADERS = {
