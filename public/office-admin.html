@@ -2623,6 +2623,7 @@ function updateRule(){
   $("payRule").textContent =
     m;
 
+
 }
 
 
@@ -3409,7 +3410,8 @@ async function loadOverview(){
 
 
 /* ============================================================
-   MY WORK TODAY
+   MY WORK TODAY — FIXED: uses issued_at for receipts,
+   no total_amount on printing_jobs
 ============================================================ */
 async function loadMyWorkToday(){
   const target=$("myWorkActivity");
@@ -3460,7 +3462,7 @@ async function loadMyWorkToday(){
     type:"Walk-in job",
     reference:x.job_number||x.id,
     description:"Printing / service job",
-    amount:x.total_amount,
+    amount:x.amount_paid??null,
     status:x.status
   }));
   payments.forEach(x=>activity.push({
@@ -3478,6 +3480,14 @@ async function loadMyWorkToday(){
     description:"Invoice",
     amount:x.total_amount,
     status:x.status
+  }));
+  receipts.forEach(x=>activity.push({
+    time:x.issued_at,
+    type:"Receipt issued",
+    reference:x.receipt_number||x.id,
+    description:"Receipt",
+    amount:x.amount,
+    status:"ISSUED"
   }));
 
   activity.sort((a,b)=>new Date(b.time)-new Date(a.time));
@@ -6442,7 +6452,7 @@ function renderWalkins(){
   target.innerHTML=rows.length?rows.map(j=>{
     const c=j.printing_customers||{};
     const phone=c.phone||c.customer_phone||j.phone||j.customer_phone||"—";
-    const total=Number(j.total_amount??j.total??j.amount??j.amount_paid??0);
+    const total=Number(j.amount_paid ?? j.total ?? j.amount ?? 0);
     const payment=j.payment_method||j.method||j.payment_type||"—";
     const reference=j.payment_reference||j.reference||j.transaction_reference||j.mpesa_receipt_number||"—";
     const receipt=j.receipt_number||j.receipt_no||j.job_number||j.payment_number||"—";
