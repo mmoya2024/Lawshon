@@ -9,511 +9,108 @@
 
 <style>
 :root{
-  --navy:#071a33;
-  --navy2:#0d2748;
-  --green:#16c784;
-  --green-dark:#087443;
-  --bg:#f4f7fb;
-  --text:#172033;
-  --muted:#68758a;
-  --border:#dce3ed;
-  --danger:#d92d20;
-  --warning:#8a6100;
+  --navy:#071a33; --navy2:#0d2748; --green:#16c784; --green-dark:#087443;
+  --bg:#f4f7fb; --text:#172033; --muted:#68758a; --border:#dce3ed;
+  --danger:#d92d20; --warning:#8a6100;
 }
-
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Inter,Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-
-button,input,select,textarea{
-  font:inherit;
-}
-
-.sidebar{
-  position:fixed;
-  left:0;
-  top:0;
-  bottom:0;
-  width:245px;
-  background:var(--navy);
-  color:#fff;
-  padding:20px 14px;
-  z-index:20;
-}
-
-.brand{
-  padding:10px 12px 24px;
-  font-size:20px;
-  font-weight:900;
-}
-
-.brand small{
-  display:block;
-  margin-top:5px;
-  color:#9fb1c8;
-  font-size:11px;
-}
-
-.nav{
-  display:grid;
-  gap:6px;
-}
-
-.nav button{
-  border:0;
-  background:transparent;
-  color:#c8d4e4;
-  text-align:left;
-  padding:12px;
-  border-radius:9px;
-  cursor:pointer;
-  font-size:14px;
-}
-
-.nav button:hover,
-.nav button.active{
-  background:var(--navy2);
-  color:#fff;
-}
-
-.nav button.active{
-  border-left:3px solid var(--green);
-}
-
-.userbox{
-  position:absolute;
-  left:14px;
-  right:14px;
-  bottom:18px;
-  border-top:1px solid #27415f;
-  padding:15px 8px;
-  color:#b8c7d9;
-  font-size:12px;
-}
-
-.user-name{
-  color:#fff;
-  font-weight:800;
-  margin-bottom:3px;
-}
-
-.user-email{
-  word-break:break-word;
-  margin-bottom:10px;
-}
-
-.main{
-  margin-left:245px;
-  padding:28px;
-}
-
-.topbar h1{
-  margin:0;
-  font-size:26px;
-}
-
-.db-status{
-  color:var(--muted);
-  font-size:12px;
-  margin:6px 0 24px;
-}
-
-.db-status.ok{
-  color:var(--green-dark);
-}
-
-.db-status.bad{
-  color:var(--danger);
-}
-
-.panel{
-  display:none;
-}
-
-.panel.active{
-  display:block;
-}
-
-.lede{
-  color:var(--muted);
-  margin-top:-12px;
-  margin-bottom:20px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:15px;
-}
-
-.card{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:18px;
-  margin-bottom:18px;
-}
-
-.card h2{
-  margin:0 0 15px;
-  font-size:17px;
-}
-
-.stat .label{
-  color:var(--muted);
-  font-size:12px;
-}
-
-.stat .value{
-  font-size:27px;
-  font-weight:800;
-  margin-top:8px;
-}
-
-.form-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
-
-.form-group{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
-.form-group.full{
-  grid-column:1/-1;
-}
-
-label{
-  font-size:12px;
-  font-weight:700;
-  color:#44526a;
-}
-
-input,
-select,
-textarea{
-  width:100%;
-  padding:10px 11px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  background:#fff;
-  color:var(--text);
-  font-size:13px;
-}
-
-input[readonly]{
-  background:#f5f7fa;
-}
-
-.actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:17px;
-}
-
-.btn{
-  border:0;
-  background:var(--green);
-  color:#062719;
-  padding:10px 15px;
-  border-radius:8px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.btn:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
-
-.btn.outline{
-  background:#fff;
-  border:1px solid var(--border);
-  color:var(--text);
-}
-
-.table-wrap{
-  overflow:auto;
-}
-
-.table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
-}
-
-.table th,
-.table td{
-  padding:11px 10px;
-  border-bottom:1px solid #edf0f5;
-  text-align:left;
-  white-space:nowrap;
-}
-
-.table th{
-  background:#fafbfd;
-  color:var(--muted);
-  font-size:11px;
-  text-transform:uppercase;
-}
-
-.pill{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:999px;
-  font-size:10px;
-  font-weight:800;
-  background:#edf2f7;
-}
-
-.pill.green{
-  background:#e5f8ef;
-  color:#087443;
-}
-
-.pill.yellow{
-  background:#fff7dc;
-  color:#8a6100;
-}
-
-.pill.red{
-  background:#ffeded;
-  color:#a32118;
-}
-
-.notice{
-  padding:12px;
-  border-radius:8px;
-  font-size:13px;
-  margin-bottom:15px;
-}
-
-.notice.info{
-  background:#eef6ff;
-  color:#24547d;
-}
-
-.notice.err{
-  background:#fff0ef;
-  color:#9d251b;
-}
-
-.notice.success{
-  background:#e7f8ef;
-  color:#087443;
-}
-
-.empty{
-  text-align:center;
-  color:var(--muted);
-  padding:30px;
-}
-
-.hint{
-  color:var(--muted);
-  font-size:11px;
-  margin-top:8px;
-}
-
-.search{
-  max-width:380px;
-  margin-bottom:14px;
-}
-
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(7,26,51,.55);
-  z-index:100;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-
-.modal.open{
-  display:flex;
-}
-
-.modal-box{
-  width:min(680px,100%);
-  max-height:90vh;
-  overflow:auto;
-  background:#fff;
-  border-radius:14px;
-  padding:24px;
-}
-
-.receipt h2{
-  text-align:center;
-  margin:0;
-}
-
-.receipt hr{
-  border:0;
-  border-top:1px dashed #999;
-  margin:15px 0;
-}
-
-.receipt-row{
-  display:flex;
-  justify-content:space-between;
-  gap:20px;
-  padding:5px 0;
-}
-
-#toast{
-  position:fixed;
-  right:20px;
-  bottom:20px;
-  z-index:200;
-}
-
-@media(max-width:1000px){
-  .grid,
-  .form-grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-}
-
+body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:245px;background:var(--navy);color:#fff;padding:20px 14px;z-index:20}
+.brand{padding:10px 12px 24px;font-size:20px;font-weight:900}
+.brand small{display:block;margin-top:5px;color:#9fb1c8;font-size:11px}
+.nav{display:grid;gap:6px}
+.nav button{border:0;background:transparent;color:#c8d4e4;text-align:left;padding:12px;border-radius:9px;cursor:pointer;font-size:14px}
+.nav button:hover,.nav button.active{background:var(--navy2);color:#fff}
+.nav button.active{border-left:3px solid var(--green)}
+.userbox{position:absolute;left:14px;right:14px;bottom:18px;border-top:1px solid #27415f;padding:15px 8px;color:#b8c7d9;font-size:12px}
+.user-name{color:#fff;font-weight:800;margin-bottom:3px}
+.user-email{word-break:break-word;margin-bottom:10px}
+.main{margin-left:245px;padding:28px}
+.topbar h1{margin:0;font-size:26px}
+.db-status{color:var(--muted);font-size:12px;margin:6px 0 24px}
+.db-status.ok{color:var(--green-dark)}
+.db-status.bad{color:var(--danger)}
+.panel{display:none}
+.panel.active{display:block}
+.lede{color:var(--muted);margin-top:-12px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px}
+.card h2{margin:0 0 15px;font-size:17px}
+.stat .label{color:var(--muted);font-size:12px}
+.stat .value{font-size:27px;font-weight:800;margin-top:8px}
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+label{font-size:12px;font-weight:700;color:#44526a}
+input,select,textarea{width:100%;padding:10px 11px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font-size:13px}
+input[readonly]{background:#f5f7fa}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}
+.btn{border:0;background:var(--green);color:#062719;padding:10px 15px;border-radius:8px;font-weight:800;cursor:pointer}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.outline{background:#fff;border:1px solid var(--border);color:var(--text)}
+.table-wrap{overflow:auto}
+.table{width:100%;border-collapse:collapse;font-size:13px}
+.table th,.table td{padding:11px 10px;border-bottom:1px solid #edf0f5;text-align:left;white-space:nowrap}
+.table th{background:#fafbfd;color:var(--muted);font-size:11px;text-transform:uppercase}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;background:#edf2f7}
+.pill.green{background:#e5f8ef;color:#087443}
+.pill.yellow{background:#fff7dc;color:#8a6100}
+.pill.red{background:#ffeded;color:#a32118}
+.notice{padding:12px;border-radius:8px;font-size:13px;margin-bottom:15px}
+.notice.info{background:#eef6ff;color:#24547d}
+.notice.err{background:#fff0ef;color:#9d251b}
+.notice.success{background:#e7f8ef;color:#087443}
+.empty{text-align:center;color:var(--muted);padding:30px}
+.hint{color:var(--muted);font-size:11px;margin-top:8px}
+.search{max-width:380px;margin-bottom:14px}
+.modal{display:none;position:fixed;inset:0;background:rgba(7,26,51,.55);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-box{width:min(680px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:14px;padding:24px}
+.receipt h2{text-align:center;margin:0}
+.receipt hr{border:0;border-top:1px dashed #999;margin:15px 0}
+.receipt-row{display:flex;justify-content:space-between;gap:20px;padding:5px 0}
+#toast{position:fixed;right:20px;bottom:20px;z-index:200}
+@media(max-width:1000px){.grid,.form-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){
-  .sidebar{
-    position:static;
-    width:100%;
-  }
-
-  .main{
-    margin-left:0;
-    padding:15px;
-  }
-
-  .userbox{
-    position:static;
-    margin-top:20px;
-  }
-
-  .grid,
-  .form-grid{
-    grid-template-columns:1fr;
-  }
-
-  .form-group.full{
-    grid-column:auto;
-  }
+  .sidebar{position:static;width:100%}
+  .main{margin-left:0;padding:15px}
+  .userbox{position:static;margin-top:20px}
+  .grid,.form-grid{grid-template-columns:1fr}
+  .form-group.full{grid-column:auto}
 }
-
 @media print{
-  .sidebar,
-  .main{
-    display:none;
-  }
-
-  .modal{
-    position:static;
-    background:none;
-  }
-
-  .modal .actions{
-    display:none;
-  }
+  .sidebar,.main{display:none}
+  .modal{position:static;background:none}
+  .modal .actions{display:none}
 }
 </style>
 </head>
-
 <body>
 
-<!-- =========================================================
-     SIDEBAR
-========================================================= -->
-
 <aside class="sidebar">
-
-  <div class="brand">
-    LASHAWN ACADEMY
-    <small>OFFICE ADMIN</small>
-  </div>
-
+  <div class="brand">LASHAWN ACADEMY<small>OFFICE ADMIN</small></div>
   <nav class="nav">
-
-    <button class="active" data-panel="dashboard">
-      Dashboard
-    </button>
-
-    <button data-panel="mywork" id="navMyWork">
-      My Work Today
-    </button>
-
-    <button data-panel="training">
-      6-Week Training
-    </button>
-
-    <button data-panel="registration">
-      New Registration / Enrolment
-    </button>
-
-    <button data-panel="walkins">
-      Walk-in Clients
-    </button>
-
-    <button data-panel="students">
-      Students
-    </button>
-
-    <button data-panel="enrolments">
-      Enrolments
-    </button>
-
-    <button data-panel="payments">
-      Payments
-    </button>
-
-    <button data-panel="fees">
-      Fees &amp; Pricing
-    </button>
-
+    <button class="active" data-panel="dashboard">Dashboard</button>
+    <button data-panel="mywork" id="navMyWork">My Work Today</button>
+    <button data-panel="training">6-Week Training</button>
+    <button data-panel="registration">New Registration / Enrolment</button>
+    <button data-panel="walkins">Walk-in Clients</button>
+    <button data-panel="students">Students</button>
+    <button data-panel="enrolments">Enrolments</button>
+    <button data-panel="payments">Payments</button>
+    <button data-panel="fees">Fees &amp; Pricing</button>
   </nav>
-
   <div class="userbox">
-
-    <div class="user-name" id="adminName">
-      Office Admin
-    </div>
-
+    <div class="user-name" id="adminName">Office Admin</div>
     <div class="user-email" id="adminEmail"></div>
-
-    <button
-      class="btn outline"
-      id="logoutBtn"
-      style="width:100%">
-      Logout
-    </button>
-
+    <button class="btn outline" id="logoutBtn" style="width:100%">Logout</button>
   </div>
-
 </aside>
 
-
-<!-- =========================================================
-     MAIN
-========================================================= -->
-
 <main class="main">
-
-  <div class="topbar">
-    <h1 id="pageTitle">Dashboard</h1>
-  </div>
-
+  <div class="topbar"><h1 id="pageTitle">Dashboard</h1></div>
   <div id="dbStatus" class="db-status" style="display:none"></div>
-
 
   <!-- DASHBOARD -->
   <section class="panel active" id="panel-dashboard">
@@ -529,7 +126,6 @@ input[readonly]{
       <div class="card stat"><div class="label">Payments Awaiting Approval</div><div class="value" id="statPending">—</div></div>
       <div class="card stat"><div class="label">Self-Enrolments Awaiting Action</div><div class="value" id="statSelfEnrolments">—</div></div>
     </div>
-
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
         <div>
@@ -552,7 +148,6 @@ input[readonly]{
     </div>
   </section>
 
-
   <!-- MY WORK TODAY -->
   <section class="panel" id="panel-mywork">
     <div class="card" style="margin-bottom:16px">
@@ -574,7 +169,6 @@ input[readonly]{
       <div id="myWorkActivity" class="table-wrap">Loading today's work...</div>
     </div>
   </section>
-
 
   <!-- 6-WEEK TRAINING -->
   <section class="panel" id="panel-training">
@@ -607,7 +201,6 @@ input[readonly]{
       </div>
     </div>
   </section>
-
 
   <!-- NEW ENROLMENT -->
   <section class="panel" id="panel-registration">
@@ -740,7 +333,6 @@ input[readonly]{
     </form>
   </section>
 
-
   <!-- STUDENTS -->
   <section class="panel" id="panel-students">
     <p class="lede">Registered students and their latest training status.</p>
@@ -759,7 +351,6 @@ input[readonly]{
       </div>
     </div>
   </section>
-
 
   <!-- ENROLMENTS -->
   <section class="panel" id="panel-enrolments">
@@ -780,7 +371,6 @@ input[readonly]{
     </div>
   </section>
 
-
   <!-- FEES -->
   <section class="panel" id="panel-fees">
     <p class="lede">Invoices with totals, payments and balances.</p>
@@ -798,7 +388,6 @@ input[readonly]{
       </div>
     </div>
   </section>
-
 
   <!-- PAYMENTS -->
   <section class="panel" id="panel-payments">
@@ -818,7 +407,6 @@ input[readonly]{
     </div>
   </section>
 
-
   <!-- APPROVALS -->
   <section class="panel" id="panel-approvals">
     <p class="lede">Payments below 50% of the fee. No receipt is issued until a Super Admin approves.</p>
@@ -836,7 +424,6 @@ input[readonly]{
       </div>
     </div>
   </section>
-
 
   <!-- WALK-IN CLIENTS -->
   <section class="panel" id="panel-walkins">
@@ -871,11 +458,8 @@ input[readonly]{
       </div>
     </div>
   </section>
-
 </main>
 
-
-<!-- RECEIPT MODAL -->
 <div class="modal" id="receiptModal">
   <div class="modal-box">
     <div class="receipt" id="receiptContent"></div>
@@ -886,8 +470,6 @@ input[readonly]{
   </div>
 </div>
 
-
-<!-- PAYMENT MODAL -->
 <div class="modal" id="payModal">
   <div class="modal-box" style="width:min(460px,100%)">
     <h2 style="margin-top:0">Receive Payment</h2>
@@ -918,8 +500,6 @@ input[readonly]{
   </div>
 </div>
 
-
-<!-- VIEW STUDENT MODAL -->
 <div class="modal" id="viewModal">
   <div class="modal-box">
     <div id="viewBody"></div>
@@ -929,37 +509,24 @@ input[readonly]{
   </div>
 </div>
 
-
 <div id="toast"></div>
-
 
 <script>
 
-/* ============================================================
-   SUPABASE
-============================================================ */
+/* SUPABASE */
 const SUPABASE_URL = "https://qjfinbftcserrjiedduf.supabase.co";
 const SUPABASE_KEY = "sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
 const DB = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-/* RECEIPT LOGO */
 const LOGO_URL = "/images/logo.png";
 
-/* TABLE NAMES */
 const T = {
-  students:"students",
-  enrolments:"enrolments",
-  invoices:"invoices",
-  payments:"payments",
-  fees:"fee_structures",
-  driving:"driving_classes",
-  computer:"computer_courses",
-  selfEnrolments:"self_enrolments",
-  status:"academy_student_training_status",
-  balances:"student_balances"
+  students:"students", enrolments:"enrolments", invoices:"invoices",
+  payments:"payments", fees:"fee_structures", driving:"driving_classes",
+  computer:"computer_courses", selfEnrolments:"self_enrolments",
+  status:"academy_student_training_status", balances:"student_balances"
 };
 
-/* STATE */
 let INVOICES = [];
 let PAYS = [];
 let PAY_INV = null;
@@ -972,7 +539,6 @@ let STUDENT_ROWS = [];
 let SELF_ENROLMENTS = [];
 let CALC = { unit:0, qty:1, total:0, paid:0, balance:0 };
 
-/* HELPERS */
 const $ = id => document.getElementById(id);
 
 const money = v =>
@@ -998,18 +564,36 @@ let BRANCHES = {};
 let CURRENT_USER_EMAIL = "";
 let CURRENT_BRANCH_ID = null;
 let CURRENT_BRANCH_NAME = "";
+let ALL_BRANCH_USER = false;   /* ★ NEW */
 
 function defaultBranchNameForEmail(email){
   return DEFAULT_BRANCH_BY_EMAIL[String(email || "").trim().toLowerCase()] || "";
 }
 
-/* PATCH 1: loadOfficeBranch reads branch from RPC first */
+/* PATCH: loadOfficeBranch now sets ALL_BRANCH_USER */
 async function loadOfficeBranch(){
   try {
     const { data, error } = await DB.rpc("get_office_dashboard");
-    if (!error && data?.user?.branch_id) {
-      CURRENT_BRANCH_ID   = data.user.branch_id;
-      CURRENT_BRANCH_NAME = data.user.branch_name || "Branch";
+    if (!error && data?.user) {
+      const u = data.user;
+
+      if (u.restricted === true) {
+        CURRENT_BRANCH_ID   = null;
+        CURRENT_BRANCH_NAME = "Unassigned";
+        ALL_BRANCH_USER     = false;
+        return;
+      }
+
+      if (!u.branch_id) {
+        CURRENT_BRANCH_ID   = null;
+        CURRENT_BRANCH_NAME = u.branch_name || "All branches";
+        ALL_BRANCH_USER     = true;
+        return;
+      }
+
+      CURRENT_BRANCH_ID   = u.branch_id;
+      CURRENT_BRANCH_NAME = u.branch_name || "Branch";
+      ALL_BRANCH_USER     = false;
       return;
     }
   } catch (e) {
@@ -1032,6 +616,7 @@ async function loadOfficeBranch(){
   if (!wanted) {
     CURRENT_BRANCH_ID   = null;
     CURRENT_BRANCH_NAME = "All branches";
+    ALL_BRANCH_USER     = true;
     return;
   }
 
@@ -1041,12 +626,16 @@ async function loadOfficeBranch(){
 
   CURRENT_BRANCH_ID   = found?.id || null;
   CURRENT_BRANCH_NAME = found?.branch_name || wanted;
+  ALL_BRANCH_USER     = !found;
+}
+
+/* Guard helper — reused by every loader */
+function branchLocked(){
+  return !CURRENT_BRANCH_ID && !ALL_BRANCH_USER;
 }
 
 function party(r){
-  if(r?.students){
-    return { no:r.students.student_number, name:fullName(r.students), obj:r.students };
-  }
+  if(r?.students) return { no:r.students.student_number, name:fullName(r.students), obj:r.students };
   const c = r?.printing_jobs?.printing_customers;
   return {
     no:c?.customer_number || "—",
@@ -1057,9 +646,7 @@ function party(r){
 
 function enr(r){
   if(r?.enrolments) return r.enrolments;
-  if(r?.printing_jobs){
-    return { enrolment_number:r.printing_jobs.job_number, programme:"PRINTING_DIGITAL" };
-  }
+  if(r?.printing_jobs) return { enrolment_number:r.printing_jobs.job_number, programme:"PRINTING_DIGITAL" };
   return null;
 }
 
@@ -1074,11 +661,8 @@ const badge = status => {
 };
 
 const today = () => new Date().toISOString().slice(0,10);
+const empty = (cols,msg) => `<tr><td colspan="${cols}" class="empty">${esc(msg)}</td></tr>`;
 
-const empty = (cols,msg) =>
-  `<tr><td colspan="${cols}" class="empty">${esc(msg)}</td></tr>`;
-
-/* TOAST / STATUS */
 function toast(msg,ok=true){
   $("toast").innerHTML = `<div style="background:${ok ? "#0d2748" : "#9d251b"};color:#fff;padding:12px 16px;border-radius:8px">${esc(msg)}</div>`;
   setTimeout(() => $("toast").innerHTML = "", 3500);
@@ -1093,7 +677,6 @@ function setStatus(text,cls){
   $("dbStatus").className = "db-status " + (cls || "");
 }
 
-/* AUTH */
 function isStaff(u){
   const a = u?.app_metadata || {};
   const m = u?.user_metadata || {};
@@ -1108,14 +691,12 @@ function isStaff(u){
 
 async function guard(){
   if(!DB){ setStatus("● Supabase unavailable","bad"); return false; }
-
   const { data:{session}, error } = await DB.auth.getSession();
   if(error){ setStatus("● Authentication error","bad"); return false; }
   if(!session){ location.href = "login.html"; return false; }
 
   const u = session.user;
   window.__lashawnSessionUserId = u.id;
-
   if(!isStaff(u)){ setStatus("● Office Admin access required","bad"); return false; }
 
   CURRENT_USER_EMAIL = u.email || "";
@@ -1129,22 +710,19 @@ async function guard(){
     if(!sr.error && sr.data) window.__lashawnStaffId = sr.data.id;
   }catch(e){ console.warn("Staff identity lookup skipped:",e); }
 
-  try{
-    IS_SUPER = (await DB.rpc("is_super_admin")).data === true;
-  }catch(_){ IS_SUPER = false; }
+  try{ IS_SUPER = (await DB.rpc("is_super_admin")).data === true; }
+  catch(_){ IS_SUPER = false; }
 
   setStatus("● Connected to Supabase","ok");
   return true;
 }
 
-/* REFERENCE DATA */
 async function loadReference(){
   const [d,c,f] = await Promise.all([
     DB.from(T.driving).select("id,class_code,class_name,description,minimum_age,training_weeks,theory_required,practical_required,is_active").eq("is_active",true).order("class_code"),
     DB.from(T.computer).select("id,course_code,course_name,description,duration_weeks,duration_hours,fee,is_active").eq("is_active",true).order("course_name"),
     DB.from(T.fees).select("id,name,programme,driving_class_id,computer_course_id,amount,description,option_code,unit,quantity_based,course_type,is_active").eq("is_active",true).order("programme").order("name")
   ]);
-
   if(d.error) throw new Error("Driving classes: " + d.error.message);
   if(c.error) throw new Error("Computer courses: " + c.error.message);
   if(f.error) throw new Error("Fee structures: " + f.error.message);
@@ -1162,7 +740,6 @@ async function loadReference(){
   renderServices();
 }
 
-/* PROGRAMME */
 function programmeChanged(){
   const p = $("programme").value;
   const student = p === "DRIVING" || p === "COMPUTER";
@@ -1180,7 +757,6 @@ function programmeChanged(){
   refreshFeeOptions();
 }
 
-/* FEE OPTIONS */
 function refreshFeeOptions(){
   const p = $("programme").value;
   const dc = $("drivingClass").value;
@@ -1203,7 +779,6 @@ function refreshFeeOptions(){
   updateFee();
 }
 
-/* FEE CALCULATION */
 function updateFee(){
   const fee = FEES.find(f => f.id === $("feeOption").value);
   const q = $("quantity");
@@ -1243,7 +818,6 @@ function updateFee(){
   updateRule();
 }
 
-/* PAYMENT RULE */
 function updateRule(){
   const t = CALC.total;
   let m = "";
@@ -1259,14 +833,12 @@ function updateRule(){
   $("payRule").textContent = m;
 }
 
-/* PAYER */
 function payerChanged(){
   const other = $("payer").value !== "Self";
   $("payerNameGroup").style.display = other ? "flex" : "none";
   $("payerName").required = other;
 }
 
-/* RESET */
 function resetForm(){
   $("enrolForm").reset();
   $("startDate").value = today();
@@ -1274,7 +846,6 @@ function resetForm(){
   programmeChanged();
 }
 
-/* PRINTING / CYBER */
 async function savePrinting(fee, paid, payerText, modeText){
   const { data, error } = await DB.rpc("register_printing_job", {
     p_first_name: $("firstName").value.trim(),
@@ -1288,11 +859,11 @@ async function savePrinting(fee, paid, payerText, modeText){
     p_payment_method: $("paymentMethod").value,
     p_reference: $("paymentReference").value.trim() || null,
     p_notes: `${fee.name} x ${CALC.qty} | Payer: ${payerText} | Mode: ${modeText}` +
-      ($("notes").value.trim() ? " | " + $("notes").value.trim() : "")
+      ($("notes").value.trim() ? " | " + $("notes").value.trim() : ""),
+    p_branch_id: CURRENT_BRANCH_ID   /* ★ branch scoping for printing jobs */
   });
 
   if(error) throw error;
-
   const r = Array.isArray(data) ? data[0] : data;
 
   showNotice(
@@ -1322,7 +893,6 @@ async function savePrinting(fee, paid, payerText, modeText){
   await loadOverviewPage();
 }
 
-/* SAVE ENROLMENT */
 async function saveEnrolment(e){
   e.preventDefault();
   showNotice("");
@@ -1344,7 +914,6 @@ async function saveEnrolment(e){
     ($("payer").value !== "Self" && $("payerName").value.trim()
       ? ` (${$("payerName").value.trim()})`
       : "");
-
   const modeText = $("payMode").value === "INSTALMENTS" ? "Instalments 50/30/20" : "Full payment";
 
   $("saveBtn").disabled = true;
@@ -1358,7 +927,6 @@ async function saveEnrolment(e){
 
     let { data: liveSessionData, error: liveSessionError } = await DB.auth.getSession();
     if(liveSessionError) throw new Error("Authentication check failed: " + liveSessionError.message);
-
     if(!liveSessionData?.session){
       const refreshed = await DB.auth.refreshSession();
       if(refreshed.error) throw new Error("Your login session has expired. Please log in again.");
@@ -1459,7 +1027,6 @@ async function saveEnrolment(e){
 
     resetForm();
     await loadOverviewPage();
-
   }catch(err){
     console.error(err);
     showNotice(err.message || "Could not save enrolment.","err");
@@ -1469,15 +1036,13 @@ async function saveEnrolment(e){
   }
 }
 
-/* OVERVIEW (RPC-driven) */
 async function loadOverview(){
   const {data,error} = await DB.rpc("get_office_dashboard");
   if(error) throw error;
   const summary = data?.summary || {};
   const user = data?.user || {};
 
-  if(user.branch_name){
-    CURRENT_BRANCH_ID = user.branch_id || null;
+  if(user.branch_name && user.branch_name !== "Unassigned"){
     CURRENT_BRANCH_NAME = user.branch_name;
   }
 
@@ -1493,7 +1058,6 @@ async function loadOverview(){
   $("statSelfEnrolments").textContent = Number(summary.pending_self_enrolments || 0);
 }
 
-/* MY WORK TODAY (RPC-driven) */
 async function loadMyWorkToday(){
   const target = $("myWorkActivity");
   target.innerHTML = `<div class="hint">Loading today's work...</div>`;
@@ -1522,31 +1086,12 @@ async function loadMyWorkToday(){
   $("workReceipts").textContent = receipts.length;
 
   const activity = [];
-  students.forEach(x => activity.push({
-    time:x.created_at, type:"Student registered", reference:x.student_number,
-    description:fullName(x), amount:null, status:x.status
-  }));
-  enrolments.forEach(x => activity.push({
-    time:x.created_at, type:"Enrolment created", reference:x.enrolment_number,
-    description:x.programme, amount:null, status:x.status
-  }));
-  jobs.forEach(x => activity.push({
-    time:x.created_at, type:"Walk-in job", reference:x.job_number || x.id,
-    description:"Printing / service job", amount:x.amount_paid ?? null, status:x.status
-  }));
-  payments.forEach(x => activity.push({
-    time:x.payment_date || x.created_at, type:"Payment received",
-    reference:x.payment_number || x.id, description:x.payment_method || "Payment",
-    amount:x.amount, status:x.status
-  }));
-  invoices.forEach(x => activity.push({
-    time:x.created_at, type:"Invoice created", reference:x.invoice_number || x.id,
-    description:"Invoice", amount:x.total_amount, status:x.status
-  }));
-  receipts.forEach(x => activity.push({
-    time:x.issued_at, type:"Receipt issued", reference:x.receipt_number || x.id,
-    description:"Receipt", amount:x.amount, status:"ISSUED"
-  }));
+  students.forEach(x => activity.push({ time:x.created_at, type:"Student registered", reference:x.student_number, description:fullName(x), amount:null, status:x.status }));
+  enrolments.forEach(x => activity.push({ time:x.created_at, type:"Enrolment created", reference:x.enrolment_number, description:x.programme, amount:null, status:x.status }));
+  jobs.forEach(x => activity.push({ time:x.created_at, type:"Walk-in job", reference:x.job_number || x.id, description:"Printing / service job", amount:x.amount_paid ?? null, status:x.status }));
+  payments.forEach(x => activity.push({ time:x.payment_date || x.created_at, type:"Payment received", reference:x.payment_number || x.id, description:x.payment_method || "Payment", amount:x.amount, status:x.status }));
+  invoices.forEach(x => activity.push({ time:x.created_at, type:"Invoice created", reference:x.invoice_number || x.id, description:"Invoice", amount:x.total_amount, status:x.status }));
+  receipts.forEach(x => activity.push({ time:x.issued_at, type:"Receipt issued", reference:x.receipt_number || x.id, description:"Receipt", amount:x.amount, status:"ISSUED" }));
 
   activity.sort((a,b) => new Date(b.time) - new Date(a.time));
 
@@ -1564,20 +1109,22 @@ async function loadMyWorkToday(){
     : `<div class="empty">No work recorded for this branch today.</div>`;
 }
 
-/* ENROLMENTS LIST */
+/* ENROLMENTS */
 async function loadEnrolments(){
-  if(!CURRENT_BRANCH_ID){
+  if(branchLocked()){
     $("enrolmentsTable").innerHTML = empty(8, "No branch assigned to your account. Contact an administrator.");
     return;
   }
 
-  const { data, error } = await DB
+  let query = DB
     .from(T.enrolments)
     .select("id,enrolment_number,student_id,programme,branch_id,start_date,expected_end_date,status,payment_status,created_at,students(first_name,middle_name,last_name,phone,student_number)")
-    .eq("branch_id", CURRENT_BRANCH_ID)
     .order("created_at",{ascending:false})
     .limit(500);
 
+  if(CURRENT_BRANCH_ID) query = query.eq("branch_id", CURRENT_BRANCH_ID);
+
+  const { data, error } = await query;
   if(error) throw error;
   window.__ENROLMENTS_LIST = data || [];
   renderEnrolments();
@@ -1682,14 +1229,14 @@ async function updateSelfEnrolment(id,patch){
   await loadOverview();
 }
 
-/* STUDENTS (direct table query because view has no branch_id) */
+/* STUDENTS */
 async function loadStudents(){
-  if(!CURRENT_BRANCH_ID){
+  if(branchLocked()){
     $("studentsTable").innerHTML = empty(9, "No branch assigned to your account. Contact an administrator.");
     return;
   }
 
-  const { data, error } = await DB
+  let q = DB
     .from("students")
     .select(`
       id, student_number, first_name, middle_name, last_name, phone,
@@ -1699,10 +1246,12 @@ async function loadStudents(){
         status, payment_status, created_at
       )
     `)
-    .eq("branch_id", CURRENT_BRANCH_ID)
     .order("created_at", { ascending:false })
     .limit(1000);
 
+  if(CURRENT_BRANCH_ID) q = q.eq("branch_id", CURRENT_BRANCH_ID);
+
+  const { data, error } = await q;
   if(error) throw error;
 
   STUDENT_ROWS = (data || []).map(s => {
@@ -1750,36 +1299,14 @@ function renderStudents(){
     : empty(9, "No students found.");
 }
 
-/* FEES (branch via student_id.in / printing_job_id.in) */
+/* FEES */
 async function loadFees(){
-  if(!CURRENT_BRANCH_ID){
+  if(branchLocked()){
     $("feesTable").innerHTML = empty(9, "No branch assigned to your account. Contact an administrator.");
     return;
   }
 
-  const [stRes, pjRes] = await Promise.all([
-    DB.from("students").select("id").eq("branch_id", CURRENT_BRANCH_ID),
-    DB.from("printing_jobs").select("id").eq("branch_id", CURRENT_BRANCH_ID)
-  ]);
-
-  if(stRes.error) throw stRes.error;
-  if(pjRes.error) throw pjRes.error;
-
-  const studentIds = (stRes.data || []).map(x => x.id);
-  const jobIds     = (pjRes.data || []).map(x => x.id);
-
-  if(!studentIds.length && !jobIds.length){
-    INVOICES = [];
-    $("feesTable").innerHTML = empty(9, "No invoices found.");
-    return;
-  }
-
-  const orFilter = [
-    studentIds.length ? `student_id.in.(${studentIds.join(",")})` : null,
-    jobIds.length     ? `printing_job_id.in.(${jobIds.join(",")})` : null
-  ].filter(Boolean).join(",");
-
-  const { data, error } = await DB
+  let query = DB
     .from(T.invoices)
     .select(`
       id, invoice_number, student_id, enrolment_id, printing_job_id,
@@ -1788,10 +1315,35 @@ async function loadFees(){
       enrolments(enrolment_number, programme),
       printing_jobs(job_number, printing_customers(customer_name, customer_number))
     `)
-    .or(orFilter)
     .order("created_at",{ascending:false})
     .limit(1000);
 
+  if(CURRENT_BRANCH_ID){
+    const [stRes, pjRes] = await Promise.all([
+      DB.from("students").select("id").eq("branch_id", CURRENT_BRANCH_ID),
+      DB.from("printing_jobs").select("id").eq("branch_id", CURRENT_BRANCH_ID)
+    ]);
+    if(stRes.error) throw stRes.error;
+    if(pjRes.error) throw pjRes.error;
+
+    const studentIds = (stRes.data || []).map(x => x.id);
+    const jobIds     = (pjRes.data || []).map(x => x.id);
+
+    if(!studentIds.length && !jobIds.length){
+      INVOICES = [];
+      $("feesTable").innerHTML = empty(9, "No invoices found.");
+      return;
+    }
+
+    const orFilter = [
+      studentIds.length ? `student_id.in.(${studentIds.join(",")})` : null,
+      jobIds.length     ? `printing_job_id.in.(${jobIds.join(",")})` : null
+    ].filter(Boolean).join(",");
+
+    query = query.or(orFilter);
+  }
+
+  const { data, error } = await query;
   if(error) throw error;
   INVOICES = data || [];
 
@@ -1817,35 +1369,14 @@ async function loadFees(){
   }).join("") : empty(9, "No invoices found.");
 }
 
-/* PAYMENTS (branch via student_id.in / printing_job_id.in) */
+/* PAYMENTS */
 async function loadPayments(){
-  if(!CURRENT_BRANCH_ID){
+  if(branchLocked()){
     $("paymentsTable").innerHTML = empty(7, "No branch assigned to your account. Contact an administrator.");
     return;
   }
 
-  const [stRes, pjRes] = await Promise.all([
-    DB.from("students").select("id").eq("branch_id", CURRENT_BRANCH_ID),
-    DB.from("printing_jobs").select("id").eq("branch_id", CURRENT_BRANCH_ID)
-  ]);
-  if(stRes.error) throw stRes.error;
-  if(pjRes.error) throw pjRes.error;
-
-  const studentIds = (stRes.data || []).map(x => x.id);
-  const jobIds     = (pjRes.data || []).map(x => x.id);
-
-  if(!studentIds.length && !jobIds.length){
-    PAYS = [];
-    $("paymentsTable").innerHTML = empty(7, "No confirmed payments.");
-    return;
-  }
-
-  const orFilter = [
-    studentIds.length ? `student_id.in.(${studentIds.join(",")})` : null,
-    jobIds.length     ? `printing_job_id.in.(${jobIds.join(",")})` : null
-  ].filter(Boolean).join(",");
-
-  const { data, error } = await DB
+  let query = DB
     .from(T.payments)
     .select(`
       id, payment_number, payment_date, amount, payment_method,
@@ -1856,10 +1387,32 @@ async function loadPayments(){
       invoices(invoice_number)
     `)
     .eq("status", "CONFIRMED")
-    .or(orFilter)
     .order("payment_date",{ascending:false})
     .limit(1000);
 
+  if(CURRENT_BRANCH_ID){
+    const [stRes, pjRes] = await Promise.all([
+      DB.from("students").select("id").eq("branch_id", CURRENT_BRANCH_ID),
+      DB.from("printing_jobs").select("id").eq("branch_id", CURRENT_BRANCH_ID)
+    ]);
+    const studentIds = (stRes.data || []).map(x => x.id);
+    const jobIds     = (pjRes.data || []).map(x => x.id);
+
+    if(!studentIds.length && !jobIds.length){
+      PAYS = [];
+      $("paymentsTable").innerHTML = empty(7, "No confirmed payments.");
+      return;
+    }
+
+    const orFilter = [
+      studentIds.length ? `student_id.in.(${studentIds.join(",")})` : null,
+      jobIds.length     ? `printing_job_id.in.(${jobIds.join(",")})` : null
+    ].filter(Boolean).join(",");
+
+    query = query.or(orFilter);
+  }
+
+  const { data, error } = await query;
   if(error) throw error;
   PAYS = data || [];
 
@@ -1876,7 +1429,7 @@ async function loadPayments(){
   `).join("") : empty(7, "No confirmed payments.");
 }
 
-/* SERVICES (renderService tables) */
+/* SERVICES */
 function renderServices(){
   const drivingTarget = $("drivingServices");
   if(drivingTarget) drivingTarget.innerHTML = DRIVING.length
@@ -1927,7 +1480,6 @@ function renderServices(){
 /* RECEIPT */
 function showReceipt(d){
   const row = (l,v) => `<div class="receipt-row"><span>${l}</span><strong>${esc(v)}</strong></div>`;
-
   $("receiptContent").innerHTML = `
     ${LOGO_URL ? `<div style="text-align:center;margin-bottom:8px">
       <img src="${esc(LOGO_URL)}" alt="Lashawn Academy"
@@ -1939,10 +1491,8 @@ function showReceipt(d){
     <hr>
     ${row("Payment No.", d.payment?.payment_number || "—")}
     ${row("Date", fmtDate(d.payment?.payment_date))}
-    ${row(d.enrolment?.programme === "PRINTING_DIGITAL" ? "Customer No." : "Student No.",
-          d.student?.student_number || "—")}
-    ${row(d.enrolment?.programme === "PRINTING_DIGITAL" ? "Job No." : "Enrolment No.",
-          d.enrolment?.enrolment_number || "—")}
+    ${row(d.enrolment?.programme === "PRINTING_DIGITAL" ? "Customer No." : "Student No.", d.student?.student_number || "—")}
+    ${row(d.enrolment?.programme === "PRINTING_DIGITAL" ? "Job No." : "Enrolment No.", d.enrolment?.enrolment_number || "—")}
     ${row(d.enrolment?.programme === "PRINTING_DIGITAL" ? "Client" : "Student", fullName(d.student))}
     ${row("Programme", d.enrolment?.programme || "—")}
     <hr>
@@ -1959,46 +1509,37 @@ function showReceipt(d){
     </div>
     <p style="text-align:center;font-size:12px">Thank you for choosing Lashawn Academy.</p>
   `;
-
   $("receiptModal").classList.add("open");
 }
 
-/* PRINT RECEIPT */
 function printReceipt(){
   const html = $("receiptContent").innerHTML;
   const old = document.getElementById("printFrame");
   if(old) old.remove();
-
   const f = document.createElement("iframe");
   f.id = "printFrame";
   f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
   document.body.appendChild(f);
-
   const d = f.contentWindow.document;
   d.open();
-  d.write(`
-    <!DOCTYPE html><html><head>
-      <title>Receipt</title>
-      <base href="${location.href}">
-      <style>
-        @page{margin:10mm}
-        body{font-family:Arial,Helvetica,sans-serif;color:#000;max-width:380px;margin:0 auto;font-size:13px}
-        h2{text-align:center;margin:0}
-        hr{border:0;border-top:1px dashed #999;margin:12px 0}
-        .receipt-row{display:flex;justify-content:space-between;gap:16px;padding:4px 0}
-      </style>
-    </head><body>${html}</body></html>
-  `);
+  d.write(`<!DOCTYPE html><html><head>
+    <title>Receipt</title>
+    <base href="${location.href}">
+    <style>
+      @page{margin:10mm}
+      body{font-family:Arial,Helvetica,sans-serif;color:#000;max-width:380px;margin:0 auto;font-size:13px}
+      h2{text-align:center;margin:0}
+      hr{border:0;border-top:1px dashed #999;margin:12px 0}
+      .receipt-row{display:flex;justify-content:space-between;gap:16px;padding:4px 0}
+    </style>
+  </head><body>${html}</body></html>`);
   d.close();
-
   const go = () => { f.contentWindow.focus(); f.contentWindow.print(); };
   const img = d.querySelector("img");
-
   if(img && !img.complete){
     let done = false;
     const once = () => { if(!done){ done = true; go(); } };
-    img.onload = once;
-    img.onerror = once;
+    img.onload = once; img.onerror = once;
     setTimeout(once, 3000);
   } else {
     setTimeout(go, 250);
@@ -2021,28 +1562,20 @@ function openPay(id){
   const pd = Number(inv.amount_paid || 0);
   const target = [.5,.8,1].map(x => t*x).find(x => x > pd + .005) ?? t;
 
-  $("payAmount").value = Math.min(
-    Number(inv.balance || 0),
-    +(target - pd).toFixed(2)
-  );
-
+  $("payAmount").value = Math.min(Number(inv.balance || 0), +(target - pd).toFixed(2));
   $("payInfo").textContent =
     `${inv.invoice_number || "Invoice"} · ${party(inv).no} ${party(inv).name} · Balance ${money(inv.balance)} · Cumulative payment under 50% needs Super Admin approval`;
-
   $("payModal").classList.add("open");
 }
 
-/* SUBMIT PAYMENT */
 async function submitPay(e){
   e.preventDefault();
   payErr("");
-
   const inv = INVOICES.find(x => x.id === PAY_INV);
   if(!inv) return;
 
   const amt = Number($("payAmount").value || 0);
   const bal = Number(inv.balance || 0);
-
   if(amt <= 0) return payErr("Enter an amount.");
   if(amt > bal) return payErr("Amount exceeds the balance of " + money(bal));
 
@@ -2076,7 +1609,6 @@ async function submitPay(e){
 
     const total = Number(inv.total_amount || 0);
     const expected = Number(inv.amount_paid || 0) + amt;
-
     const { data:cur } = await DB.from(T.invoices).select("amount_paid").eq("id", inv.id).single();
 
     if(Number(cur?.amount_paid || 0) < expected){
@@ -2085,12 +1617,10 @@ async function submitPay(e){
         balance: Math.max(0, total - expected),
         status: expected >= total ? "PAID" : "PARTIAL"
       }).eq("id", inv.id);
-
       if(ue) throw new Error("Payment " + p.payment_number + " saved but invoice update failed: " + ue.message);
     }
 
     $("payModal").classList.remove("open");
-
     showReceipt({
       payment:p, paid:amt,
       student: party(inv).obj,
@@ -2103,7 +1633,6 @@ async function submitPay(e){
 
     toast("Payment recorded");
     await loadFees();
-
   }catch(err){
     console.error(err);
     payErr(err.message || "Could not save payment.");
@@ -2122,7 +1651,6 @@ const drow = (l,v) => `<div class="receipt-row" style="border-bottom:1px solid #
 async function viewStudent(id){
   $("viewBody").innerHTML = "Loading...";
   $("viewModal").classList.add("open");
-
   try{
     const [st, en, inv] = await Promise.all([
       DB.from(T.students).select("*").eq("id",id).single(),
@@ -2135,7 +1663,6 @@ async function viewStudent(id){
         invoice_number, total_amount, amount_paid, balance, status
       `).eq("student_id",id).order("created_at",{ascending:false})
     ]);
-
     if(st.error) throw st.error;
 
     const x = st.data;
@@ -2180,19 +1707,15 @@ async function viewStudent(id){
       ${drow("Relationship", nokRel)}
       ${drow("Phone", x.emergency_contact_phone)}
       <h3 style="margin:18px 0 6px">Enrolments</h3>
-      <div class="table-wrap">
-        <table class="table">
-          <thead><tr><th>No.</th><th>Programme</th><th>Start</th><th>Status</th></tr></thead>
-          <tbody>${enRows}</tbody>
-        </table>
-      </div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>No.</th><th>Programme</th><th>Start</th><th>Status</th></tr></thead>
+        <tbody>${enRows}</tbody>
+      </table></div>
       <h3 style="margin:18px 0 6px">Fees</h3>
-      <div class="table-wrap">
-        <table class="table">
-          <thead><tr><th>Invoice</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead>
-          <tbody>${invRows}</tbody>
-        </table>
-      </div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>Invoice</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead>
+        <tbody>${invRows}</tbody>
+      </table></div>
     `;
   }catch(err){
     console.error(err);
@@ -2246,7 +1769,7 @@ async function loadOverviewPage(){
   await loadMyWorkToday();
 }
 
-/* NAVIGATION */
+/* NAVIGATION HELPERS */
 async function loadEnrolmentFormPage(){
   if(typeof loadEnrolmentForm === "function") await loadEnrolmentForm();
 }
@@ -2281,8 +1804,7 @@ function renderTraining(){
   const starting = TRAINING_ROWS.filter(e => e.start_date === todayStr).length;
   const due = TRAINING_ROWS.filter(e =>
     e.expected_end_date && e.expected_end_date >= todayStr && e.expected_end_date <= weekEndStr &&
-    !["COMPLETED","CANCELLED","CLOSED"].includes(String(e.status || "").toUpperCase())
-  ).length;
+    !["COMPLETED","CANCELLED","CLOSED"].includes(String(e.status || "").toUpperCase())).length;
   const completed = TRAINING_ROWS.filter(e =>
     String(e.status || "").toUpperCase() === "COMPLETED").length;
 
@@ -2309,17 +1831,19 @@ function renderTraining(){
 }
 
 async function loadTraining(){
-  if(!CURRENT_BRANCH_ID){
+  if(branchLocked()){
     $("trainingTable").innerHTML = empty(9, "No branch assigned to your account. Contact an administrator.");
     return;
   }
 
-  const { data, error } = await DB
+  let q = DB
     .from(T.enrolments)
     .select("id,enrolment_number,student_id,programme,branch_id,start_date,expected_end_date,status,payment_status,created_at,students(first_name,middle_name,last_name,phone,student_number)")
-    .eq("branch_id", CURRENT_BRANCH_ID)
     .order("start_date",{ascending:false});
 
+  if(CURRENT_BRANCH_ID) q = q.eq("branch_id", CURRENT_BRANCH_ID);
+
+  const { data, error } = await q;
   if(error) throw error;
   TRAINING_ROWS = (data || []).filter(e => e.programme !== "PRINTING_DIGITAL");
   renderTraining();
@@ -2369,24 +1893,25 @@ async function loadWalkins(){
   const target = $("walkinsTable");
   if(target) target.innerHTML = empty(10, "Loading walk-in customers...");
 
-  if(!CURRENT_BRANCH_ID){
+  if(branchLocked()){
     if(target) target.innerHTML = empty(10, "No branch assigned to your account. Contact an administrator.");
     return;
   }
 
-  const { data, error } = await DB
+  let q = DB
     .from("printing_jobs")
     .select("*,printing_customers(*)")
-    .eq("branch_id", CURRENT_BRANCH_ID)
     .order("created_at",{ascending:false})
     .limit(500);
 
+  if(CURRENT_BRANCH_ID) q = q.eq("branch_id", CURRENT_BRANCH_ID);
+
+  const { data, error } = await q;
   if(error){
     console.error(error);
     if(target) target.innerHTML = empty(10, esc(error.message));
     return;
   }
-
   WALKIN_ROWS = data || [];
   renderWalkins();
 }
@@ -2464,7 +1989,6 @@ $("logoutBtn").addEventListener("click", async () => {
 $("selfEnrolmentsTable").addEventListener("click", async e => {
   const b = e.target.closest("[data-self-action]");
   if(!b) return;
-
   const id = b.dataset.id;
   const action = b.dataset.selfAction;
   const row = SELF_ENROLMENTS.find(x => x.id === id);
@@ -2472,7 +1996,6 @@ $("selfEnrolmentsTable").addEventListener("click", async e => {
 
   try{
     b.disabled = true;
-
     if(action === "paid"){
       if(!confirm(`Confirm that payment has been received from ${row.full_name}?`)){ b.disabled = false; return; }
       await updateSelfEnrolment(id, { payment_status:"PAID", status:"PENDING_VERIFICATION" });
@@ -2534,10 +2057,8 @@ $("closeView").addEventListener("click", () => $("viewModal").classList.remove("
 $("approvalsTable").addEventListener("click", async e => {
   const b = e.target.closest("[data-approve]");
   if(!b) return;
-
   const p = PENDING[b.dataset.approve];
   if(!confirm(`Approve ${money(p.amount)} for ${party(p).name}?`)) return;
-
   b.disabled = true;
 
   try{
@@ -2545,7 +2066,6 @@ $("approvalsTable").addEventListener("click", async e => {
     if(error) throw error;
 
     const t = Number(p.invoices?.total_amount || 0);
-
     showReceipt({
       payment:p, paid:p.amount,
       student: party(p).obj,
@@ -2555,10 +2075,8 @@ $("approvalsTable").addEventListener("click", async e => {
       method: p.payment_method,
       reference: p.transaction_reference || ""
     });
-
     toast("Payment approved");
     await loadApprovals();
-
   }catch(err){
     console.error(err);
     toast(err.message || "Approval failed", false);
@@ -2582,6 +2100,5 @@ $("approvalsTable").addEventListener("click", async e => {
 })();
 
 </script>
-
 </body>
 </html>
