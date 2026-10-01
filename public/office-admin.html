@@ -1965,6 +1965,16 @@ function enr(r){
 
 }
 
+const badge = status => {
+  const value = String(status ?? "—").trim();
+  const normalized = value.toUpperCase();
+  let cls = "";
+  if (["PAID","ACTIVE","COMPLETED","CONFIRMED","VERIFIED","SUCCESS","SUCCESSFUL"].includes(normalized)) cls = "green";
+  else if (["PENDING","PARTIAL","PROCESSING","IN_PROGRESS","UNPAID"].includes(normalized)) cls = "yellow";
+  else if (["CANCELLED","CANCELED","FAILED","REJECTED","OVERDUE","INACTIVE"].includes(normalized)) cls = "red";
+  return `<span class="pill ${cls}">${esc(value)}</span>`;
+};
+
 const today = () =>
   new Date()
     .toISOString()
