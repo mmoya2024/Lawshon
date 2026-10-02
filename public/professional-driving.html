@@ -1,0 +1,710 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Lashawn Academy | Professional & Defensive Driving</title>
+
+<meta name="description"
+      content="Professional and defensive driving courses at Lashawn Driving & Computer College. Defensive driving, motorcycle defensive riding, executive chauffeur and school transport safety training.">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+    --navy:#071a33;
+    --navy2:#0d2948;
+    --green:#39e75f;
+    --green2:#20c957;
+    --white:#ffffff;
+    --light:#f4f7fa;
+    --text:#172033;
+    --muted:#667085;
+    --border:#e4e9ef;
+    --shadow:0 12px 35px rgba(7,26,51,.10);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--light);
+    color:var(--text);
+    line-height:1.6;
+}
+
+a{
+    text-decoration:none;
+}
+
+.header{
+    background:var(--navy);
+    color:white;
+    padding:18px 6%;
+}
+
+.header-inner{
+    max-width:1200px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:800;
+}
+
+.logo span{
+    color:var(--green);
+}
+
+.nav{
+    display:flex;
+    gap:22px;
+    align-items:center;
+}
+
+.nav a{
+    color:white;
+    font-size:14px;
+    font-weight:600;
+}
+
+.nav .btn{
+    background:var(--green);
+    color:var(--navy);
+    padding:10px 16px;
+    border-radius:8px;
+}
+
+.hero{
+    background:linear-gradient(135deg,var(--navy),var(--navy2));
+    color:white;
+    padding:75px 6%;
+}
+
+.hero-inner{
+    max-width:1100px;
+    margin:auto;
+    text-align:center;
+}
+
+.badge{
+    display:inline-block;
+    background:rgba(57,231,95,.12);
+    color:var(--green);
+    border:1px solid rgba(57,231,95,.35);
+    padding:7px 14px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:18px;
+}
+
+.hero h1{
+    font-size:clamp(34px,5vw,58px);
+    line-height:1.1;
+    margin-bottom:18px;
+}
+
+.hero p{
+    max-width:760px;
+    margin:auto;
+    color:#d7e0ea;
+    font-size:18px;
+}
+
+.courses{
+    max-width:1200px;
+    margin:60px auto;
+    padding:0 20px;
+}
+
+.section-heading{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.section-heading h2{
+    color:var(--navy);
+    font-size:34px;
+    margin-bottom:8px;
+}
+
+.section-heading p{
+    color:var(--muted);
+}
+
+.course-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:24px;
+}
+
+.course-card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+}
+
+.course-top{
+    background:var(--navy);
+    color:white;
+    padding:22px;
+    position:relative;
+}
+
+.course-code{
+    color:var(--green);
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:1px;
+}
+
+.popular{
+    position:absolute;
+    top:18px;
+    right:18px;
+    background:var(--green);
+    color:var(--navy);
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:800;
+}
+
+.course-body{
+    padding:24px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+.programme{
+    color:var(--green2);
+    font-size:12px;
+    font-weight:800;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+
+.course-body h3{
+    color:var(--navy);
+    font-size:22px;
+    line-height:1.25;
+    margin-bottom:12px;
+}
+
+.course-body p{
+    color:var(--muted);
+    font-size:14px;
+    margin-bottom:22px;
+}
+
+.course-meta{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    border-top:1px solid var(--border);
+    padding-top:18px;
+    margin-top:auto;
+}
+
+.meta-item{
+    display:flex;
+    flex-direction:column;
+}
+
+.meta-label{
+    font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;
+    font-weight:700;
+}
+
+.meta-value{
+    font-size:18px;
+    color:var(--navy);
+    font-weight:800;
+}
+
+.course-btn{
+    display:block;
+    text-align:center;
+    background:var(--green);
+    color:var(--navy);
+    padding:13px 15px;
+    border-radius:9px;
+    font-weight:800;
+    margin-top:20px;
+    transition:.2s;
+}
+
+.course-btn:hover{
+    background:var(--green2);
+    transform:translateY(-1px);
+}
+
+.guidance{
+    max-width:1100px;
+    margin:70px auto;
+    padding:0 20px;
+}
+
+.guidance-box{
+    background:var(--navy);
+    color:white;
+    border-radius:20px;
+    padding:50px;
+    text-align:center;
+}
+
+.guidance-box h2{
+    font-size:32px;
+    margin-bottom:12px;
+}
+
+.guidance-box p{
+    color:#d7e0ea;
+    max-width:700px;
+    margin:0 auto 28px;
+}
+
+.stats{
+    display:flex;
+    justify-content:center;
+    gap:55px;
+    margin:30px 0;
+    flex-wrap:wrap;
+}
+
+.stat strong{
+    display:block;
+    color:var(--green);
+    font-size:26px;
+}
+
+.stat span{
+    color:#d7e0ea;
+    font-size:13px;
+}
+
+.guidance-btn{
+    display:inline-block;
+    background:var(--green);
+    color:var(--navy);
+    padding:13px 22px;
+    border-radius:9px;
+    font-weight:800;
+}
+
+.footer{
+    background:#04101f;
+    color:#b8c4d1;
+    padding:35px 20px;
+    text-align:center;
+    font-size:13px;
+}
+
+.footer strong{
+    color:white;
+}
+
+@media(max-width:900px){
+    .course-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:650px){
+    .nav{
+        display:none;
+    }
+
+    .hero{
+        padding:55px 20px;
+    }
+
+    .course-grid{
+        grid-template-columns:1fr;
+    }
+
+    .guidance-box{
+        padding:35px 22px;
+    }
+
+    .stats{
+        gap:25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="header-inner">
+
+        <div class="logo">
+            LASHawn <span>Academy</span>
+        </div>
+
+        <nav class="nav">
+            <a href="/">Home</a>
+            <a href="/driving">Driving</a>
+            <a href="/courses">Courses</a>
+            <a href="/contact">Contact</a>
+            <a class="btn" href="/enrolment">Enrol Now</a>
+        </nav>
+
+    </div>
+</header>
+
+
+<section class="hero">
+    <div class="hero-inner">
+
+        <span class="badge">PROFESSIONAL DRIVING PROGRAMMES</span>
+
+        <h1>Professional &amp; Defensive Driving</h1>
+
+        <p>
+            Build safer driving habits, sharpen hazard perception,
+            strengthen emergency handling and develop professional
+            road-safety skills with Lashawn Academy.
+        </p>
+
+    </div>
+</section>
+
+
+<section class="courses">
+
+    <div class="section-heading">
+        <h2>Professional Driving Courses</h2>
+        <p>Choose the programme that matches your driving and professional development goals.</p>
+    </div>
+
+
+    <div class="course-grid">
+
+
+        <!-- DD1 -->
+        <article class="course-card">
+
+            <div class="course-top">
+                <div class="course-code">DD1</div>
+                <div class="popular">POPULAR</div>
+            </div>
+
+            <div class="course-body">
+
+                <div class="programme">Professional Programme</div>
+
+                <h3>Foundational Defensive Driving</h3>
+
+                <p>
+                    Sharpen observation, hazard perception and safe
+                    decision-making for everyday driving.
+                </p>
+
+                <div class="course-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-value">3 Days</span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Fee</span>
+                        <span class="meta-value">KES 18,000</span>
+                    </div>
+                </div>
+
+                <a class="course-btn"
+                   href="/enrolment?course=Foundational%20Defensive%20Driving">
+                    Pay &amp; Enrol →
+                </a>
+
+            </div>
+        </article>
+
+
+        <!-- DD2 -->
+        <article class="course-card">
+
+            <div class="course-top">
+                <div class="course-code">DD2</div>
+            </div>
+
+            <div class="course-body">
+
+                <div class="programme">Professional Programme</div>
+
+                <h3>Advanced Defensive Driving</h3>
+
+                <p>
+                    An intensive programme in advanced road safety,
+                    accident management and emergency handling for
+                    experienced drivers.
+                </p>
+
+                <div class="course-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-value">5 Days</span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Fee</span>
+                        <span class="meta-value">KES 25,000</span>
+                    </div>
+                </div>
+
+                <a class="course-btn"
+                   href="/enrolment?course=Advanced%20Defensive%20Driving">
+                    Pay &amp; Enrol →
+                </a>
+
+            </div>
+        </article>
+
+
+        <!-- MDR -->
+        <article class="course-card">
+
+            <div class="course-top">
+                <div class="course-code">MDR</div>
+            </div>
+
+            <div class="course-body">
+
+                <div class="programme">Professional Programme</div>
+
+                <h3>Motorcycle Defensive Riding</h3>
+
+                <p>
+                    Specialised motorcycle safety training focused on
+                    accident prevention, rider responsibility and safe
+                    riding practice.
+                </p>
+
+                <div class="course-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-value">3 Days</span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Fee</span>
+                        <span class="meta-value">KES 7,500</span>
+                    </div>
+                </div>
+
+                <a class="course-btn"
+                   href="/enrolment?course=Motorcycle%20Defensive%20Riding">
+                    Pay &amp; Enrol →
+                </a>
+
+            </div>
+        </article>
+
+
+        <!-- ECH -->
+        <article class="course-card">
+
+            <div class="course-top">
+                <div class="course-code">ECH</div>
+            </div>
+
+            <div class="course-body">
+
+                <div class="programme">Professional Programme</div>
+
+                <h3>Executive Chauffeur Development</h3>
+
+                <p>
+                    Professional driving standards, discretion, customer
+                    service, route planning and advanced safety for
+                    executive drivers.
+                </p>
+
+                <div class="course-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-value">5 Days</span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Fee</span>
+                        <span class="meta-value">KES 40,000</span>
+                    </div>
+                </div>
+
+                <a class="course-btn"
+                   href="/enrolment?course=Executive%20Chauffeur%20Development">
+                    Pay &amp; Enrol →
+                </a>
+
+            </div>
+        </article>
+
+
+        <!-- CSP -->
+        <article class="course-card">
+
+            <div class="course-top">
+                <div class="course-code">CSP</div>
+            </div>
+
+            <div class="course-body">
+
+                <div class="programme">Professional Programme</div>
+
+                <h3>Customer Service for Transport Professionals</h3>
+
+                <p>
+                    Service-excellence training that strengthens
+                    communication, professionalism, conflict resolution
+                    and passenger experience.
+                </p>
+
+                <div class="course-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-value">5 Days</span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Fee</span>
+                        <span class="meta-value">KES 20,000</span>
+                    </div>
+                </div>
+
+                <a class="course-btn"
+                   href="/enrolment?course=Customer%20Service%20for%20Transport%20Professionals">
+                    Pay &amp; Enrol →
+                </a>
+
+            </div>
+        </article>
+
+
+        <!-- STW -->
+        <article class="course-card">
+
+            <div class="course-top">
+                <div class="course-code">STW</div>
+            </div>
+
+            <div class="course-body">
+
+                <div class="programme">Professional Programme</div>
+
+                <h3>School Transport Safety &amp; Warden Training</h3>
+
+                <p>
+                    A child-focused safety programme covering emergency
+                    response, defensive driving, fire suppression and
+                    risk assessment.
+                </p>
+
+                <div class="course-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-value">3 Days</span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Fee</span>
+                        <span class="meta-value">KES 5,000</span>
+                    </div>
+                </div>
+
+                <a class="course-btn"
+                   href="/enrolment?course=School%20Transport%20Safety%20and%20Warden%20Training">
+                    Pay &amp; Enrol →
+                </a>
+
+            </div>
+        </article>
+
+    </div>
+</section>
+
+
+<section class="guidance">
+
+    <div class="guidance-box">
+
+        <h2>Not sure where to start?</h2>
+
+        <p>
+            We'll match the course to your goals. Tell us what you want
+            to drive, your current experience and where you live.
+            A Lashawn Academy course advisor will guide you through
+            the right programme and branch.
+        </p>
+
+        <div class="stats">
+
+            <div class="stat">
+                <strong>1:1</strong>
+                <span>Course Guidance</span>
+            </div>
+
+            <div class="stat">
+                <strong>Multiple</strong>
+                <span>Branches</span>
+            </div>
+
+            <div class="stat">
+                <strong>Flexible</strong>
+                <span>Schedules</span>
+            </div>
+
+        </div>
+
+        <a class="guidance-btn" href="/contact">
+            Talk to a Course Advisor →
+        </a>
+
+    </div>
+
+</section>
+
+
+<footer class="footer">
+
+    <strong>Lashawn Driving &amp; Computer College</strong>
+
+    <br>
+
+    Professional Driving • Computer Training • Printing &amp; Digital Services
+
+    <br><br>
+
+    © <span id="year"></span> Lashawn Academy. All rights reserved.
+
+</footer>
+
+
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
+```
