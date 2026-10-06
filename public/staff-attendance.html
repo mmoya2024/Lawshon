@@ -1,205 +1,2582 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#071a33">
-<title>Lashawn Academy | Staff Attendance</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--navy:#071a33;--navy2:#0d2748;--green:#16c784;--green-dark:#087443;--bg:#f4f7fb;--text:#172033;--muted:#68758a;--border:#dce3ed;--danger:#d92d20;--warning:#8a6100}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
-.wrap{max-width:1050px;margin:0 auto;padding:24px}.top{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
-.brand{font-size:22px;font-weight:900;color:var(--navy)}.brand small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
-.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px;margin-top:18px;box-shadow:0 2px 8px rgba(7,26,51,.04)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.stat{padding:16px}.label{font-size:12px;color:var(--muted);font-weight:700}.value{font-size:25px;font-weight:900;margin-top:7px}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.btn{border:0;border-radius:9px;padding:13px 20px;font-weight:900;cursor:pointer;background:var(--green);color:#062719}.btn:disabled{opacity:.5;cursor:not-allowed}.btn.outline{background:#fff;border:1px solid var(--border);color:var(--text)}
-.btn.danger{background:#ffeceb;color:#a32118;border:1px solid #ffd0cc}.notice{padding:13px;border-radius:9px;margin-top:15px;font-size:13px}.notice.info{background:#eef6ff;color:#24547d}.notice.err{background:#fff0ef;color:#9d251b}.notice.success{background:#e7f8ef;color:#087443}
-.status{display:inline-block;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900}.working{background:#e5f8ef;color:#087443}.out{background:#edf2f7;color:#526174}.late{background:#fff7dc;color:#8a6100}
-.muted{color:var(--muted);font-size:13px}.big{font-size:36px;font-weight:900;color:var(--navy)}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:11px;border-bottom:1px solid #edf0f5;text-align:left;white-space:nowrap}th{font-size:11px;text-transform:uppercase;color:var(--muted);background:#fafbfd}
-.table-wrap{overflow:auto}.hidden{display:none}.admin{display:none}.location-box{border:1px dashed var(--border);padding:15px;border-radius:10px;margin-top:14px}
-@media(max-width:800px){.grid{grid-template-columns:1fr}.wrap{padding:14px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071a2f">
+  <meta name="robots" content="noindex,nofollow">
+
+  <title>Staff Attendance | Lashawn Academy</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --navy: #071a2f;
+      --navy-2: #0b2542;
+      --green: #20d879;
+      --green-dark: #0d9f54;
+      --red: #ef4444;
+      --orange: #f59e0b;
+      --blue: #3b82f6;
+      --white: #ffffff;
+      --muted: #718096;
+      --bg: #f4f7fb;
+      --border: #e5eaf0;
+      --shadow: 0 10px 30px rgba(7, 26, 47, .08);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: #172033;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .topbar {
+      background: var(--navy);
+      color: white;
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--green);
+      color: var(--navy);
+      font-weight: 900;
+      font-size: 18px;
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .brand-subtitle {
+      color: #b9c7d8;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .btn {
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      transition: .15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: var(--navy);
+    }
+
+    .btn-danger {
+      background: var(--red);
+      color: white;
+    }
+
+    .btn-dark {
+      background: var(--navy-2);
+      color: white;
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--navy);
+      border: 1px solid var(--border);
+    }
+
+    .btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .container {
+      max-width: 1250px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .welcome {
+      margin-bottom: 22px;
+    }
+
+    .welcome h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+    }
+
+    .welcome p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--navy);
+      word-break: break-word;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .card h2 {
+      margin: 0 0 16px;
+      font-size: 19px;
+      color: var(--navy);
+    }
+
+    .staff-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .info-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px;
+    }
+
+    .info-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      font-weight: 700;
+      color: var(--navy);
+      word-break: break-word;
+    }
+
+    .status-box {
+      text-align: center;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .status-neutral {
+      background: #e8edf3;
+      color: #475569;
+    }
+
+    .status-present {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .status-late {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .status-complete {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .status-early {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .status-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--navy);
+    }
+
+    .time-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .time-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 12px;
+    }
+
+    .time-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .time-value {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .attendance-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .attendance-actions .btn {
+      min-height: 52px;
+      font-size: 15px;
+    }
+
+    .location-card {
+      margin-top: 18px;
+    }
+
+    .location-status {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    .location-icon {
+      font-size: 22px;
+    }
+
+    .location-title {
+      font-weight: 800;
+      margin-bottom: 3px;
+    }
+
+    .location-text {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .gps-details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .gps-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 11px;
+      border-radius: 10px;
+    }
+
+    .gps-label {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .gps-value {
+      font-weight: 700;
+      font-size: 13px;
+      word-break: break-word;
+    }
+
+    .admin-card {
+      margin-top: 18px;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #d6dde6;
+      border-radius: 9px;
+      background: white;
+      outline: none;
+      font: inherit;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--green-dark);
+      box-shadow: 0 0 0 3px rgba(32, 216, 121, .12);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 18px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 950px;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #475569;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .small-pill {
+      display: inline-block;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 10px;
+    }
+
+    .verified {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .not-verified {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .message {
+      margin-top: 15px;
+      padding: 13px 15px;
+      border-radius: 11px;
+      display: none;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .message.info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .loading {
+      opacity: .65;
+      pointer-events: none;
+    }
+
+    .office-config {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px;
+    }
+
+    .office-config-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 10px;
+    }
+
+    .office-location-details {
+      margin-top: 13px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 30px 20px;
+    }
+
+    @media (max-width: 1000px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .container {
+        padding: 15px;
+      }
+
+      .topbar {
+        padding: 13px 15px;
+      }
+
+      .grid,
+      .staff-info,
+      .attendance-actions,
+      .time-row,
+      .gps-details,
+      .office-config-grid,
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .top-actions .btn {
+        padding: 9px 11px;
+        font-size: 12px;
+      }
+
+      .welcome h1 {
+        font-size: 23px;
+      }
+    }
+  </style>
+
 </head>
+
 <body>
-<div class="wrap">
-  <div class="top">
-    <div class="brand">LASHAWN ACADEMY<small>STAFF ATTENDANCE</small></div>
-    <button class="btn outline" id="logoutBtn">Logout</button>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">LA</div>
+
+```
+<div>
+  <div class="brand-title">Lashawn Academy</div>
+  <div class="brand-subtitle">Staff Attendance & Time Management</div>
+</div>
+```
+
   </div>
 
-  <div id="notice"></div>
+  <div class="top-actions">
+    <button class="btn btn-light" id="refreshBtn">
+      Refresh
+    </button>
 
-  <div class="card">
-    <div class="muted">Signed in as</div>
-    <div class="big" id="staffName">Loading...</div>
-    <div class="muted" id="staffEmail"></div>
-    <div class="muted" id="branchName" style="margin-top:5px"></div>
-  </div>
+```
+<button class="btn btn-danger" id="logoutBtn">
+  Logout
+</button>
+```
 
-  <div class="grid">
-    <div class="card stat"><div class="label">Today's Status</div><div class="value" id="statusText">—</div></div>
-    <div class="card stat"><div class="label">Clock In</div><div class="value" id="clockIn">—</div></div>
-    <div class="card stat"><div class="label">Clock Out</div><div class="value" id="clockOut">—</div></div>
   </div>
+</header>
 
-  <div class="card">
-    <h2>Attendance</h2>
-    <p class="muted">Clock-in and clock-out are permitted only inside the configured Lashawn Academy office geofence.</p>
-    <div class="location-box">
-      <strong>Location verification</strong>
-      <div class="muted" id="locationText">Your location is checked when you clock in or out. Your device must allow location access.</div>
-    </div>
-    <div class="actions">
-      <button class="btn" id="clockInBtn">Clock In</button>
-      <button class="btn danger" id="clockOutBtn" disabled>Clock Out</button>
-      <button class="btn outline" id="refreshBtn">Refresh Status</button>
-    </div>
-  </div>
+<main class="container">
 
-  <div class="card admin" id="adminPanel">
-    <div class="top">
-      <div>
-        <h2 style="margin:0">Attendance Report</h2>
-        <div class="muted">Super Admin view</div>
-      </div>
-      <div class="actions" style="margin-top:0">
-        <input id="fromDate" type="date">
-        <input id="toDate" type="date">
-        <button class="btn" id="loadReportBtn">Load</button>
-      </div>
-    </div>
-    <div class="table-wrap" style="margin-top:15px">
-      <table>
-        <thead><tr><th>Date</th><th>Staff</th><th>Clock In</th><th>Clock Out</th><th>Status</th><th>Late</th><th>Hours</th><th>GPS</th></tr></thead>
-        <tbody id="reportBody"></tbody>
-      </table>
-    </div>
-  </div>
+  <section class="welcome">
+    <h1>Staff Attendance</h1>
+    <p>Clock in and out only when you are physically within the Lashawn office attendance area.</p>
+  </section>
+
+  <!-- ======================================================
+       STAFF INFORMATION
+       ====================================================== -->
+
+  <section class="grid">
+
+```
+<div class="card">
+  <div class="stat-label">Staff Name</div>
+  <div class="stat-value" id="staffName">Loading...</div>
 </div>
 
+<div class="card">
+  <div class="stat-label">Staff Number</div>
+  <div class="stat-value" id="staffNumber">—</div>
+</div>
+
+<div class="card">
+  <div class="stat-label">Role</div>
+  <div class="stat-value" id="staffRole">—</div>
+</div>
+
+<div class="card">
+  <div class="stat-label">Today's Date</div>
+  <div class="stat-value" id="todayDate">—</div>
+</div>
+```
+
+  </section>
+
+  <div class="main-grid">
+
+```
+<!-- ====================================================
+     ATTENDANCE STATUS
+     ==================================================== -->
+
+<section class="card">
+
+  <h2>Today's Attendance</h2>
+
+  <div class="status-box">
+
+    <div
+      id="statusPill"
+      class="status-pill status-neutral"
+    >
+      NOT CLOCKED IN
+    </div>
+
+    <div
+      id="statusTitle"
+      class="status-title"
+    >
+      Ready
+    </div>
+
+    <div class="time-row">
+
+      <div class="time-box">
+        <div class="time-label">Clock In</div>
+        <div class="time-value" id="clockInTime">—</div>
+      </div>
+
+      <div class="time-box">
+        <div class="time-label">Clock Out</div>
+        <div class="time-value" id="clockOutTime">—</div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="attendance-actions">
+
+    <button
+      class="btn btn-primary"
+      id="clockInBtn"
+    >
+      📍 Clock In
+    </button>
+
+    <button
+      class="btn btn-danger"
+      id="clockOutBtn"
+      disabled
+    >
+      📍 Clock Out
+    </button>
+
+  </div>
+
+
+  <div id="attendanceMessage" class="message"></div>
+
+</section>
+
+
+<!-- ====================================================
+     GPS STATUS
+     ==================================================== -->
+
+<section class="card">
+
+  <h2>Office Location Verification</h2>
+
+  <div class="location-status">
+
+    <div class="location-icon">📍</div>
+
+    <div>
+
+      <div class="location-title">
+        GPS verification required
+      </div>
+
+      <div class="location-text">
+        Your device location is checked against the official
+        Lashawn office location before attendance is recorded.
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="gps-details">
+
+    <div class="gps-box">
+      <div class="gps-label">GPS Accuracy</div>
+      <div class="gps-value" id="gpsAccuracy">—</div>
+    </div>
+
+    <div class="gps-box">
+      <div class="gps-label">Office Distance</div>
+      <div class="gps-value" id="gpsDistance">—</div>
+    </div>
+
+    <div class="gps-box">
+      <div class="gps-label">Verification</div>
+      <div class="gps-value" id="gpsVerification">—</div>
+    </div>
+
+  </div>
+
+  <div
+    id="locationMessage"
+    class="message"
+  ></div>
+
+</section>
+```
+
+  </div>
+
+  <!-- ======================================================
+       SUPER ADMIN
+       ====================================================== -->
+
+  <section
+    class="card admin-card hidden"
+    id="adminPanel"
+  >
+
+```
+<div class="admin-header">
+
+  <div>
+    <h2 style="margin-bottom:4px;">
+      Attendance Administration
+    </h2>
+
+    <div style="color:#718096;font-size:13px;">
+      Super Admin controls and attendance reporting.
+    </div>
+  </div>
+
+</div>
+
+
+<!-- OFFICE LOCATION -->
+
+<div class="office-config">
+
+  <h3 style="margin:0 0 12px;color:#071a2f;">
+    Office Geofence
+  </h3>
+
+  <p style="margin:0 0 14px;color:#718096;font-size:13px;line-height:1.5;">
+    Stand physically at the Lashawn office and use the button below
+    to register the current GPS position as the official attendance
+    location.
+  </p>
+
+  <div class="office-config-grid">
+
+    <div>
+      <label for="officeName">
+        Office Name
+      </label>
+
+      <input
+        id="officeName"
+        type="text"
+        value="Lashawn Academy Office"
+      >
+    </div>
+
+    <div>
+      <label for="officeRadius">
+        Geofence Radius (metres)
+      </label>
+
+      <select id="officeRadius">
+        <option value="50">50 metres</option>
+        <option value="75">75 metres</option>
+        <option value="100" selected>100 metres</option>
+        <option value="150">150 metres</option>
+        <option value="200">200 metres</option>
+        <option value="250">250 metres</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div style="margin-top:12px;">
+
+    <button
+      class="btn btn-primary"
+      id="setOfficeBtn"
+    >
+      📍 Set Office Location From This Device
+    </button>
+
+  </div>
+
+  <div
+    id="officeMessage"
+    class="message"
+  ></div>
+
+  <div
+    id="currentOffice"
+    class="office-location-details"
+  >
+    Loading current office location...
+  </div>
+
+</div>
+
+
+<!-- REPORT -->
+
+<div style="margin-top:25px;">
+
+  <h3 style="margin:0 0 14px;color:#071a2f;">
+    Attendance Report
+  </h3>
+
+  <div class="form-row">
+
+    <div>
+      <label for="reportFrom">
+        From
+      </label>
+
+      <input
+        id="reportFrom"
+        type="date"
+      >
+    </div>
+
+    <div>
+      <label for="reportTo">
+        To
+      </label>
+
+      <input
+        id="reportTo"
+        type="date"
+      >
+    </div>
+
+    <div>
+      <label>
+        &nbsp;
+      </label>
+
+      <button
+        class="btn btn-dark"
+        id="loadReportBtn"
+      >
+        Load Attendance
+      </button>
+    </div>
+
+    <div>
+      <label>
+        &nbsp;
+      </label>
+
+      <button
+        class="btn btn-light"
+        id="todayReportBtn"
+      >
+        Today
+      </button>
+    </div>
+
+  </div>
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Date</th>
+          <th>Staff</th>
+          <th>Staff No.</th>
+          <th>Role</th>
+          <th>Clock In</th>
+          <th>Clock Out</th>
+          <th>Status</th>
+          <th>Late</th>
+          <th>Early</th>
+          <th>Hours</th>
+          <th>GPS</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="attendanceTableBody">
+
+        <tr>
+          <td colspan="11" style="text-align:center;color:#718096;">
+            No attendance loaded.
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+</main>
+
+<footer class="footer">
+  Lashawn Academy · Staff Attendance System
+</footer>
+
 <script>
-const SUPABASE_URL="https://qjfinbftcserrjiedduf.supabase.co";
-const SUPABASE_KEY="sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
-const DB=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const $=id=>document.getElementById(id);
 
-function notice(msg,type="info"){
-  $("notice").innerHTML=msg?`<div class="notice ${type}">${escapeHtml(msg)}</div>`:"";
-}
-function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
-function time(v){return v?v?new Date(v).toLocaleTimeString("en-KE",{hour:"2-digit",minute:"2-digit"}):"—":"—";}
-function date(v){return v?new Date(v).toLocaleDateString("en-KE"):"—";}
+  /* ========================================================
+     SUPABASE CONFIG
+     ======================================================== */
 
-async function guard(){
-  const {data,error}=await DB.auth.getSession();
-  if(error||!data.session){location.href="login.html";return false}
-  const u=data.session.user;
-  $("staffEmail").textContent=u.email||"";
-  $("staffName").textContent=u.user_metadata?.full_name||u.user_metadata?.office_role||"Staff";
+  const SUPABASE_URL =
+    "https://qjfinbftcserrjiedduf.supabase.co";
 
-  try{
-    const s=await DB.from("staff").select("id,first_name,middle_name,last_name,email,is_active").eq("auth_user_id",u.id).eq("is_active",true).maybeSingle();
-    if(s.error) throw s.error;
-    if(!s.data){
-      notice("No active staff profile is linked to this login. Contact Lashawn administration.","err");
-      $("clockInBtn").disabled=true; $("clockOutBtn").disabled=true; return false;
-    }
-    window.STAFF=s.data;
-    $("staffName").textContent=[s.data.first_name,s.data.middle_name,s.data.last_name].filter(Boolean).join(" ")||s.data.email||u.email||"Staff";
-  }catch(e){
-    console.error(e); notice("Could not load your staff profile: "+e.message,"err"); return false;
-  }
+  /*
+   * IMPORTANT:
+   * Replace this with the same PUBLIC/ANON key already used
+   * by your Lashawn frontend if this differs from your current
+   * project configuration.
+   *
+   * Never place a service_role key in this HTML file.
+   */
 
-  try{
-    const r=await DB.rpc("is_super_admin");
-    if(r.data===true){$("adminPanel").style.display="block";window.IS_SUPER=true}
-  }catch(e){window.IS_SUPER=false}
-  return true;
-}
+  const SUPABASE_ANON_KEY =
+    "YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY";
 
-async function loadStatus(){
-  const {data,error}=await DB.rpc("staff_attendance_status");
-  if(error){notice(error.message,"err");return}
-  if(!data?.ok){notice(data?.message||"Could not load attendance status.","err");return}
-  const s=data.status||"NOT_CLOCKED_IN";
-  $("statusText").textContent=s.replaceAll("_"," ");
-  $("statusText").className="value";
-  $("clockIn").textContent=time(data.clock_in);
-  $("clockOut").textContent=time(data.clock_out);
-  $("clockInBtn").disabled=!["NOT_CLOCKED_IN"].includes(s);
-  $("clockOutBtn").disabled=s!=="WORKING";
-}
-
-function getPosition(){
-  return new Promise((resolve,reject)=>{
-    if(!navigator.geolocation)return reject(new Error("This device/browser does not support GPS location."));
-    navigator.geolocation.getCurrentPosition(
-      p=>resolve(p),
-      e=>reject(new Error(e.code===1?"Location permission was denied. Please allow location access.":e.code===2?"Your location could not be determined. Move to an area with a better GPS signal.":"Location request timed out. Try again.")),
-      {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+  const { createClient } =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
     );
-  });
-}
 
-async function clock(action){
-  const btn=action==="in"?$("clockInBtn"):$("clockOutBtn");
-  btn.disabled=true;
-  notice("Checking your location...","info");
-  try{
-    const p=await getPosition();
-    const lat=p.coords.latitude, lng=p.coords.longitude, acc=p.coords.accuracy;
-    $("locationText").textContent=`GPS accuracy: approximately ${Math.round(acc)} metres. Verifying office location...`;
 
-    if(acc>100)throw new Error("GPS accuracy is too low ("+Math.round(acc)+"m). Please move closer to a window/outdoors and try again.");
+  /* ========================================================
+     HELPERS
+     ======================================================== */
 
-    const rpc=action==="in"?"staff_clock_in":"staff_clock_out";
-    const {data,error}=await DB.rpc(rpc,{p_lat:lat,p_lng:lng,p_accuracy:acc});
-    if(error)throw error;
-    if(!data?.ok)throw new Error(data?.message||"Attendance action was denied.");
+  const $ = id =>
+    document.getElementById(id);
 
-    notice(data.message||"Attendance recorded.","success");
-    $("locationText").textContent=`Location verified. Distance from office: ${Math.round(Number(data.distance_meters||0))} metres.`;
-    await loadStatus();
-    if(window.IS_SUPER)await loadReport();
-  }catch(e){
-    console.error(e);
-    notice(e.message||"Could not record attendance.","err");
-    await loadStatus();
+
+  function escapeHtml(value) {
+
+    if (value === null || value === undefined) {
+      return "";
+    }
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
-}
 
-async function loadReport(){
-  if(!window.IS_SUPER)return;
-  const from=$("fromDate").value||new Date().toISOString().slice(0,10);
-  const to=$("toDate").value||from;
-  const {data,error}=await DB.rpc("admin_staff_attendance",{p_from:from,p_to:to});
-  if(error){$("reportBody").innerHTML=`<tr><td colspan="8">${escapeHtml(error.message)}</td></tr>`;return}
-  $("reportBody").innerHTML=(data||[]).length?(data||[]).map(r=>`<tr>
-    <td>${escapeHtml(r.attendance_date)}</td>
-    <td><strong>${escapeHtml(r.staff_name)}</strong><br><span class="muted">${escapeHtml(r.staff_email||"")}</span></td>
-    <td>${time(r.clock_in)}</td><td>${time(r.clock_out)}</td>
-    <td>${escapeHtml(r.status||"—")}</td><td>${r.late_minutes||0} min</td>
-    <td>${r.total_minutes==null?"—":(r.total_minutes/60).toFixed(2)+" h"}</td>
-    <td>${r.geofence_verified?"✓ "+Math.round(Number(r.clock_in_distance_meters||0))+"m":"—"}</td>
-  </tr>`).join(""):`<tr><td colspan="8" style="text-align:center">No attendance records.</td></tr>`;
-}
 
-$("clockInBtn").onclick=()=>clock("in");
-$("clockOutBtn").onclick=()=>clock("out");
-$("refreshBtn").onclick=loadStatus;
-$("loadReportBtn").onclick=loadReport;
-$("logoutBtn").onclick=async()=>{await DB.auth.signOut();location.href="login.html"};
+  function showMessage(
+    element,
+    message,
+    type = "info"
+  ) {
 
-(async()=>{
-  const ok=await guard();
-  if(!ok)return;
-  $("fromDate").value=new Date().toISOString().slice(0,10);
-  $("toDate").value=$("fromDate").value;
-  await loadStatus();
-  if(window.IS_SUPER)await loadReport();
-})();
+    if (!element) return;
+
+    element.textContent = message;
+
+    element.className =
+      "message show " + type;
+
+  }
+
+
+  function clearMessage(element) {
+
+    if (!element) return;
+
+    element.textContent = "";
+
+    element.className =
+      "message";
+
+  }
+
+
+  function formatDateTime(value) {
+
+    if (!value) {
+      return "—";
+    }
+
+    const d = new Date(value);
+
+    if (Number.isNaN(d.getTime())) {
+      return "—";
+    }
+
+    return d.toLocaleString(
+      "en-KE",
+      {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }
+    );
+
+  }
+
+
+  function formatDate(value) {
+
+    if (!value) {
+      return "—";
+    }
+
+    const d = new Date(
+      value + "T00:00:00"
+    );
+
+    if (Number.isNaN(d.getTime())) {
+      return value;
+    }
+
+    return d.toLocaleDateString(
+      "en-KE",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      }
+    );
+
+  }
+
+
+  function minutesToHours(minutes) {
+
+    if (
+      minutes === null ||
+      minutes === undefined
+    ) {
+      return "—";
+    }
+
+    const value =
+      Number(minutes) || 0;
+
+    const hours =
+      Math.floor(value / 60);
+
+    const mins =
+      value % 60;
+
+    return `${hours}h ${mins}m`;
+
+  }
+
+
+  function todayISO() {
+
+    const d = new Date();
+
+    const offset =
+      d.getTimezoneOffset();
+
+    const local =
+      new Date(
+        d.getTime() -
+        offset * 60000
+      );
+
+    return local
+      .toISOString()
+      .slice(0, 10);
+
+  }
+
+
+  function setDefaultDates() {
+
+    const today =
+      todayISO();
+
+    $("reportFrom").value =
+      today;
+
+    $("reportTo").value =
+      today;
+
+    $("todayDate").textContent =
+      formatDate(today);
+
+  }
+
+
+  /* ========================================================
+     STAFF
+     ======================================================== */
+
+  let currentStaff = null;
+  let isSuperAdmin = false;
+
+
+  async function loadStaffProfile() {
+
+    const {
+      data: {
+        session
+      },
+      error: sessionError
+    } =
+      await supabase.auth.getSession();
+
+
+    if (
+      sessionError ||
+      !session
+    ) {
+
+      window.location.href =
+        "login.html";
+
+      return null;
+
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await supabase
+        .from("staff")
+        .select(`
+          id,
+          auth_user_id,
+          staff_number,
+          first_name,
+          last_name,
+          phone,
+          email,
+          national_id,
+          role,
+          branch_id,
+          is_active,
+          created_at,
+          updated_at
+        `)
+        .eq(
+          "auth_user_id",
+          session.user.id
+        )
+        .eq(
+          "is_active",
+          true
+        )
+        .maybeSingle();
+
+
+    if (error) {
+
+      console.error(
+        "Staff profile error:",
+        error
+      );
+
+      throw new Error(
+        "Could not load your staff profile: " +
+        error.message
+      );
+
+    }
+
+
+    if (!data) {
+
+      throw new Error(
+        "No active staff profile is linked to your login."
+      );
+
+    }
+
+
+    currentStaff = data;
+
+
+    $("staffName").textContent =
+      `${data.first_name || ""} ${data.last_name || ""}`
+        .trim();
+
+    $("staffNumber").textContent =
+      data.staff_number || "—";
+
+    $("staffRole").textContent =
+      data.role || "—";
+
+
+    return data;
+
+  }
+
+
+  /* ========================================================
+     ATTENDANCE STATUS
+     ======================================================== */
+
+  async function loadAttendanceStatus() {
+
+    const {
+      data,
+      error
+    } =
+      await supabase.rpc(
+        "staff_attendance_status"
+      );
+
+
+    if (error) {
+
+      console.error(
+        "Attendance status error:",
+        error
+      );
+
+      throw new Error(
+        error.message
+      );
+
+    }
+
+
+    if (!data) {
+      return;
+    }
+
+
+    $("clockInTime").textContent =
+      formatDateTime(
+        data.clock_in
+      );
+
+    $("clockOutTime").textContent =
+      formatDateTime(
+        data.clock_out
+      );
+
+
+    const status =
+      String(
+        data.status || ""
+      ).toUpperCase();
+
+
+    const pill =
+      $("statusPill");
+
+    pill.className =
+      "status-pill";
+
+
+    if (!data.clock_in) {
+
+      pill.textContent =
+        "NOT CLOCKED IN";
+
+      pill.classList.add(
+        "status-neutral"
+      );
+
+      $("statusTitle").textContent =
+        "Ready to clock in";
+
+    }
+    else if (
+      data.clock_in &&
+      !data.clock_out
+    ) {
+
+      if (status === "LATE") {
+
+        pill.textContent =
+          "LATE";
+
+        pill.classList.add(
+          "status-late"
+        );
+
+        $("statusTitle").textContent =
+          `Clocked in · ${data.late_minutes || 0} minutes late`;
+
+      }
+      else {
+
+        pill.textContent =
+          "CLOCKED IN";
+
+        pill.classList.add(
+          "status-present"
+        );
+
+        $("statusTitle").textContent =
+          "Currently at work";
+
+      }
+
+    }
+    else if (
+      status === "EARLY_DEPARTURE"
+    ) {
+
+      pill.textContent =
+        "EARLY DEPARTURE";
+
+      pill.classList.add(
+        "status-early"
+      );
+
+      $("statusTitle").textContent =
+        `Completed · ${data.early_departure_minutes || 0} minutes early`;
+
+    }
+    else {
+
+      pill.textContent =
+        "COMPLETE";
+
+      pill.classList.add(
+        "status-complete"
+      );
+
+      $("statusTitle").textContent =
+        `Completed · ${minutesToHours(data.total_minutes)}`;
+
+    }
+
+
+    $("clockInBtn").disabled =
+      !!data.clock_in;
+
+    $("clockOutBtn").disabled =
+      !data.clock_in ||
+      !!data.clock_out;
+
+
+    if (data.geofence_verified) {
+
+      $("gpsVerification").textContent =
+        "Verified ✓";
+
+    }
+    else {
+
+      $("gpsVerification").textContent =
+        "Not yet verified";
+
+    }
+
+  }
+
+
+  /* ========================================================
+     GEOLOCATION
+     ======================================================== */
+
+  function getCurrentPosition() {
+
+    return new Promise(
+      (resolve, reject) => {
+
+        if (
+          !navigator.geolocation
+        ) {
+
+          reject(
+            new Error(
+              "This browser does not support GPS location."
+            )
+          );
+
+          return;
+
+        }
+
+
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          error => {
+
+            let message =
+              "Unable to obtain your GPS location.";
+
+            switch (error.code) {
+
+              case error.PERMISSION_DENIED:
+
+                message =
+                  "Location permission was denied. Enable location access for Lashawn Academy and try again.";
+
+                break;
+
+              case error.POSITION_UNAVAILABLE:
+
+                message =
+                  "Your GPS location is currently unavailable. Move to an open area and try again.";
+
+                break;
+
+              case error.TIMEOUT:
+
+                message =
+                  "GPS request timed out. Please try again.";
+
+                break;
+
+            }
+
+            reject(
+              new Error(message)
+            );
+
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+          }
+        );
+
+      }
+    );
+
+  }
+
+
+  async function getGPS() {
+
+    showMessage(
+      $("locationMessage"),
+      "Obtaining your GPS location. Please wait...",
+      "info"
+    );
+
+
+    const position =
+      await getCurrentPosition();
+
+
+    const latitude =
+      position.coords.latitude;
+
+    const longitude =
+      position.coords.longitude;
+
+    const accuracy =
+      position.coords.accuracy;
+
+
+    $("gpsAccuracy").textContent =
+      `${Math.round(accuracy)} m`;
+
+    $("gpsDistance").textContent =
+      "Checking...";
+
+    $("gpsVerification").textContent =
+      "Checking...";
+
+
+    if (accuracy > 100) {
+
+      throw new Error(
+        `GPS accuracy is ${Math.round(accuracy)}m. The system requires accuracy of 100m or better. Move to an open area and try again.`
+      );
+
+    }
+
+
+    return {
+      latitude,
+      longitude,
+      accuracy
+    };
+
+  }
+
+
+  /* ========================================================
+     CLOCK IN
+     ======================================================== */
+
+  async function clockIn() {
+
+    const button =
+      $("clockInBtn");
+
+    const message =
+      $("attendanceMessage");
+
+
+    button.disabled = true;
+
+    clearMessage(message);
+
+
+    try {
+
+      const gps =
+        await getGPS();
+
+
+      const {
+        data,
+        error
+      } =
+        await supabase.rpc(
+          "staff_clock_in",
+          {
+            p_lat:
+              gps.latitude,
+
+            p_lng:
+              gps.longitude,
+
+            p_accuracy:
+              gps.accuracy
+          }
+        );
+
+
+      if (error) {
+
+        throw new Error(
+          error.message
+        );
+
+      }
+
+
+      if (!data) {
+
+        throw new Error(
+          "No response received from the attendance system."
+        );
+
+      }
+
+
+      if (!data.success) {
+
+        if (
+          data.distance_meters !== undefined
+        ) {
+
+          $("gpsDistance").textContent =
+            `${Math.round(data.distance_meters)} m`;
+
+        }
+
+        $("gpsVerification").textContent =
+          "Rejected";
+
+
+        throw new Error(
+          data.message ||
+          "Clock-in was rejected."
+        );
+
+      }
+
+
+      if (
+        data.distance_meters !== undefined
+      ) {
+
+        $("gpsDistance").textContent =
+          `${Math.round(data.distance_meters)} m`;
+
+      }
+
+
+      $("gpsVerification").textContent =
+        "Verified ✓";
+
+
+      showMessage(
+        message,
+        data.message ||
+        "Clock-in successful.",
+        "success"
+      );
+
+
+      await loadAttendanceStatus();
+
+    }
+    catch (error) {
+
+      console.error(
+        "Clock-in error:",
+        error
+      );
+
+      showMessage(
+        message,
+        error.message ||
+        "Clock-in failed.",
+        "error"
+      );
+
+    }
+    finally {
+
+      button.disabled =
+        false;
+
+      try {
+
+        await loadAttendanceStatus();
+
+      }
+      catch (_) {}
+
+    }
+
+  }
+
+
+  /* ========================================================
+     CLOCK OUT
+     ======================================================== */
+
+  async function clockOut() {
+
+    const button =
+      $("clockOutBtn");
+
+    const message =
+      $("attendanceMessage");
+
+
+    button.disabled = true;
+
+    clearMessage(message);
+
+
+    try {
+
+      const gps =
+        await getGPS();
+
+
+      const {
+        data,
+        error
+      } =
+        await supabase.rpc(
+          "staff_clock_out",
+          {
+            p_lat:
+              gps.latitude,
+
+            p_lng:
+              gps.longitude,
+
+            p_accuracy:
+              gps.accuracy
+          }
+        );
+
+
+      if (error) {
+
+        throw new Error(
+          error.message
+        );
+
+      }
+
+
+      if (!data) {
+
+        throw new Error(
+          "No response received from the attendance system."
+        );
+
+      }
+
+
+      if (!data.success) {
+
+        if (
+          data.distance_meters !== undefined
+        ) {
+
+          $("gpsDistance").textContent =
+            `${Math.round(data.distance_meters)} m`;
+
+        }
+
+        $("gpsVerification").textContent =
+          "Rejected";
+
+
+        throw new Error(
+          data.message ||
+          "Clock-out was rejected."
+        );
+
+      }
+
+
+      if (
+        data.distance_meters !== undefined
+      ) {
+
+        $("gpsDistance").textContent =
+          `${Math.round(data.distance_meters)} m`;
+
+      }
+
+
+      $("gpsVerification").textContent =
+        "Verified ✓";
+
+
+      showMessage(
+        message,
+        data.message ||
+        "Clock-out successful.",
+        "success"
+      );
+
+
+      await loadAttendanceStatus();
+
+    }
+    catch (error) {
+
+      console.error(
+        "Clock-out error:",
+        error
+      );
+
+      showMessage(
+        message,
+        error.message ||
+        "Clock-out failed.",
+        "error"
+      );
+
+    }
+    finally {
+
+      button.disabled =
+        false;
+
+      try {
+
+        await loadAttendanceStatus();
+
+      }
+      catch (_) {}
+
+    }
+
+  }
+
+
+  /* ========================================================
+     SUPER ADMIN CHECK
+     ======================================================== */
+
+  async function checkSuperAdmin() {
+
+    try {
+
+      const {
+        data,
+        error
+      } =
+        await supabase.rpc(
+          "is_super_admin"
+        );
+
+
+      if (error) {
+
+        console.warn(
+          "Super Admin check:",
+          error.message
+        );
+
+        return false;
+
+      }
+
+
+      return data === true;
+
+    }
+    catch (error) {
+
+      console.warn(
+        "Super Admin check failed:",
+        error
+      );
+
+      return false;
+
+    }
+
+  }
+
+
+  /* ========================================================
+     LOAD CURRENT OFFICE
+     ======================================================== */
+
+  async function loadOfficeLocation() {
+
+    const {
+      data,
+      error
+    } =
+      await supabase
+        .from("attendance_locations")
+        .select(`
+          id,
+          name,
+          latitude,
+          longitude,
+          radius_meters,
+          scheduled_start,
+          scheduled_end,
+          is_active,
+          created_at
+        `)
+        .eq(
+          "is_active",
+          true
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        )
+        .limit(1)
+        .maybeSingle();
+
+
+    if (error) {
+
+      console.error(
+        "Office location error:",
+        error
+      );
+
+      $("currentOffice").textContent =
+        "Could not load office location: " +
+        error.message;
+
+      return;
+
+    }
+
+
+    if (!data) {
+
+      $("currentOffice").innerHTML =
+        "<strong>No office geofence configured.</strong>";
+
+      return;
+
+    }
+
+
+    $("currentOffice").innerHTML = `
+
+      <strong>Current office:</strong>
+      ${escapeHtml(data.name)}
+
+      <br>
+
+      <strong>Coordinates:</strong>
+      ${Number(data.latitude).toFixed(7)},
+      ${Number(data.longitude).toFixed(7)}
+
+      <br>
+
+      <strong>Radius:</strong>
+      ${data.radius_meters} metres
+
+      <br>
+
+      <strong>Working hours:</strong>
+      ${escapeHtml(data.scheduled_start)}
+      –
+      ${escapeHtml(data.scheduled_end)}
+
+    `;
+
+  }
+
+
+  /* ========================================================
+     SET OFFICE LOCATION
+     ======================================================== */
+
+  async function setOfficeLocation() {
+
+    const button =
+      $("setOfficeBtn");
+
+    const message =
+      $("officeMessage");
+
+
+    button.disabled = true;
+
+    clearMessage(message);
+
+
+    try {
+
+      const confirmed =
+        confirm(
+          "You must physically be at the Lashawn office before continuing.\n\nUse this device's current GPS position as the official office attendance location?"
+        );
+
+
+      if (!confirmed) {
+
+        return;
+
+      }
+
+
+      showMessage(
+        message,
+        "Obtaining the current office GPS position...",
+        "info"
+      );
+
+
+      const gps =
+        await getCurrentPosition();
+
+
+      if (
+        gps.coords.accuracy > 100
+      ) {
+
+        throw new Error(
+          `GPS accuracy is ${Math.round(gps.coords.accuracy)}m. Move to an open area and try again.`
+        );
+
+      }
+
+
+      const officeName =
+        $("officeName")
+          .value
+          .trim() ||
+        "Lashawn Academy Office";
+
+
+      const radius =
+        Number(
+          $("officeRadius").value
+        );
+
+
+      const {
+        data,
+        error
+      } =
+        await supabase.rpc(
+          "set_lashawn_attendance_location",
+          {
+            p_name:
+              officeName,
+
+            p_latitude:
+              gps.coords.latitude,
+
+            p_longitude:
+              gps.coords.longitude,
+
+            p_radius_meters:
+              radius
+          }
+        );
+
+
+      if (error) {
+
+        throw new Error(
+          error.message
+        );
+
+      }
+
+
+      if (
+        !data ||
+        !data.success
+      ) {
+
+        throw new Error(
+          data?.message ||
+          "Office location could not be saved."
+        );
+
+      }
+
+
+      showMessage(
+        message,
+        `Office location saved successfully using GPS accuracy of ${Math.round(gps.coords.accuracy)}m.`,
+        "success"
+      );
+
+
+      await loadOfficeLocation();
+
+    }
+    catch (error) {
+
+      console.error(
+        "Set office location:",
+        error
+      );
+
+      showMessage(
+        message,
+        error.message ||
+        "Could not set office location.",
+        "error"
+      );
+
+    }
+    finally {
+
+      button.disabled =
+        false;
+
+    }
+
+  }
+
+
+  /* ========================================================
+     ATTENDANCE REPORT
+     ======================================================== */
+
+  async function loadReport() {
+
+    const from =
+      $("reportFrom").value;
+
+    const to =
+      $("reportTo").value;
+
+
+    if (!from || !to) {
+
+      alert(
+        "Please select both the start and end dates."
+      );
+
+      return;
+
+    }
+
+
+    if (from > to) {
+
+      alert(
+        "The From date cannot be after the To date."
+      );
+
+      return;
+
+    }
+
+
+    const body =
+      $("attendanceTableBody");
+
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="11" style="text-align:center;">
+          Loading attendance...
+        </td>
+      </tr>
+    `;
+
+
+    const {
+      data,
+      error
+    } =
+      await supabase.rpc(
+        "admin_staff_attendance",
+        {
+          p_from:
+            from,
+
+          p_to:
+            to
+        }
+      );
+
+
+    if (error) {
+
+      console.error(
+        "Attendance report:",
+        error
+      );
+
+      body.innerHTML = `
+        <tr>
+          <td colspan="11" style="text-align:center;color:#b91c1c;">
+            ${escapeHtml(error.message)}
+          </td>
+        </tr>
+      `;
+
+      return;
+
+    }
+
+
+    if (!data || data.length === 0) {
+
+      body.innerHTML = `
+        <tr>
+          <td colspan="11" style="text-align:center;color:#718096;">
+            No attendance records found.
+          </td>
+        </tr>
+      `;
+
+      return;
+
+    }
+
+
+    body.innerHTML =
+      data.map(row => {
+
+        let statusClass =
+          "status-neutral";
+
+
+        const status =
+          String(
+            row.status || ""
+          ).toUpperCase();
+
+
+        if (
+          status === "PRESENT"
+        ) {
+
+          statusClass =
+            "status-present";
+
+        }
+        else if (
+          status === "LATE"
+        ) {
+
+          statusClass =
+            "status-late";
+
+        }
+        else if (
+          status === "COMPLETE"
+        ) {
+
+          statusClass =
+            "status-complete";
+
+        }
+        else if (
+          status === "EARLY_DEPARTURE"
+        ) {
+
+          statusClass =
+            "status-early";
+
+        }
+
+
+        return `
+
+          <tr>
+
+            <td>
+              ${escapeHtml(
+                formatDate(
+                  row.attendance_date
+                )
+              )}
+            </td>
+
+            <td>
+              <strong>
+                ${escapeHtml(
+                  `${row.first_name || ""} ${row.last_name || ""}`.trim()
+                )}
+              </strong>
+            </td>
+
+            <td>
+              ${escapeHtml(
+                row.staff_number || "—"
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                row.role || "—"
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                formatDateTime(
+                  row.clock_in
+                )
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                formatDateTime(
+                  row.clock_out
+                )
+              )}
+            </td>
+
+            <td>
+              <span class="status-pill ${statusClass}">
+                ${escapeHtml(
+                  status || "UNKNOWN"
+                )}
+              </span>
+            </td>
+
+            <td>
+              ${Number(
+                row.late_minutes || 0
+              )} min
+            </td>
+
+            <td>
+              ${Number(
+                row.early_departure_minutes || 0
+              )} min
+            </td>
+
+            <td>
+              ${escapeHtml(
+                minutesToHours(
+                  row.total_minutes
+                )
+              )}
+            </td>
+
+            <td>
+
+              ${
+                row.geofence_verified
+
+                  ? `
+                    <span class="small-pill verified">
+                      VERIFIED
+                    </span>
+                  `
+
+                  : `
+                    <span class="small-pill not-verified">
+                      NOT VERIFIED
+                    </span>
+                  `
+              }
+
+            </td>
+
+          </tr>
+
+        `;
+
+      }).join("");
+
+  }
+
+
+  /* ========================================================
+     LOGOUT
+     ======================================================== */
+
+  async function logout() {
+
+    await supabase.auth.signOut();
+
+    window.location.href =
+      "login.html";
+
+  }
+
+
+  /* ========================================================
+     INITIALISE
+     ======================================================== */
+
+  async function init() {
+
+    setDefaultDates();
+
+
+    try {
+
+      await loadStaffProfile();
+
+      await loadAttendanceStatus();
+
+
+      isSuperAdmin =
+        await checkSuperAdmin();
+
+
+      if (isSuperAdmin) {
+
+        $("adminPanel")
+          .classList
+          .remove("hidden");
+
+        await loadOfficeLocation();
+
+        await loadReport();
+
+      }
+
+    }
+    catch (error) {
+
+      console.error(
+        "Attendance initialisation:",
+        error
+      );
+
+
+      document.body.innerHTML = `
+
+        <div style="
+          min-height:100vh;
+          display:grid;
+          place-items:center;
+          padding:25px;
+          background:#f4f7fb;
+          font-family:Arial,Helvetica,sans-serif;
+        ">
+
+          <div style="
+            max-width:520px;
+            background:white;
+            padding:30px;
+            border-radius:16px;
+            box-shadow:0 10px 30px rgba(0,0,0,.08);
+            text-align:center;
+          ">
+
+            <h2 style="
+              color:#071a2f;
+              margin-top:0;
+            ">
+              Staff Attendance
+            </h2>
+
+            <p style="
+              color:#991b1b;
+              line-height:1.6;
+            ">
+              ${escapeHtml(
+                error.message ||
+                "Could not load the attendance system."
+              )}
+            </p>
+
+            <button
+              onclick="window.location.href='login.html'"
+              style="
+                border:0;
+                padding:12px 18px;
+                border-radius:9px;
+                background:#071a2f;
+                color:white;
+                font-weight:700;
+                cursor:pointer;
+              "
+            >
+              Return to Login
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+  }
+
+
+  /* ========================================================
+     EVENTS
+     ======================================================== */
+
+  $("clockInBtn")
+    .addEventListener(
+      "click",
+      clockIn
+    );
+
+
+  $("clockOutBtn")
+    .addEventListener(
+      "click",
+      clockOut
+    );
+
+
+  $("refreshBtn")
+    .addEventListener(
+      "click",
+      async () => {
+
+        try {
+
+          await loadStaffProfile();
+
+          await loadAttendanceStatus();
+
+          if (isSuperAdmin) {
+
+            await loadOfficeLocation();
+
+            await loadReport();
+
+          }
+
+        }
+        catch (error) {
+
+          showMessage(
+            $("attendanceMessage"),
+            error.message,
+            "error"
+          );
+
+        }
+
+      }
+    );
+
+
+  $("logoutBtn")
+    .addEventListener(
+      "click",
+      logout
+    );
+
+
+  $("setOfficeBtn")
+    .addEventListener(
+      "click",
+      setOfficeLocation
+    );
+
+
+  $("loadReportBtn")
+    .addEventListener(
+      "click",
+      loadReport
+    );
+
+
+  $("todayReportBtn")
+    .addEventListener(
+      "click",
+      async () => {
+
+        const today =
+          todayISO();
+
+        $("reportFrom").value =
+          today;
+
+        $("reportTo").value =
+          today;
+
+        await loadReport();
+
+      }
+    );
+
+
+  /* ========================================================
+     START
+     ======================================================== */
+
+  init();
+
 </script>
+
 </body>
 </html>
