@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#071a33">
+<title>Lashawn Academy | Staff Attendance</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--navy:#071a33;--navy2:#0d2748;--green:#16c784;--green-dark:#087443;--bg:#f4f7fb;--text:#172033;--muted:#68758a;--border:#dce3ed;--danger:#d92d20;--warning:#8a6100}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:1050px;margin:0 auto;padding:24px}.top{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
+.brand{font-size:22px;font-weight:900;color:var(--navy)}.brand small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px;margin-top:18px;box-shadow:0 2px 8px rgba(7,26,51,.04)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.stat{padding:16px}.label{font-size:12px;color:var(--muted);font-weight:700}.value{font-size:25px;font-weight:900;margin-top:7px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.btn{border:0;border-radius:9px;padding:13px 20px;font-weight:900;cursor:pointer;background:var(--green);color:#062719}.btn:disabled{opacity:.5;cursor:not-allowed}.btn.outline{background:#fff;border:1px solid var(--border);color:var(--text)}
+.btn.danger{background:#ffeceb;color:#a32118;border:1px solid #ffd0cc}.notice{padding:13px;border-radius:9px;margin-top:15px;font-size:13px}.notice.info{background:#eef6ff;color:#24547d}.notice.err{background:#fff0ef;color:#9d251b}.notice.success{background:#e7f8ef;color:#087443}
+.status{display:inline-block;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900}.working{background:#e5f8ef;color:#087443}.out{background:#edf2f7;color:#526174}.late{background:#fff7dc;color:#8a6100}
+.muted{color:var(--muted);font-size:13px}.big{font-size:36px;font-weight:900;color:var(--navy)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:11px;border-bottom:1px solid #edf0f5;text-align:left;white-space:nowrap}th{font-size:11px;text-transform:uppercase;color:var(--muted);background:#fafbfd}
+.table-wrap{overflow:auto}.hidden{display:none}.admin{display:none}.location-box{border:1px dashed var(--border);padding:15px;border-radius:10px;margin-top:14px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">LASHAWN ACADEMY<small>STAFF ATTENDANCE</small></div>
+    <button class="btn outline" id="logoutBtn">Logout</button>
+  </div>
+
+  <div id="notice"></div>
+
+  <div class="card">
+    <div class="muted">Signed in as</div>
+    <div class="big" id="staffName">Loading...</div>
+    <div class="muted" id="staffEmail"></div>
+    <div class="muted" id="branchName" style="margin-top:5px"></div>
+  </div>
+
+  <div class="grid">
+    <div class="card stat"><div class="label">Today's Status</div><div class="value" id="statusText">—</div></div>
+    <div class="card stat"><div class="label">Clock In</div><div class="value" id="clockIn">—</div></div>
+    <div class="card stat"><div class="label">Clock Out</div><div class="value" id="clockOut">—</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Attendance</h2>
+    <p class="muted">Clock-in and clock-out are permitted only inside the configured Lashawn Academy office geofence.</p>
+    <div class="location-box">
+      <strong>Location verification</strong>
+      <div class="muted" id="locationText">Your location is checked when you clock in or out. Your device must allow location access.</div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="clockInBtn">Clock In</button>
+      <button class="btn danger" id="clockOutBtn" disabled>Clock Out</button>
+      <button class="btn outline" id="refreshBtn">Refresh Status</button>
+    </div>
+  </div>
+
+  <div class="card admin" id="adminPanel">
+    <div class="top">
+      <div>
+        <h2 style="margin:0">Attendance Report</h2>
+        <div class="muted">Super Admin view</div>
+      </div>
+      <div class="actions" style="margin-top:0">
+        <input id="fromDate" type="date">
+        <input id="toDate" type="date">
+        <button class="btn" id="loadReportBtn">Load</button>
+      </div>
+    </div>
+    <div class="table-wrap" style="margin-top:15px">
+      <table>
+        <thead><tr><th>Date</th><th>Staff</th><th>Clock In</th><th>Clock Out</th><th>Status</th><th>Late</th><th>Hours</th><th>GPS</th></tr></thead>
+        <tbody id="reportBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL="https://qjfinbftcserrjiedduf.supabase.co";
+const SUPABASE_KEY="sb_publishable_tzXXoqZwC2SXZwhS8km2FQ_pNQcuCW5";
+const DB=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+
+function notice(msg,type="info"){
+  $("notice").innerHTML=msg?`<div class="notice ${type}">${escapeHtml(msg)}</div>`:"";
+}
+function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+function time(v){return v?v?new Date(v).toLocaleTimeString("en-KE",{hour:"2-digit",minute:"2-digit"}):"—":"—";}
+function date(v){return v?new Date(v).toLocaleDateString("en-KE"):"—";}
+
+async function guard(){
+  const {data,error}=await DB.auth.getSession();
+  if(error||!data.session){location.href="login.html";return false}
+  const u=data.session.user;
+  $("staffEmail").textContent=u.email||"";
+  $("staffName").textContent=u.user_metadata?.full_name||u.user_metadata?.office_role||"Staff";
+
+  try{
+    const s=await DB.from("staff").select("id,first_name,middle_name,last_name,email,is_active").eq("auth_user_id",u.id).eq("is_active",true).maybeSingle();
+    if(s.error) throw s.error;
+    if(!s.data){
+      notice("No active staff profile is linked to this login. Contact Lashawn administration.","err");
+      $("clockInBtn").disabled=true; $("clockOutBtn").disabled=true; return false;
+    }
+    window.STAFF=s.data;
+    $("staffName").textContent=[s.data.first_name,s.data.middle_name,s.data.last_name].filter(Boolean).join(" ")||s.data.email||u.email||"Staff";
+  }catch(e){
+    console.error(e); notice("Could not load your staff profile: "+e.message,"err"); return false;
+  }
+
+  try{
+    const r=await DB.rpc("is_super_admin");
+    if(r.data===true){$("adminPanel").style.display="block";window.IS_SUPER=true}
+  }catch(e){window.IS_SUPER=false}
+  return true;
+}
+
+async function loadStatus(){
+  const {data,error}=await DB.rpc("staff_attendance_status");
+  if(error){notice(error.message,"err");return}
+  if(!data?.ok){notice(data?.message||"Could not load attendance status.","err");return}
+  const s=data.status||"NOT_CLOCKED_IN";
+  $("statusText").textContent=s.replaceAll("_"," ");
+  $("statusText").className="value";
+  $("clockIn").textContent=time(data.clock_in);
+  $("clockOut").textContent=time(data.clock_out);
+  $("clockInBtn").disabled=!["NOT_CLOCKED_IN"].includes(s);
+  $("clockOutBtn").disabled=s!=="WORKING";
+}
+
+function getPosition(){
+  return new Promise((resolve,reject)=>{
+    if(!navigator.geolocation)return reject(new Error("This device/browser does not support GPS location."));
+    navigator.geolocation.getCurrentPosition(
+      p=>resolve(p),
+      e=>reject(new Error(e.code===1?"Location permission was denied. Please allow location access.":e.code===2?"Your location could not be determined. Move to an area with a better GPS signal.":"Location request timed out. Try again.")),
+      {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+    );
+  });
+}
+
+async function clock(action){
+  const btn=action==="in"?$("clockInBtn"):$("clockOutBtn");
+  btn.disabled=true;
+  notice("Checking your location...","info");
+  try{
+    const p=await getPosition();
+    const lat=p.coords.latitude, lng=p.coords.longitude, acc=p.coords.accuracy;
+    $("locationText").textContent=`GPS accuracy: approximately ${Math.round(acc)} metres. Verifying office location...`;
+
+    if(acc>100)throw new Error("GPS accuracy is too low ("+Math.round(acc)+"m). Please move closer to a window/outdoors and try again.");
+
+    const rpc=action==="in"?"staff_clock_in":"staff_clock_out";
+    const {data,error}=await DB.rpc(rpc,{p_lat:lat,p_lng:lng,p_accuracy:acc});
+    if(error)throw error;
+    if(!data?.ok)throw new Error(data?.message||"Attendance action was denied.");
+
+    notice(data.message||"Attendance recorded.","success");
+    $("locationText").textContent=`Location verified. Distance from office: ${Math.round(Number(data.distance_meters||0))} metres.`;
+    await loadStatus();
+    if(window.IS_SUPER)await loadReport();
+  }catch(e){
+    console.error(e);
+    notice(e.message||"Could not record attendance.","err");
+    await loadStatus();
+  }
+}
+
+async function loadReport(){
+  if(!window.IS_SUPER)return;
+  const from=$("fromDate").value||new Date().toISOString().slice(0,10);
+  const to=$("toDate").value||from;
+  const {data,error}=await DB.rpc("admin_staff_attendance",{p_from:from,p_to:to});
+  if(error){$("reportBody").innerHTML=`<tr><td colspan="8">${escapeHtml(error.message)}</td></tr>`;return}
+  $("reportBody").innerHTML=(data||[]).length?(data||[]).map(r=>`<tr>
+    <td>${escapeHtml(r.attendance_date)}</td>
+    <td><strong>${escapeHtml(r.staff_name)}</strong><br><span class="muted">${escapeHtml(r.staff_email||"")}</span></td>
+    <td>${time(r.clock_in)}</td><td>${time(r.clock_out)}</td>
+    <td>${escapeHtml(r.status||"—")}</td><td>${r.late_minutes||0} min</td>
+    <td>${r.total_minutes==null?"—":(r.total_minutes/60).toFixed(2)+" h"}</td>
+    <td>${r.geofence_verified?"✓ "+Math.round(Number(r.clock_in_distance_meters||0))+"m":"—"}</td>
+  </tr>`).join(""):`<tr><td colspan="8" style="text-align:center">No attendance records.</td></tr>`;
+}
+
+$("clockInBtn").onclick=()=>clock("in");
+$("clockOutBtn").onclick=()=>clock("out");
+$("refreshBtn").onclick=loadStatus;
+$("loadReportBtn").onclick=loadReport;
+$("logoutBtn").onclick=async()=>{await DB.auth.signOut();location.href="login.html"};
+
+(async()=>{
+  const ok=await guard();
+  if(!ok)return;
+  $("fromDate").value=new Date().toISOString().slice(0,10);
+  $("toDate").value=$("fromDate").value;
+  await loadStatus();
+  if(window.IS_SUPER)await loadReport();
+})();
+</script>
+</body>
+</html>
