@@ -1397,9 +1397,18 @@ async function loadFees(){
     .limit(1000);
 
   if(CURRENT_BRANCH_ID){
+    /*
+     * Legacy students migrated from the old system may not have a branch_id.
+     * They must still be visible to Office Admins so their existing invoices
+     * can receive fee top-ups. Current-branch students remain branch-scoped.
+     */
     const [stRes, pjRes] = await Promise.all([
-      DB.from("students").select("id").eq("branch_id", CURRENT_BRANCH_ID),
-      DB.from("printing_jobs").select("id").eq("branch_id", CURRENT_BRANCH_ID)
+      DB.from("students")
+        .select("id")
+        .or(`branch_id.eq.${CURRENT_BRANCH_ID},branch_id.is.null`),
+      DB.from("printing_jobs")
+        .select("id")
+        .eq("branch_id", CURRENT_BRANCH_ID)
     ]);
     if(stRes.error) throw stRes.error;
     if(pjRes.error) throw pjRes.error;
