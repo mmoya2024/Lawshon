@@ -125,6 +125,8 @@ input[readonly]{background:#f5f7fa}
       <div class="card stat"><div class="label">Today's Revenue</div><div class="value" id="statTodayRev">—</div></div>
       <div class="card stat"><div class="label">Payments Awaiting Approval</div><div class="value" id="statPending">—</div></div>
       <div class="card stat"><div class="label">Self-Enrolments Awaiting Action</div><div class="value" id="statSelfEnrolments">—</div></div>
+      <div class="card stat"><div class="label">Outstanding Fee Arrears</div><div class="value" id="statArrears">KES 0.00</div></div>
+      <div class="card stat"><div class="label">Students With Arrears</div><div class="value" id="statArrearsStudents">0</div></div>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -373,17 +375,47 @@ input[readonly]{background:#f5f7fa}
 
   <!-- FEES -->
   <section class="panel" id="panel-fees">
-    <p class="lede">Invoices with totals, payments and balances.</p>
+    <p class="lede">Manage student fees, arrears, payments and fee top-ups.</p>
+
+    <div class="grid" style="margin-bottom:2px">
+      <div class="card stat"><div class="label">Invoices</div><div class="value" id="feeInvoiceCount">0</div></div>
+      <div class="card stat"><div class="label">Outstanding Arrears</div><div class="value" id="feeOutstanding">KES 0.00</div></div>
+      <div class="card stat"><div class="label">Students With Arrears</div><div class="value" id="feeArrearsStudents">0</div></div>
+      <div class="card stat"><div class="label">Active Top-Ups</div><div class="value" id="feeTopupCount">0</div></div>
+    </div>
+
     <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <div>
+          <h2 style="margin-bottom:4px">Student Fee Accounts</h2>
+          <div class="hint">Use <strong>Add Fee Top-Up</strong> when an existing student incurs an additional charge. Original fees and payments remain unchanged.</div>
+        </div>
+        <input class="search" id="feeSearch" style="margin:0;max-width:360px" placeholder="Search invoice, student, phone or enrolment">
+      </div>
       <div class="table-wrap">
         <table class="table">
           <thead>
             <tr>
               <th>Invoice</th><th>Student / Client</th><th>Enrolment / Job</th><th>Programme</th>
-              <th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th></th>
+              <th>Original</th><th>Top-Ups</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th></th>
             </tr>
           </thead>
           <tbody id="feesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <div>
+          <h2 style="margin-bottom:4px">Fee Top-Up History</h2>
+          <div class="hint">All top-ups are recorded with a reason, reference, date and staff audit trail.</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Date</th><th>Student</th><th>Invoice</th><th>Type</th><th>Amount</th><th>Reason</th><th>Reference</th><th>Status</th><th></th></tr></thead>
+          <tbody id="topupsTable"></tbody>
         </table>
       </div>
     </div>
@@ -500,6 +532,27 @@ input[readonly]{background:#f5f7fa}
   </div>
 </div>
 
+<div class="modal" id="topupModal">
+  <div class="modal-box">
+    <h2 style="margin-top:0">Add Fee Top-Up</h2>
+    <div id="topupInfo" class="notice info"></div>
+    <div id="topupErr"></div>
+    <form id="topupForm">
+      <div class="form-grid">
+        <div class="form-group"><label>Top-Up Amount (KES) *</label><input id="topupAmount" type="number" min="1" step="0.01" required></div>
+        <div class="form-group"><label>Adjustment Date *</label><input id="topupDate" type="date" required></div>
+        <div class="form-group"><label>Reference</label><input id="topupReference" placeholder="e.g. TOPUP-42082876-001"></div>
+        <div class="form-group full"><label>Reason *</label><input id="topupReason" required placeholder="e.g. Additional driving training fee"></div>
+        <div class="form-group full"><label>Notes</label><textarea id="topupNotes" rows="3" placeholder="Additional details, approval notes or supporting information"></textarea></div>
+      </div>
+      <div class="actions">
+        <button class="btn" type="submit" id="topupBtn">Add Fee Top-Up</button>
+        <button class="btn outline" type="button" id="topupCancel">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="modal" id="viewModal">
   <div class="modal-box">
     <div id="viewBody"></div>
@@ -538,6 +591,9 @@ let FEES = [];
 let STUDENT_ROWS = [];
 let SELF_ENROLMENTS = [];
 let CALC = { unit:0, qty:1, total:0, paid:0, balance:0 };
+let TOPUPS = [];
+let PAYABLE_INVOICES = [];
+let TOPUP_INV = null;
 
 const $ = id => document.getElementById(id);
 
@@ -1056,6 +1112,27 @@ async function loadOverview(){
   $("statTodayRev").textContent = money(summary.today_revenue);
   $("statPending").textContent = Number(summary.pending_payments || 0);
   $("statSelfEnrolments").textContent = Number(summary.pending_self_enrolments || 0);
+
+  try{
+    let aq = DB.from(T.invoices).select("id,student_id,balance").gt("balance",0).limit(5000);
+    if(CURRENT_BRANCH_ID){
+      const {data:bs,error:be} = await DB.from("students").select("id").eq("branch_id",CURRENT_BRANCH_ID);
+      if(!be && bs?.length){
+        aq = aq.in("student_id",bs.map(x=>x.id));
+      } else if(!be){
+        aq = null;
+      }
+    }
+    const ar = aq ? await aq : {data:[],error:null};
+    if(ar.error) throw ar.error;
+    const arrears = ar.data || [];
+    $("statArrears").textContent = money(arrears.reduce((sum,x)=>sum+Number(x.balance||0),0));
+    $("statArrearsStudents").textContent = new Set(arrears.filter(x=>x.student_id).map(x=>x.student_id)).size;
+  }catch(e){
+    console.warn("Arrears summary unavailable:",e);
+    $("statArrears").textContent = "—";
+    $("statArrearsStudents").textContent = "—";
+  }
 }
 
 async function loadMyWorkToday(){
@@ -1302,7 +1379,8 @@ function renderStudents(){
 /* FEES */
 async function loadFees(){
   if(branchLocked()){
-    $("feesTable").innerHTML = empty(9, "No branch assigned to your account. Contact an administrator.");
+    $("feesTable").innerHTML = empty(11, "No branch assigned to your account. Contact an administrator.");
+    $("topupsTable").innerHTML = empty(9, "No fee top-ups found.");
     return;
   }
 
@@ -1310,8 +1388,8 @@ async function loadFees(){
     .from(T.invoices)
     .select(`
       id, invoice_number, student_id, enrolment_id, printing_job_id,
-      total_amount, amount_paid, balance, status,
-      students(student_number, first_name, last_name),
+      subtotal, discount, total_amount, amount_paid, balance, status, created_at,
+      students(student_number, first_name, middle_name, last_name, phone),
       enrolments(enrolment_number, programme),
       printing_jobs(job_number, printing_customers(customer_name, customer_number))
     `)
@@ -1331,7 +1409,11 @@ async function loadFees(){
 
     if(!studentIds.length && !jobIds.length){
       INVOICES = [];
-      $("feesTable").innerHTML = empty(9, "No invoices found.");
+      TOPUPS = [];
+      PAYABLE_INVOICES = [];
+      $("feesTable").innerHTML = empty(11, "No invoices found.");
+      $("topupsTable").innerHTML = empty(9, "No fee top-ups found.");
+      updateFeeSummary();
       return;
     }
 
@@ -1346,27 +1428,178 @@ async function loadFees(){
   const { data, error } = await query;
   if(error) throw error;
   INVOICES = data || [];
+  PAYABLE_INVOICES = INVOICES.filter(i => Number(i.balance || 0) > 0 && !!i.student_id);
 
-  $("feesTable").innerHTML = INVOICES.length ? INVOICES.map(i => {
+  const invoiceIds = INVOICES.map(i => i.id).filter(Boolean);
+  TOPUPS = [];
+  if(invoiceIds.length){
+    let tq = DB.from("fee_adjustments")
+      .select("id,student_id,enrolment_id,invoice_id,adjustment_type,amount,reason,notes,reference_number,adjustment_date,is_active,reversed_at,created_at")
+      .in("invoice_id", invoiceIds)
+      .order("created_at",{ascending:false});
+    const {data:td,error:te} = await tq;
+    if(te && !/relation .* does not exist/i.test(te.message || "")) throw te;
+    TOPUPS = td || [];
+  }
+
+  renderFees();
+  renderTopups();
+  updateFeeSummary();
+}
+
+function invoiceTopupTotal(invoiceId){
+  return TOPUPS
+    .filter(x => x.invoice_id === invoiceId && x.is_active && x.adjustment_type === "TOP_UP")
+    .reduce((sum,x) => sum + Number(x.amount || 0), 0);
+}
+
+function renderFees(){
+  const search = ($("feeSearch")?.value || "").toLowerCase().trim();
+  const rows = INVOICES.filter(i => {
+    const p = party(i);
+    const e = enr(i);
+    const text = [
+      i.invoice_number,
+      p.no,
+      p.name,
+      i.students?.phone,
+      e?.enrolment_number,
+      e?.programme,
+      i.printing_jobs?.job_number
+    ].filter(Boolean).join(" ").toLowerCase();
+    return !search || text.includes(search);
+  });
+
+  $("feesTable").innerHTML = rows.length ? rows.map(i => {
+    const original = Number(i.subtotal || 0);
+    const topups = invoiceTopupTotal(i.id);
     const total = Number(i.total_amount || 0);
-    const paid  = Number(i.amount_paid   || 0);
-    const bal   = Number(i.balance       || 0);
-    const [st, cls] =
-      bal <= 0 ? ["PAID","green"] :
-      paid > 0 ? ["PARTIAL","yellow"] :
-                 ["PENDING","red"];
+    const paid  = Number(i.amount_paid || 0);
+    const bal   = Number(i.balance || 0);
+    const [st, cls] = bal <= 0 ? ["PAID","green"] : paid > 0 ? ["PARTIAL","yellow"] : ["PENDING","red"];
+    const p = party(i);
+    const e = enr(i);
     return `<tr>
-      <td>${esc(i.invoice_number || "—")}</td>
-      <td>${esc(party(i).no)} · ${esc(party(i).name)}</td>
-      <td>${esc(enr(i)?.enrolment_number || "—")}</td>
-      <td>${esc(enr(i)?.programme || "—")}</td>
-      <td>${money(total)}</td>
+      <td><strong>${esc(i.invoice_number || "—")}</strong></td>
+      <td>${esc(p.no)} · ${esc(p.name)}</td>
+      <td>${esc(e?.enrolment_number || i.printing_jobs?.job_number || "—")}</td>
+      <td>${esc(e?.programme || "—")}</td>
+      <td>${money(original)}</td>
+      <td>${money(topups)}</td>
+      <td><strong>${money(total)}</strong></td>
       <td>${money(paid)}</td>
-      <td>${money(bal)}</td>
+      <td><strong>${money(bal)}</strong></td>
       <td><span class="pill ${cls}">${st}</span></td>
-      <td>${bal > 0 ? `<button class="btn outline" data-pay="${esc(i.id)}">Receive Payment</button>` : ""}</td>
+      <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${i.student_id ? `<button class="btn outline" data-topup="${esc(i.id)}">Add Fee Top-Up</button>` : ""}
+        ${bal > 0 ? `<button class="btn outline" data-pay="${esc(i.id)}">Receive Payment</button>` : ""}
+      </div></td>
     </tr>`;
-  }).join("") : empty(9, "No invoices found.");
+  }).join("") : empty(11, "No invoices found.");
+}
+
+function renderTopups(){
+  $("topupsTable").innerHTML = TOPUPS.length ? TOPUPS.map(x => {
+    const inv = INVOICES.find(i => i.id === x.invoice_id);
+    const p = inv ? party(inv) : {no:"—",name:"—"};
+    const active = x.is_active;
+    return `<tr>
+      <td>${fmtDate(x.adjustment_date)}</td>
+      <td>${esc(p.no)} · ${esc(p.name)}</td>
+      <td>${esc(inv?.invoice_number || "—")}</td>
+      <td>${badge(x.adjustment_type)}</td>
+      <td><strong>${money(x.amount)}</strong></td>
+      <td>${esc(x.reason)}</td>
+      <td>${esc(x.reference_number || "—")}</td>
+      <td>${active ? `<span class="pill green">ACTIVE</span>` : `<span class="pill red">REVERSED</span>`}</td>
+      <td>${active ? `<button class="btn outline" data-reverse-topup="${esc(x.id)}">Reverse</button>` : ""}</td>
+    </tr>`;
+  }).join("") : empty(9, "No fee top-ups recorded.");
+}
+
+function updateFeeSummary(){
+  const outstanding = INVOICES.reduce((sum,i) => sum + Math.max(0,Number(i.balance || 0)),0);
+  const arrearsStudents = new Set(INVOICES.filter(i => Number(i.balance || 0) > 0 && i.student_id).map(i => i.student_id)).size;
+  const activeTopups = TOPUPS.filter(x => x.is_active && x.adjustment_type === "TOP_UP");
+  $("feeInvoiceCount").textContent = INVOICES.length;
+  $("feeOutstanding").textContent = money(outstanding);
+  $("feeArrearsStudents").textContent = arrearsStudents;
+  $("feeTopupCount").textContent = activeTopups.length;
+}
+
+async function openTopup(invoiceId){
+  const inv = INVOICES.find(x => x.id === invoiceId);
+  if(!inv || !inv.student_id) return;
+  TOPUP_INV = invoiceId;
+  $("topupForm").reset();
+  $("topupDate").value = today();
+  $("topupErr").innerHTML = "";
+  const p = party(inv);
+  const e = enr(inv);
+  $("topupInfo").innerHTML = `<strong>${esc(p.name)}</strong> · ${esc(p.no)}<br>Invoice: <strong>${esc(inv.invoice_number)}</strong> · ${esc(e?.enrolment_number || "—")}<br>Current total: <strong>${money(inv.total_amount)}</strong> · Paid: <strong>${money(inv.amount_paid)}</strong> · Outstanding: <strong>${money(inv.balance)}</strong>`;
+  $("topupModal").classList.add("open");
+}
+
+function topupErr(msg){
+  $("topupErr").innerHTML = msg ? `<div class="notice err">${esc(msg)}</div>` : "";
+}
+
+async function submitTopup(e){
+  e.preventDefault();
+  topupErr("");
+  const inv = INVOICES.find(x => x.id === TOPUP_INV);
+  if(!inv) return topupErr("Invoice not found. Refresh the fee page and try again.");
+
+  const amount = Number($("topupAmount").value || 0);
+  const reason = $("topupReason").value.trim();
+  if(amount <= 0) return topupErr("Enter a valid top-up amount.");
+  if(!reason) return topupErr("A reason is required.");
+
+  $("topupBtn").disabled = true;
+  $("topupBtn").textContent = "Saving...";
+  try{
+    const reference = $("topupReference").value.trim() || null;
+    const {data,error} = await DB.rpc("add_fee_top_up",{
+      p_student_id: inv.student_id,
+      p_enrolment_id: inv.enrolment_id,
+      p_invoice_id: inv.id,
+      p_amount: amount,
+      p_reason: reason,
+      p_notes: $("topupNotes").value.trim() || null,
+      p_adjustment_date: $("topupDate").value,
+      p_reference_number: reference
+    });
+    if(error) throw error;
+
+    $("topupModal").classList.remove("open");
+    toast(`Fee top-up of ${money(amount)} added to ${party(inv).name}.`);
+    await loadFees();
+    await loadOverviewPage();
+  }catch(err){
+    console.error(err);
+    topupErr(err.message || "Could not add fee top-up.");
+  }finally{
+    $("topupBtn").disabled = false;
+    $("topupBtn").textContent = "Add Fee Top-Up";
+  }
+}
+
+async function reverseTopup(id){
+  const x = TOPUPS.find(t => t.id === id);
+  if(!x) return;
+  const reason = prompt("Enter the reason for reversing this fee top-up:");
+  if(!reason || !reason.trim()) return;
+  if(!confirm(`Reverse ${money(x.amount)} fee top-up? This will recalculate the invoice balance.`)) return;
+  try{
+    const {error} = await DB.rpc("reverse_fee_adjustment",{p_adjustment_id:id,p_reason:reason.trim()});
+    if(error) throw error;
+    toast("Fee top-up reversed.");
+    await loadFees();
+    await loadOverviewPage();
+  }catch(err){
+    console.error(err);
+    toast(err.message || "Could not reverse fee top-up.",false);
+  }
 }
 
 /* PAYMENTS */
@@ -2026,9 +2259,20 @@ $("refreshSelfEnrolments").addEventListener("click", () =>
 );
 
 $("feesTable").addEventListener("click", e => {
+  const top = e.target.closest("[data-topup]");
+  if(top){ openTopup(top.dataset.topup); return; }
   const b = e.target.closest("[data-pay]");
   if(b) openPay(b.dataset.pay);
 });
+
+$("topupsTable").addEventListener("click", e => {
+  const b = e.target.closest("[data-reverse-topup]");
+  if(b) reverseTopup(b.dataset.reverseTopup);
+});
+
+$("feeSearch")?.addEventListener("input", renderFees);
+$("topupForm").addEventListener("submit", submitTopup);
+$("topupCancel").addEventListener("click", () => $("topupModal").classList.remove("open"));
 
 $("paymentsTable").addEventListener("click", e => {
   const b = e.target.closest("[data-receipt]");
